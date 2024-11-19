@@ -33,7 +33,8 @@ class HomeController extends Controller
         return view('dashboard', array_merge([
             'title' => 'Dashboard',
             'startDate' => $startDate,
-            'endDate' => $endDate
+            'endDate' => $endDate,
+            'poData' => $poData
         ], $stockData, $poData));
     }
 
@@ -117,7 +118,6 @@ class HomeController extends Controller
                             AND ket_lt = 'NON LEAD TIME' THEN amount ELSE 0 END) AS amount_nlt_prev
             ")
             )->first();
-
         return [
             'qty_lt_now' => $query->qty_lt_now ?? 0,
             'amount_lt_now' => $query->amount_lt_now ?? 0,

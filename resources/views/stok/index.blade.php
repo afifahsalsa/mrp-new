@@ -11,7 +11,8 @@
             </nav>
             <div class="d-flex">
                 <button id="dropdownButton" type="button" class="btn btn-gradient-primary" data-bs-toggle="dropdown"
-                    aria-expanded="false" onclick="toggleArrow()" style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);">
+                    aria-expanded="false" onclick="toggleArrow()" style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
+                    onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';">
                     Import | Export <span id="dropdownArrow" class="arrow">&#9656;</span>
                 </button>
 
@@ -30,7 +31,8 @@
                     @csrf
                     @method('delete')
                     <button class="btn btn-gradient-danger ms-2 px-3" type="button"
-                        style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);" onclick="deleteConfirm('deleteStock')"><i
+                        style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
+                    onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';" onclick="deleteConfirm('deleteStock')"><i
                             class="mdi mdi-delete"></i></button>
                 </form>
             </div>
@@ -50,7 +52,7 @@
                             <label for="date" class="form-label"><strong>Date</strong></label>
                             <input type="date" name="date" id="date" class="form-control"
                                 value="<?php echo date('Y-m-d'); ?>" required>
-                            <label for="date" class="form-label mt-2"><strong>Choose File</strong></label>
+                            <label for="file" class="form-label mt-2"><strong>Choose File</strong></label>
                             <input class="form-control" type="file" id="file" name="file" required>
                         </div>
                         <div class="modal-footer">
@@ -187,7 +189,7 @@
                         title: 'Import successfull!',
                         text: `${@json(session('rowCountStok'))} data success imported!`,
                         timer: 3000,
-                        showConfirmButton: false
+                        showConfirmButton: true
                     }).then(() => {
                         $('#poTable').DataTable().ajax.reload();
                     });
@@ -196,7 +198,7 @@
                         icon: 'error',
                         title: 'Item Number Stok tidak ditemukan pada database Buffer',
                         timer: 3000,
-                        showConfirmButton: false
+                        showConfirmButton: true
                     });
                 @endif
             @endif

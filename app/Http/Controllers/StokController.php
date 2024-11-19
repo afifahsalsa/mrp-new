@@ -29,7 +29,7 @@ class StokController extends Controller
         return response()->download($filePath);
     }
 
-    public function getData()
+    public function get_data()
     {
         $stokData = Stok::select(['item_number', 'part_number', 'product_name', 'lt', 'li', 'stok', 'qty_buffer', 'percentage', 'date']);
         return DataTables::of($stokData)

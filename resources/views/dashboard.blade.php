@@ -89,11 +89,67 @@
             <div class="col-md-8 grid-margin stretch-card">
                 <div class="card" style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);">
                     <div class="card-body">
-                        <h4 class="card-title">Remark Lead Time PO</h4>
+                        <h4 class="card-title" data-bs-toggle="collapse" href="#collapseLT" role="button"
+                            aria-expanded="false" aria-controls="collapseLT">Remark Lead Time PO</h4>
+                        <div class="collapse" id="collapseLT">
+                            <div class="card" style="width: 50%;">
+                                <table class="table table-hover" width="50%" cellspacing="0">
+                                    <tr>
+                                        <th style="width: 20%" class="text-danger">PO PREV MONTH</th>
+                                        <th>LEAD TIME</th>
+                                        <th>N LEAD TIME</th>
+                                    </tr>
+                                    <tbody>
+                                        <tr>
+                                            <td style="font-weight: bold; background-color: rgba(54, 162, 235, 0.2);">Qty
+                                            </td>
+                                            <td style="background-color: rgba(54, 162, 235, 0.2);">
+                                                {{ $poData['qty_lt_prev'] }}</td>
+                                            <td style="background-color: rgba(54, 162, 235, 0.2);">
+                                                {{ $poData['qty_nlt_prev'] }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: bold; background-color: rgba(255, 159, 64, 0.2);">Amount
+                                            </td>
+                                            <td style="background-color: rgba(255, 159, 64, 0.2);">
+                                                {{ $poData['amount_lt_prev'] }}</td>
+                                            <td style="background-color: rgba(255, 159, 64, 0.2);">
+                                                {{ $poData['amount_nlt_prev'] }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table table-hover" width="50%" cellspacing="0">
+                                    <tr>
+                                        <th style="width: 20%;" class="text-success">PO CURRENT MONTH</th>
+                                        <th>LEAD TIME</th>
+                                        <th>N LEAD TIME</th>
+                                    </tr>
+                                    <tbody>
+                                        <tr>
+                                            <td style="font-weight: bold; background-color: rgba(54, 162, 235, 0.2);">Qty
+                                            </td>
+                                            <td style="background-color: rgba(54, 162, 235, 0.2);">
+                                                {{ $poData['qty_lt_now'] }}</td>
+                                            <td style="background-color: rgba(54, 162, 235, 0.2);">
+                                                {{ $poData['qty_nlt_now'] }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: bold; background-color: rgba(255, 159, 64, 0.2);">
+                                                Amount</td>
+                                            <td style="background-color: rgba(255, 159, 64, 0.2);">
+                                                {{ $poData['amount_lt_now'] }}</td>
+                                            <td style="background-color: rgba(255, 159, 64, 0.2);">
+                                                {{ $poData['amount_nlt_now'] }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                         <div class=" d-flex justify-content-center">
                             <canvas id="percentage-po-chart"></canvas>
                         </div>
-                        <div id="percentage-po-chart-legend" class="rounded-legend legend-vertical legend-bottom-left pt-4">
+                        <div id="percentage-po-chart-legend"
+                            class="rounded-legend legend-vertical legend-bottom-left pt-4">
                         </div>
                     </div>
                 </div>
@@ -401,7 +457,7 @@
                     }
 
                     stockChart = new Chart(ctx, {
-                        type: 'pie',
+                        type: 'doughnut',
                         data: {
                             labels: [">100%", "100%", "100-75%", "75-50%", "50-25%", "<25%"],
                             datasets: [{
@@ -466,8 +522,10 @@
                         });
 
                     const labels = [
-                        `${prevMonth} LEAD TIME`, `${prevMonth} NON LEAD TIME`,
-                        `${currentMonth} LEAD TIME`, `${currentMonth} NON LEAD TIME`
+                        [`${prevMonth}`, `LEAD TIME`],
+                        [`${currentMonth}`, `LEAD TIME`],
+                        [`${prevMonth}`, `NON LEAD TIME`],
+                        [`${currentMonth}`, `NON LEAD TIME`]
                     ];
 
                     poChart = new Chart(ctx, {
@@ -478,8 +536,8 @@
                                     label: 'QTY',
                                     data: [
                                         chartPoData.qty_lt_now,
-                                        chartPoData.qty_nlt_now,
                                         chartPoData.qty_lt_prev,
+                                        chartPoData.qty_nlt_now,
                                         chartPoData.qty_nlt_prev
                                     ],
                                     backgroundColor: 'rgba(54, 162, 235, 0.2)',
@@ -490,8 +548,8 @@
                                     label: 'AMOUNT',
                                     data: [
                                         chartPoData.amount_lt_now,
-                                        chartPoData.amount_nlt_now,
                                         chartPoData.amount_lt_prev,
+                                        chartPoData.amount_nlt_now,
                                         chartPoData.amount_nlt_prev
                                     ],
                                     backgroundColor: 'rgba(255, 159, 64, 0.2)',
@@ -505,7 +563,12 @@
                             scales: {
                                 x: {
                                     grid: {
-                                        display: false
+                                        display: true
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: true,
                                     }
                                 },
                                 y: {
@@ -514,12 +577,17 @@
                             },
                             plugins: {
                                 legend: {
-                                    position: 'bottom'
+                                    position: 'bottom',
+                                    labels:{
+                                        font : {
+                                            weight: 'bold'
+                                        }
+                                    }
                                 },
                                 title: {
                                     display: true,
                                     text: 'PO Lead Time Analysis'
-                                }
+                                },
                             }
                         }
                     });

@@ -15431,6 +15431,14 @@ textarea.is-invalid.tt-hint, .select2-container--default .select2-selection--sin
   z-index: 1030;
 }
 
+.fixed-top {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 1030;
+  }
+
 .fixed-bottom {
   position: fixed;
   right: 0;
@@ -25634,6 +25642,7 @@ dl li {
 
 /* Sidebar */
 .sidebar {
+  position: fixed;
   min-height: calc(100vh - 70px);
   background: #ffffff;
   font-family: "ubuntu-regular", sans-serif;

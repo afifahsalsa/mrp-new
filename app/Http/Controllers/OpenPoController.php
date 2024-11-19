@@ -74,7 +74,6 @@ class OpenPoController extends Controller
         $request->validate([
             'file' => 'required|file|mimes:csv,xlsx'
         ]);
-        $dataArray = [];
         $import = new PoImport($import);
         $poVal = Excel::toArray($import, $request->file('file'));
         $emptyPRItems = [];

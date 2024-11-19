@@ -9,12 +9,16 @@
                     <li class="breadcrumb-item active" aria-current="page">Basic tables</li>
                 </ol>
             </nav>
+            {{-- Button Import | Export --}}
             <div class="d-flex">
                 <button id="dropdownButton" type="button" class="btn btn-gradient-primary" data-bs-toggle="dropdown"
-                    aria-expanded="false" onclick="toggleArrow()" style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);">
+                    aria-expanded="false" onclick="toggleArrow()"
+                    style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
+                    onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';">
                     Import | Export <span id="dropdownArrow" class="arrow">&#9656;</span>
                 </button>
 
+                {{-- Dropdown File --}}
                 <div class="dropdown-menu navbar-dropdown" aria-labelledby="profileDropdown">
                     <a class="dropdown-item" href="{{ route('buffer.format-import') }}">
                         <i class="mdi mdi-cloud-download me-2 text-success"></i> Download Format </a>
@@ -26,12 +30,15 @@
                     <a class="dropdown-item" href="#">
                         <i class="mdi mdi-cloud-download me-2 text-primary"></i> Download Hasil Excel </a>
                 </div>
+
+                {{-- Button Delete --}}
                 <form action="{{ route('buffer.delete') }}" method="DELETE" id="delBuff">
                     @csrf
                     @method('delete')
                     <button class="btn btn-danger ms-2 px-3" type="button"
-                        style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);" onclick="deleteConfirm('delBuff')"><i
-                            class="mdi mdi-delete"></i></button>
+                        style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform:scale(1);"
+                        onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';"
+                        onclick="deleteConfirm('delBuff')"><i class="mdi mdi-delete"></i></button>
                 </form>
             </div>
         </div>
@@ -67,9 +74,9 @@
             <div class="col-lg-12 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
-                        <h4 class="card-title">Striped Table</h4>
+                        {{-- <h4 class="card-title">Striped Table</h4>
                         <p class="card-description"> Add class <code>.table-striped</code>
-                        </p>
+                        </p> --}}
                         <div class="table-responsive">
                             <table class="table display" id="bufferTable" style="width: 100%">
                                 <thead>

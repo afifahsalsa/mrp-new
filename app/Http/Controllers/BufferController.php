@@ -27,7 +27,7 @@ class BufferController extends Controller
         return response()->download($filePath);
     }
 
-    public function getData()
+    public function get_data()
     {
         $bufferData = Buffer::select('*');
         return DataTables::of($bufferData)
