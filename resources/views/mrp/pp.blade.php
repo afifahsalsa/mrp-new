@@ -25,14 +25,6 @@
                     <a class="dropdown-item" href="#">
                         <i class="mdi mdi-cloud-download me-2 text-primary"></i> Download Hasil Excel</a>
                 </div>
-                <form action="#" method="DELETE" id="deleteMPP">
-                    @csrf
-                    @method('delete')
-                    <button class="btn btn-danger ms-2 px-3" type="button"
-                        style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
-                    onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';" onclick="deleteConfirm('deleteMPP')"><i
-                            class="mdi mdi-delete"></i></button>
-                </form>
             </div>
         </div>
 

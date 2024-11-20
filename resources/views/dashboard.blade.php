@@ -100,7 +100,7 @@
                                         <th>N LEAD TIME</th>
                                     </tr>
                                     <tbody>
-                                        <tr>
+                                        {{-- <tr>
                                             <td style="font-weight: bold; background-color: rgba(54, 162, 235, 0.2);">Qty
                                             </td>
                                             <td style="background-color: rgba(54, 162, 235, 0.2);">
@@ -115,7 +115,7 @@
                                                 {{ $poData['amount_lt_prev'] }}</td>
                                             <td style="background-color: rgba(255, 159, 64, 0.2);">
                                                 {{ $poData['amount_nlt_prev'] }}</td>
-                                        </tr>
+                                        </tr> --}}
                                     </tbody>
                                 </table>
                                 <table class="table table-hover" width="50%" cellspacing="0">
@@ -125,7 +125,7 @@
                                         <th>N LEAD TIME</th>
                                     </tr>
                                     <tbody>
-                                        <tr>
+                                        {{-- <tr>
                                             <td style="font-weight: bold; background-color: rgba(54, 162, 235, 0.2);">Qty
                                             </td>
                                             <td style="background-color: rgba(54, 162, 235, 0.2);">
@@ -140,7 +140,7 @@
                                                 {{ $poData['amount_lt_now'] }}</td>
                                             <td style="background-color: rgba(255, 159, 64, 0.2);">
                                                 {{ $poData['amount_nlt_now'] }}</td>
-                                        </tr>
+                                        </tr> --}}
                                     </tbody>
                                 </table>
                             </div>
@@ -155,6 +155,32 @@
                 </div>
             </div>
         </div>
+
+        <div class="row" style="display: flex; align-items: center;">
+            <div class="col-md-6 stretch-card grid-margin">
+                <h3 class="page-title" style="display: flex; align-items: center;">
+                    <span class="page-title-icon bg-gradient-primary text-white me-2" style="margin-right: 10px;">
+                        <i class="mdi mdi-calendar-clock"></i>
+                    </span>
+                    Production Planning
+                </h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 grid-margin stretch-card">
+                <div class="card" style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);">
+                    <div class="card-body">
+                        <div class="clearfix">
+                            {{-- <h4 class="card-title float-start">Local</h4> --}}
+                            <div id="production-planning-chart-legend"
+                                class="rounded-legend legend-horizontal legend-top-right float-end"></div>
+                        </div>
+                        <canvas id="production-planning-chart" class="mt-4"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-12 grid-margin">
                 <div class="card">
@@ -283,21 +309,21 @@
             <div class="col-md-7 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
-                        <h4 class="card-title">Project Status</h4>
+                        <h4 class="card-title">Persentase Stock</h4>
                         <div class="table-responsive">
                             <table class="table">
                                 <thead>
                                     <tr>
                                         <th> # </th>
-                                        <th> Name </th>
-                                        <th> Due Date </th>
+                                        <th> Persentase </th>
+                                        <th> Count Persentase Stock </th>
                                         <th> Progress </th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
                                         <td> 1 </td>
-                                        <td> Herman Beck </td>
+                                        <td> >100 % </td>
                                         <td> May 15, 2015 </td>
                                         <td>
                                             <div class="progress">
@@ -309,7 +335,7 @@
                                     </tr>
                                     <tr>
                                         <td> 2 </td>
-                                        <td> Messsy Adam </td>
+                                        <td> 100% </td>
                                         <td> Jul 01, 2015 </td>
                                         <td>
                                             <div class="progress">
@@ -321,7 +347,7 @@
                                     </tr>
                                     <tr>
                                         <td> 3 </td>
-                                        <td> John Richards </td>
+                                        <td> 100 - 75% </td>
                                         <td> Apr 12, 2015 </td>
                                         <td>
                                             <div class="progress">
@@ -333,7 +359,7 @@
                                     </tr>
                                     <tr>
                                         <td> 4 </td>
-                                        <td> Peter Meggik </td>
+                                        <td> 75 - 50% </td>
                                         <td> May 15, 2015 </td>
                                         <td>
                                             <div class="progress">
@@ -345,7 +371,7 @@
                                     </tr>
                                     <tr>
                                         <td> 5 </td>
-                                        <td> Edward </td>
+                                        <td> 50 - 25% </td>
                                         <td> May 03, 2015 </td>
                                         <td>
                                             <div class="progress">
@@ -357,7 +383,8 @@
                                     </tr>
                                     <tr>
                                         <td> 5 </td>
-                                        <td> Ronald </td>
+                                        <td>
+                                            < 25% </td>
                                         <td> Jun 05, 2015 </td>
                                         <td>
                                             <div class="progress">
@@ -566,11 +593,6 @@
                                         display: true
                                     }
                                 },
-                                x: {
-                                    grid: {
-                                        display: true,
-                                    }
-                                },
                                 y: {
                                     beginAtZero: true
                                 }
@@ -578,8 +600,8 @@
                             plugins: {
                                 legend: {
                                     position: 'bottom',
-                                    labels:{
-                                        font : {
+                                    labels: {
+                                        font: {
                                             weight: 'bold'
                                         }
                                     }
@@ -663,7 +685,6 @@
                             })
                             .catch(error => {
                                 console.error('Error fetching chart data:', error);
-                                // Show error message to user if needed
                             });
                     }
                 }
@@ -693,7 +714,6 @@
                     amount_nlt_prev: parseFloat("{{ $amount_nlt_prev }}")
                 };
 
-                // Initialize both charts
                 initializeStockChart(initialStockData);
                 initializePoChart(initialPoData);
             });

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Imports\OrderOriginalImport;
 use App\Models\OrderOriginal;
+use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -90,6 +91,11 @@ class OrderOriginalController extends Controller
         $rowCount = 0;
         $month = $request->month;
         $convertMonth = DateTime::createFromFormat('Y-m', $month);
+        $currentMonthUploads = OrderOriginal::whereYear('created_at', $convertMonth->format('Y'))
+            ->whereMonth('created_at', $convertMonth->format('m'))
+            ->max('counter_update');
+        $counter = $currentMonthUploads ? $currentMonthUploads + 1 : 1;
+        $nama = $convertMonth->format('F') . "_" . $counter;
 
         foreach ($orderValue as $ov) {
             foreach ($ov as $idx => $i) {
@@ -98,7 +104,7 @@ class OrderOriginalController extends Controller
                     $sum = array_sum($subset);
                     $avg = count($subset) > 0 ? array_sum($subset) / count($subset) : 0;
 
-                    if(empty($i[2]) || $i[2] == '-' || $i[2] == null){
+                    if (empty($i[2]) || $i[2] == '-' || $i[2] == null) {
                         continue;
                     }
 
@@ -123,7 +129,9 @@ class OrderOriginalController extends Controller
                         'bulan' => $convertMonth->format('F'),
                         'tahun' => $convertMonth->format('Y'),
                         'total' => $sum,
-                        'average' => $avg
+                        'average' => $avg,
+                        'counter_update' => $counter,
+                        'nama' => $nama
                     ]);
                     $rowCount++;
                 }

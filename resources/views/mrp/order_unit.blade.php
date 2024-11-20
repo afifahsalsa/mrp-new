@@ -8,32 +8,6 @@
                     <li class="breadcrumb-item active" aria-current="page">Basic Table</li>
                 </ol>
             </nav>
-            {{-- <div class="d-flex">
-                <button id="dropdownButton" type="button" class="btn btn-gradient-primary px-4" data-bs-toggle="dropdown"
-                    aria-expanded="false" onclick="toggleArrow()" style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
-                    onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';">
-                    Import | Export <span id="dropdownArrow" class="arrow">&#9656;</span>
-                </button>
-
-                <div class="dropdown-menu navbar-dropdown" aria-labelledby="profileDropdown">
-                    <a class="dropdown-item" href="{{ route('order-original.format') }}">
-                        <i class="mdi mdi-cloud-download me-2 text-success"></i> Download Format</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalImportPP">
-                        <i class="mdi mdi-cloud-upload me-2 text-danger"></i> Import File Production Planning</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#">
-                        <i class="mdi mdi-cloud-download me-2 text-primary"></i> Download Hasil Excel</a>
-                </div>
-                <form action="#" method="DELETE" id="deleteMPP">
-                    @csrf
-                    @method('delete')
-                    <button class="btn btn-danger ms-2 px-3" type="button"
-                        style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
-                    onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';" onclick="deleteConfirm('deleteMPP')"><i
-                            class="mdi mdi-delete"></i></button>
-                </form>
-            </div> --}}
         </div>
 
         {{-- Modal Import MPP --}}

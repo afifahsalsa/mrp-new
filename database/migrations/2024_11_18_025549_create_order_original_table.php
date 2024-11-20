@@ -33,6 +33,8 @@ return new class extends Migration
             $table->integer('tahun');
             $table->float('total');
             $table->float('average');
+            $table->integer('counter_update');
+            $table->string('nama');
             $table->timestamps();
         });
     }

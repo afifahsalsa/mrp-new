@@ -31,6 +31,8 @@ class ProductionPlanning extends Model
         'bulan',
         'tahun',
         'total',
-        'average'
+        'average',
+        'counter_update',
+        'nama'
     ];
 }

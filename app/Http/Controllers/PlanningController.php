@@ -80,6 +80,11 @@ class PlanningController extends Controller
         $rowCount = 0;
         $month = $request->month;
         $convertMonth = DateTime::createFromFormat('Y-m', $month);
+        $currentMonthUploads = ProductionPlanning::whereYear('created_at', $convertMonth->format('Y'))
+            ->whereMonth('created_at', $convertMonth->format('m'))
+            ->max('counter_update');
+        $counter = $currentMonthUploads ? $currentMonthUploads + 1 : 1;
+        $nama = $convertMonth->format('F') . "_" . $counter;
 
         foreach ($orderValue as $ov) {
             foreach ($ov as $idx => $i) {
@@ -113,7 +118,9 @@ class PlanningController extends Controller
                         'bulan' => $convertMonth->format('F'),
                         'tahun' => $convertMonth->format('Y'),
                         'total' => $sum,
-                        'average' => $avg
+                        'average' => $avg,
+                        'counter_update' => $counter,
+                        'nama' => $nama
                     ]);
                     $rowCount++;
                 }

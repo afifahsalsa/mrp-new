@@ -6,9 +6,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>MRP-PPIC</title>
-    {{-- <link rel="stylesheet" href="{{ asset('dataTable/dataTables.dataTables.css') }}">
-    <link rel="stylesheet" href="{{ asset('dataTable/dataTables.dateTime.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('dataTable/searchBuilder.dataTables.css') }}"> --}}
     <link rel="stylesheet" href="{{ asset('purple-free/src/assets/vendors/mdi/css/materialdesignicons.min.css') }}">
     <link rel="stylesheet" href="{{ asset('purple-free/src/assets/vendors/ti-icons/css/themify-icons.css') }}">
     <link rel="stylesheet" href="{{ asset('purple-free/src/assets/vendors/css/vendor.bundle.base.css') }}">
@@ -17,7 +14,7 @@
         href="{{ asset('purple-free/src/assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('purple-free/src/assets/css/style.css') }}">
     <link rel="shortcut icon" href="{{ asset('purple-free/src/assets/images/favicon.png') }}">
-<link rel="stylesheet" href="{{ asset('purple-free/src/assets/css/dataTables.dataTables.css') }}">
+    <link rel="stylesheet" href="{{ asset('purple-free/src/assets/css/dataTables.dataTables.css') }}">
 </head>
 
 <body>
@@ -37,11 +34,6 @@
         </div>
         <!-- page-body-wrapper ends -->
     </div>
-    {{-- <script src="{{ asset('dataTable/jquery-3.7.1.js') }}"></script>
-    <script src="{{ asset('dataTable/dataTables.js') }}"></script>
-    <script src="{{ asset('dataTable/searchBuilder.dataTables.js') }}"></script>
-    <script src="{{ asset('dataTable/dataTables.searchBuilder.js') }}"></script>
-    <script src="{{ asset('dataTable/dataTables.dateTime.min.js') }}"></script> --}}
     <script src="{{ asset('purple-free/src/assets/js/sweetalert2@11.js') }}"></script>
     <script src="{{ asset('purple-free/src/assets/vendors/js/vendor.bundle.base.js') }}"></script>
     <script src="{{ asset('purple-free/src/assets/js/jquery-3.7.1.js') }}"></script>
@@ -62,6 +54,20 @@
     @stack('scriptPP')
     @stack('scriptOrderOriginal')
     <!-- End custom js for this page -->
+    <script>
+        function toggleArrow() {
+            const button = document.getElementById("dropdownButton");
+            const arrow = document.getElementById("dropdownArrow");
+
+            button.addEventListener("click", function() {
+                if (button.getAttribute("aria-expanded") === "true") {
+                    arrow.innerHTML = "&#9662;"; // Downward arrow when open
+                } else {
+                    arrow.innerHTML = "&#9656;"; // Rightward arrow when closed
+                }
+            });
+        }
+    </script>
 </body>
 
 </html>

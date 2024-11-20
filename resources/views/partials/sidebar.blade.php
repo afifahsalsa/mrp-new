@@ -59,7 +59,7 @@
                 <i class="mdi mdi-chart-bar menu-icon"></i>
             </a>
         </li>
-        <li class="nav-item {{ $title === 'Production Planning' || $title === 'Order Original' ? 'active' : '' }}">
+        <li class="nav-item {{ $title === 'Production Planning' || $title === 'Order Original' || $title === 'Order In Unit' ? 'active' : '' }}">
             <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
                 <span class="menu-title">MPP</span>
                 <i class="menu-arrow"></i>
@@ -93,7 +93,7 @@
                 </ul>
             </div>
         </li>
-        <li class="nav-item">
+        {{-- <li class="nav-item">
             <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
                 <span class="menu-title">User Pages</span>
                 <i class="menu-arrow"></i>
@@ -122,7 +122,7 @@
                     </li>
                 </ul>
             </div>
-        </li>
+        </li> --}}
         <li class="nav-item">
             <a class="nav-link" href="{{ asset('purple-free/src/docs/documentation.html') }}" target="_blank">
                 <span class="menu-title">Documentation</span>

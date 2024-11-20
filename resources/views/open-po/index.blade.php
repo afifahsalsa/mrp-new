@@ -105,19 +105,6 @@
     </div>
     @push('scriptPo')
         <script>
-            function toggleArrow() {
-                const button = document.getElementById("dropdownButton");
-                const arrow = document.getElementById("dropdownArrow");
-
-                button.addEventListener("click", function() {
-                    if (button.getAttribute("aria-expanded") === "true") {
-                        arrow.innerHTML = "&#9662;"; // Downward arrow when open
-                    } else {
-                        arrow.innerHTML = "&#9656;"; // Rightward arrow when closed
-                    }
-                });
-            }
-
             let poTable = $('#poTable').DataTable({
                 "lengthMenu": [10, 25, 50, 100, 500, 1000],
                 processing: true,
