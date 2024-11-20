@@ -86,7 +86,7 @@ class StokController extends Controller
                     }
 
                     if ($cekItem && $month == $monthItem) {
-                        if($cekItem->qty == 0.0 || $cekItem->qty == '0.0'){
+                        if($cekItem->qty == 0 || $cekItem->qty == '0'){
                             Stok::create([
                                 'buffer_id' => $cekItem->id,
                                 'item_number' => $i[0],
@@ -94,13 +94,13 @@ class StokController extends Controller
                                 'product_name' => $i[2],
                                 'lt' => $lt,
                                 'li' => $i[5],
-                                'stok' => $i[4],
+                                'stok' => intval($i[4]),
                                 'qty_buffer' => $cekItem->qty,
-                                'percentage' => 0.0,
+                                'percentage' => 0,
                                 'date' => $request->date
                             ]);
                         } else{
-                            $percentage = round(($i[4] / $cekItem->qty) * 100, 2);
+                            $percentage = ($i[4] / $cekItem->qty) * 100;
                             Stok::create([
                                 'buffer_id' => $cekItem->id,
                                 'item_number' => $i[0],
@@ -108,14 +108,14 @@ class StokController extends Controller
                                 'product_name' => $i[2],
                                 'lt' => $lt,
                                 'li' => $i[5],
-                                'stok' => $i[4],
+                                'stok' => intval($i[4]),
                                 'qty_buffer' => $cekItem->qty,
-                                'percentage' => $percentage,
+                                'percentage' =>  intval($percentage),
                                 'date' => $request->date
                             ]);
                         }
                     } else if ($cekItem) {
-                        if($cekItem->qty == 0.0 || $cekItem->qty == '0.0'){
+                        if($cekItem->qty == 0 || $cekItem->qty == '0'){
                             Stok::create([
                                 'buffer_id' => $cekItem->id,
                                 'item_number' => $i[0],
@@ -123,9 +123,9 @@ class StokController extends Controller
                                 'product_name' => $i[2],
                                 'lt' => $lt,
                                 'li' => $i[5],
-                                'stok' => $i[4],
+                                'stok' => intval($i[4]),
                                 'qty_buffer' => $cekItem->qty,
-                                'percentage' => 0.0,
+                                'percentage' => 0,
                                 'date' => $request->date
                             ]);
                         } else{
@@ -137,9 +137,9 @@ class StokController extends Controller
                                 'product_name' => $i[2],
                                 'lt' => $lt,
                                 'li' => $i[5],
-                                'stok' => $i[4],
+                                'stok' => intval($i[4]),
                                 'qty_buffer' => $cekItem->qty,
-                                'percentage' => $percentage,
+                                'percentage' => intval($percentage),
                                 'date' => $request->date
                             ]);
                         }
@@ -151,7 +151,7 @@ class StokController extends Controller
                             'product_name' => $i[2],
                             'lt' => $lt,
                             'li' => $i[5],
-                            'stok' => $i[4],
+                            'stok' => intval($i[4]),
                             'qty_buffer' => null,
                             'percentage' => null,
                             'date' => $request->date

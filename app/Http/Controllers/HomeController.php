@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -29,13 +30,14 @@ class HomeController extends Controller
 
         $stockData = $this->getStockData($startDate, $endDate);
         $poData = $this->getPoData($startDate, $endDate);
+        $planProdData = $this->getPlanProdData();
 
         return view('dashboard', array_merge([
             'title' => 'Dashboard',
             'startDate' => $startDate,
             'endDate' => $endDate,
             'poData' => $poData
-        ], $stockData, $poData));
+        ], $stockData, $poData, $planProdData));
     }
 
     public function getChartData(Request $request)
@@ -45,8 +47,9 @@ class HomeController extends Controller
 
         $stockData = $this->getStockData($startDate, $endDate);
         $poData = $this->getPoData($startDate, $endDate);
+        $planProdData = $this->getPlanProdData();
 
-        return response()->json(array_merge($stockData, $poData));
+        return response()->json(array_merge($stockData, $poData, $planProdData));
     }
 
     private function getStockData($startDate = null, $endDate = null)
@@ -97,27 +100,41 @@ class HomeController extends Controller
 
     private function getPoData($startDate = null, $endDate = null)
     {
+        $filterDate = $startDate ? Carbon::parse($startDate) : Carbon::now();
+        $filterMonth = $filterDate->format('m');
+        $filterYear = $filterDate->format('Y');
+        $prevMonth = $filterDate->copy()->subMonth();
+
         $query = DB::table('open_po')
             ->select(
                 DB::raw("
-                SUM(CASE WHEN bulan_datang = MONTH(GETDATE())
-                            AND ket_lt = 'LEAD TIME' THEN delivery_reminder ELSE 0 END) AS qty_lt_now,
-                SUM(CASE WHEN bulan_datang = MONTH(GETDATE())
-                            AND ket_lt = 'LEAD TIME' THEN amount ELSE 0 END) AS amount_lt_now,
-                SUM(CASE WHEN bulan_datang = MONTH(GETDATE()) - 1
-                            AND ket_lt = 'LEAD TIME' THEN delivery_reminder ELSE 0 END) AS qty_lt_prev,
-                SUM(CASE WHEN bulan_datang = MONTH(GETDATE()) - 1
-                            AND ket_lt = 'LEAD TIME' THEN amount ELSE 0 END) AS amount_lt_prev,
-                SUM(CASE WHEN bulan_datang = MONTH(GETDATE())
-                            AND ket_lt = 'NON LEAD TIME' THEN delivery_reminder ELSE 0 END) AS qty_nlt_now,
-                SUM(CASE WHEN bulan_datang = MONTH(GETDATE())
-                            AND ket_lt = 'NON LEAD TIME' THEN amount ELSE 0 END) AS amount_nlt_now,
-                SUM(CASE WHEN bulan_datang = MONTH(GETDATE()) - 1
-                            AND ket_lt = 'NON LEAD TIME' THEN delivery_reminder ELSE 0 END) AS qty_nlt_prev,
-                SUM(CASE WHEN bulan_datang = MONTH(GETDATE()) - 1
-                            AND ket_lt = 'NON LEAD TIME' THEN amount ELSE 0 END) AS amount_nlt_prev
+                SUM(CASE WHEN MONTH(created_at) = {$filterMonth}
+                         AND YEAR(created_at) = {$filterYear}
+                         AND ket_lt = 'LEAD TIME' THEN delivery_reminder ELSE 0 END) AS qty_lt_now,
+                SUM(CASE WHEN MONTH(created_at) = {$filterMonth}
+                         AND YEAR(created_at) = {$filterYear}
+                         AND ket_lt = 'LEAD TIME' THEN amount ELSE 0 END) AS amount_lt_now,
+                SUM(CASE WHEN MONTH(created_at) = {$prevMonth->format('m')}
+                         AND YEAR(created_at) = {$prevMonth->format('Y')}
+                         AND ket_lt = 'LEAD TIME' THEN delivery_reminder ELSE 0 END) AS qty_lt_prev,
+                SUM(CASE WHEN MONTH(created_at) = {$prevMonth->format('m')}
+                         AND YEAR(created_at) = {$prevMonth->format('Y')}
+                         AND ket_lt = 'LEAD TIME' THEN amount ELSE 0 END) AS amount_lt_prev,
+                SUM(CASE WHEN MONTH(created_at) = {$filterMonth}
+                         AND YEAR(created_at) = {$filterYear}
+                         AND ket_lt = 'NON LEAD TIME' THEN delivery_reminder ELSE 0 END) AS qty_nlt_now,
+                SUM(CASE WHEN MONTH(created_at) = {$filterMonth}
+                         AND YEAR(created_at) = {$filterYear}
+                         AND ket_lt = 'NON LEAD TIME' THEN amount ELSE 0 END) AS amount_nlt_now,
+                SUM(CASE WHEN MONTH(created_at) = {$prevMonth->format('m')}
+                         AND YEAR(created_at) = {$prevMonth->format('Y')}
+                         AND ket_lt = 'NON LEAD TIME' THEN delivery_reminder ELSE 0 END) AS qty_nlt_prev,
+                SUM(CASE WHEN MONTH(created_at) = {$prevMonth->format('m')}
+                         AND YEAR(created_at) = {$prevMonth->format('Y')}
+                         AND ket_lt = 'NON LEAD TIME' THEN amount ELSE 0 END) AS amount_nlt_prev
             ")
             )->first();
+
         return [
             'qty_lt_now' => $query->qty_lt_now ?? 0,
             'amount_lt_now' => $query->amount_lt_now ?? 0,
@@ -127,6 +144,47 @@ class HomeController extends Controller
             'amount_nlt_now' => $query->amount_nlt_now ?? 0,
             'qty_nlt_prev' => $query->qty_nlt_prev ?? 0,
             'amount_nlt_prev' => $query->amount_nlt_prev ?? 0,
+            'filter_month' => $filterDate->format('M Y'),
+            'prev_month' => $prevMonth->format('M Y')
         ];
+    }
+
+    private function getPlanProdData()
+    {
+        $query = DB::table('order_original')
+            ->select(
+                DB::raw("
+                SUM(bulan_1) AS bulan_1,
+                SUM(bulan_2) AS bulan_2,
+                SUM(bulan_3) AS bulan_3,
+                SUM(bulan_4) AS bulan_4,
+                SUM(bulan_5) AS bulan_5,
+                SUM(bulan_6) AS bulan_6,
+                SUM(bulan_7) AS bulan_7,
+                SUM(bulan_8) AS bulan_8,
+                SUM(bulan_9) AS bulan_9,
+                SUM(bulan_10) AS bulan_10,
+                SUM(bulan_11) AS bulan_11,
+                SUM(bulan_12) AS bulan_12
+            ")
+            )
+            ->first();
+
+        $chartData = [
+            'bulan_1' => $query->bulan_1 ?? 0,
+            'bulan_2' => $query->bulan_2 ?? 0,
+            'bulan_3' => $query->bulan_3 ?? 0,
+            'bulan_4' => $query->bulan_4 ?? 0,
+            'bulan_5' => $query->bulan_5 ?? 0,
+            'bulan_6' => $query->bulan_6 ?? 0,
+            'bulan_7' => $query->bulan_7 ?? 0,
+            'bulan_8' => $query->bulan_8 ?? 0,
+            'bulan_9' => $query->bulan_9 ?? 0,
+            'bulan_10' => $query->bulan_10 ?? 0,
+            'bulan_11' => $query->bulan_11 ?? 0,
+            'bulan_12' => $query->bulan_12 ?? 0,
+        ];
+
+        return $chartData;
     }
 }

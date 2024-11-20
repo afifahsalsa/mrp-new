@@ -595,6 +595,8 @@ div.dt-container .dt-search input {
   background-color: transparent;
   color: inherit;
   margin-left: 3px;
+  /* margin-right: 50px; */
+  /* position: fixed; */
 }
 div.dt-container .dt-input {
   border: 1px solid #aaa;

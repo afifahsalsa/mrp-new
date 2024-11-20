@@ -106,6 +106,7 @@
                 processing: true,
                 serverSide: true,
                 searching: true,
+                scrollX: true,
                 ajax: {
                     url: "{{ route('stok.data') }}",
                     type: 'GET'

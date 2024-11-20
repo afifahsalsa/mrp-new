@@ -85,10 +85,10 @@
                                         <th>Item Number</th>
                                         <th>Part Number</th>
                                         <th>Product Name</th>
-                                        <th>Usage</th>
+                                        {{-- <th>Usage</th> --}}
                                         <th>LT</th>
-                                        <th>Kode</th>
-                                        <th>Quantity</th>
+                                        <th>Supplier</th>
+                                        <th style="float: left;">Quantity</th>
                                         <th>Date</th>
                                     </tr>
                                 </thead>
@@ -104,12 +104,12 @@
     </div>
     @push('scriptBuffer')
         <script>
-
             let bufferTable = $('#bufferTable').DataTable({
                 "lengthMenu": [10, 25, 50, 100, 500, 1000],
                 processing: true,
                 serverSide: true,
                 searching: true,
+                scrollX: true,
                 ajax: {
                     url: "{{ route('buffer.data') }}",
                     type: 'GET'
@@ -136,20 +136,22 @@
                         name: 'product_name'
                     },
                     {
-                        data: 'usage',
-                        name: 'usage'
-                    },
-                    {
                         data: 'lt',
                         name: 'lt'
                     },
                     {
-                        data: 'kode',
-                        name: 'kode'
+                        data: 'supplier',
+                        name: 'supplier'
                     },
                     {
                         data: 'qty',
-                        name: 'qty'
+                        name: 'qty',
+                        render: function(data, type, row, meta) {
+                        data = data || '';
+                        return type === 'display' ?
+                            '<input type="text" style="width: 40%;" class="form-control" name="qty' + row.id +
+                            '" value="' + data + '">' : data;
+                    }
                     },
                     {
                         data: 'date',
@@ -180,6 +182,14 @@
                     });
                 }
             });
+
+            @if (session('swal'))
+                Swal.fire({
+                    icon: '{{ session('swal.type') }}',
+                    title: '{{ session('swal.title') }}',
+                    text: '{{ session('swal.text') }}',
+                });
+            @endif
 
             function deleteConfirm(formId) {
                 const selectedRows = [];

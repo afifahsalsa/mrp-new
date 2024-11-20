@@ -475,44 +475,55 @@
                 let stockChart = null;
                 let poChart = null;
 
-                // Initialize stock chart
-                function initializeStockChart(chartStockData) {
-                    const ctx = document.getElementById('percentage-stok-chart');
-                    if (!ctx) {
-                        console.error('Canvas element percentage-stok-chart not found');
+                const chartColors = {
+                    backgrounds: [
+                        'rgba(255, 99, 132, 0.2)', // Merah muda
+                        'rgba(54, 162, 235, 0.2)', // Biru
+                        'rgba(255, 206, 86, 0.2)', // Kuning
+                        'rgba(75, 192, 192, 0.2)', // Hijau
+                        'rgba(153, 102, 255, 0.2)', // Ungu
+                        'rgba(255, 159, 64, 0.2)' // Oranye
+                    ],
+                    borders: [
+                        'rgba(255, 99, 132, 1)', // Merah muda
+                        'rgba(54, 162, 235, 1)', // Biru
+                        'rgba(255, 206, 86, 1)', // Kuning
+                        'rgba(75, 192, 192, 1)', // Hijau
+                        'rgba(153, 102, 255, 1)', // Ungu
+                        'rgba(255, 159, 64, 1)' // Oranye
+                    ]
+                };
+
+                function initializeStockChart(data) {
+                    const canvas = document.getElementById('percentage-stok-chart');
+                    if (!canvas) {
+                        console.error('Tidak dapat menemukan canvas untuk grafik stok');
                         return;
                     }
 
-                    stockChart = new Chart(ctx, {
+                    const config = {
                         type: 'doughnut',
                         data: {
-                            labels: [">100%", "100%", "100-75%", "75-50%", "50-25%", "<25%"],
+                            labels: [
+                                "> 100%",
+                                "100%",
+                                "75-100%",
+                                "50-75%",
+                                "25-50%",
+                                "< 25%"
+                            ],
                             datasets: [{
-                                label: 'Count Range',
+                                label: 'Jumlah Stok',
                                 data: [
-                                    chartStockData.upSeratus,
-                                    chartStockData.seratus,
-                                    chartStockData.tujulima,
-                                    chartStockData.limapuluh,
-                                    chartStockData.dualima,
-                                    chartStockData.nol
+                                    data.upSeratus,
+                                    data.seratus,
+                                    data.tujulima,
+                                    data.limapuluh,
+                                    data.dualima,
+                                    data.nol
                                 ],
-                                backgroundColor: [
-                                    'rgba(255, 99, 132, 0.2)',
-                                    'rgba(54, 162, 235, 0.2)',
-                                    'rgba(255, 206, 86, 0.2)',
-                                    'rgba(75, 192, 192, 0.2)',
-                                    'rgba(153, 102, 255, 0.2)',
-                                    'rgba(255, 159, 64, 0.2)'
-                                ],
-                                borderColor: [
-                                    'rgba(255,99,132,1)',
-                                    'rgba(54, 162, 235, 1)',
-                                    'rgba(255, 206, 86, 1)',
-                                    'rgba(75, 192, 192, 1)',
-                                    'rgba(153, 102, 255, 1)',
-                                    'rgba(255, 159, 64, 1)'
-                                ],
+                                backgroundColor: chartColors.backgrounds,
+                                borderColor: chartColors.borders,
                                 borderWidth: 1
                             }]
                         },
@@ -520,64 +531,68 @@
                             responsive: true,
                             plugins: {
                                 legend: {
-                                    position: 'bottom'
+                                    position: 'bottom',
+                                    labels: {
+                                        font: {
+                                            weight: 'bold'
+                                        }
+                                    }
                                 },
                                 title: {
                                     display: true,
-                                    text: 'Count Percentage Stock'
+                                    text: 'Persentase Jumlah Stok'
                                 }
                             }
                         }
-                    });
+                    };
+
+                    stockChart = new Chart(canvas, config);
                 }
 
-                // Initialize PO chart
-                function initializePoChart(chartPoData) {
-                    const ctx = document.getElementById('percentage-po-chart');
-                    if (!ctx) {
-                        console.error('Canvas element percentage-po-chart not found');
+                function initializePoChart(data) {
+                    const canvas = document.getElementById('percentage-po-chart');
+                    if (!canvas) {
+                        console.error('Tidak dapat menemukan canvas untuk grafik PO');
                         return;
                     }
 
                     const currentDate = new Date();
-                    const currentMonth = currentDate.toLocaleString('default', {
+                    const currentMonth = currentDate.toLocaleString('id-ID', {
                         month: 'short'
                     });
                     const prevMonth = new Date(currentDate.setMonth(currentDate.getMonth() - 1))
-                        .toLocaleString('default', {
+                        .toLocaleString('id-ID', {
                             month: 'short'
                         });
 
-                    const labels = [
-                        [`${prevMonth}`, `LEAD TIME`],
-                        [`${currentMonth}`, `LEAD TIME`],
-                        [`${prevMonth}`, `NON LEAD TIME`],
-                        [`${currentMonth}`, `NON LEAD TIME`]
-                    ];
-
-                    poChart = new Chart(ctx, {
+                    const config = {
                         type: 'line',
                         data: {
-                            labels: labels,
+                            labels: [
+                                [`${prevMonth}`, `LEAD TIME`],
+                                [`${currentMonth}`, `LEAD TIME`],
+                                [`${prevMonth}`, `NON LEAD TIME`],
+                                [`${currentMonth}`, `NON LEAD TIME`]
+                            ],
                             datasets: [{
-                                    label: 'QTY',
+                                    label: 'Jumlah PO',
                                     data: [
-                                        chartPoData.qty_lt_now,
-                                        chartPoData.qty_lt_prev,
-                                        chartPoData.qty_nlt_now,
-                                        chartPoData.qty_nlt_prev
+                                        data.qty_lt_now,
+                                        data.qty_lt_prev,
+                                        data.qty_nlt_now,
+                                        data.qty_nlt_prev
                                     ],
                                     backgroundColor: 'rgba(54, 162, 235, 0.2)',
                                     borderColor: 'rgba(54, 162, 235, 1)',
                                     borderWidth: 1
                                 },
                                 {
-                                    label: 'AMOUNT',
+                                    label: 'Total Nilai PO',
                                     data: [
-                                        chartPoData.amount_lt_now,
-                                        chartPoData.amount_lt_prev,
-                                        chartPoData.amount_nlt_now,
-                                        chartPoData.amount_nlt_prev
+                                        data.amount_lt_now,
+                                        data.amount_lt_prev,
+                                        data.amount_nlt_now,
+                                        data.amount_nlt_prev
                                     ],
                                     backgroundColor: 'rgba(255, 159, 64, 0.2)',
                                     borderColor: 'rgba(255, 159, 64, 1)',
@@ -608,92 +623,184 @@
                                 },
                                 title: {
                                     display: true,
-                                    text: 'PO Lead Time Analysis'
-                                },
+                                    text: 'Analisis Lead Time PO'
+                                }
                             }
                         }
+                    };
+
+                    poChart = new Chart(canvas, config);
+                }
+
+                function initializePlanProdChart(data) {
+                    const canvas = document.getElementById('production-planning-chart');
+                    if (!canvas) {
+                        console.error('Tidak dapat menemukan canvas untuk grafik PO');
+                        return;
+                    }
+
+                    const currentDate = new Date();
+                    const months = Array.from({
+                        length: 12
+                    }, (_, i) => {
+                        const date = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1);
+                        return date.toLocaleString('default', {
+                            month: 'short',
+                            year: 'numeric'
+                        });
                     });
+
+                    const config = {
+                        type: 'line',
+                        data: {
+                            labels: months,
+                            datasets: [{
+                                    label: 'Last Month',
+                                    data: [
+                                        data.bulan_1,
+                                        data.bulan_2,
+                                        data.bulan_3,
+                                        data.bulan_4,
+                                        data.bulan_5,
+                                        data.bulan_6,
+                                        data.bulan_7,
+                                        data.bulan_8,
+                                        data.bulan_9,
+                                        data.bulan_10,
+                                        data.bulan_11,
+                                        data.bulan_12
+                                    ],
+                                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                    borderWidth: 1
+                                },
+                                {
+                                    label: 'Current Month',
+                                    data: [
+                                        data.bulan_1,
+                                        data.bulan_2,
+                                        data.bulan_3,
+                                        data.bulan_4,
+                                        data.bulan_5,
+                                        data.bulan_6,
+                                        data.bulan_7,
+                                        data.bulan_8,
+                                        data.bulan_9,
+                                        data.bulan_10,
+                                        data.bulan_11,
+                                    ],
+                                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                                    borderColor: 'rgba(255, 159, 64, 1)',
+                                    borderWidth: 1
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                x: {
+                                    grid: {
+                                        display: true
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        font: {
+                                            weight: 'bold'
+                                        }
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Analisis Lead Time PO'
+                                }
+                            }
+                        }
+                    };
+
+                    poChart = new Chart(canvas, config);
                 }
 
                 function updateStockChart(newData) {
-                    if (stockChart) {
-                        stockChart.data.datasets[0].data = [
-                            newData.upSeratus,
-                            newData.seratus,
-                            newData.tujulima,
-                            newData.limapuluh,
-                            newData.dualima,
-                            newData.nol
-                        ];
-                        stockChart.update();
-                    }
+                    if (!stockChart) return;
+
+                    stockChart.data.datasets[0].data = [
+                        newData.upSeratus,
+                        newData.seratus,
+                        newData.tujulima,
+                        newData.limapuluh,
+                        newData.dualima,
+                        newData.nol
+                    ];
+                    stockChart.update();
                 }
 
                 function updatePoChart(newData) {
-                    if (poChart) {
-                        poChart.data.datasets[0].data = [
-                            newData.qty_lt_now,
-                            newData.qty_nlt_now,
-                            newData.qty_lt_prev,
-                            newData.qty_nlt_prev
-                        ];
-                        poChart.data.datasets[1].data = [
-                            newData.amount_lt_now,
-                            newData.amount_nlt_now,
-                            newData.amount_lt_prev,
-                            newData.amount_nlt_prev
-                        ];
-                        poChart.update();
-                    }
+                    if (!poChart) return;
+
+                    poChart.data.datasets[0].data = [
+                        newData.qty_lt_now,
+                        newData.qty_nlt_now,
+                        newData.qty_lt_prev,
+                        newData.qty_nlt_prev
+                    ];
+                    poChart.data.datasets[1].data = [
+                        newData.amount_lt_now,
+                        newData.amount_nlt_now,
+                        newData.amount_lt_prev,
+                        newData.amount_nlt_prev
+                    ];
+                    poChart.update();
                 }
 
-                function updateCharts() {
+                // ========= Data Fetching Function =========
+                async function updateCharts() {
                     const startDate = startDateInput.value;
                     const endDate = endDateInput.value;
 
-                    if (startDate && endDate) {
-                        fetch(`/dashboard/data?startDate=${startDate}&endDate=${endDate}`)
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error('Network response was not ok');
-                                }
-                                return response.json();
-                            })
-                            .then(data => {
-                                const stockData = {
-                                    upSeratus: data.upSeratus,
-                                    seratus: data.seratus,
-                                    tujulima: data.tujulima,
-                                    limapuluh: data.limapuluh,
-                                    dualima: data.dualima,
-                                    nol: data.nol
-                                };
+                    if (!startDate || !endDate) return;
 
-                                const poData = {
-                                    qty_lt_now: data.qty_lt_now,
-                                    amount_lt_now: data.amount_lt_now,
-                                    qty_lt_prev: data.qty_lt_prev,
-                                    amount_lt_prev: data.amount_lt_prev,
-                                    qty_nlt_now: data.qty_nlt_now,
-                                    amount_nlt_now: data.amount_nlt_now,
-                                    qty_nlt_prev: data.qty_nlt_prev,
-                                    amount_nlt_prev: data.amount_nlt_prev
-                                };
+                    try {
+                        const response = await fetch(`/dashboard/data?startDate=${startDate}&endDate=${endDate}`);
+                        if (!response.ok) throw new Error('Gagal mengambil data');
 
-                                updateStockChart(stockData);
-                                updatePoChart(poData);
-                            })
-                            .catch(error => {
-                                console.error('Error fetching chart data:', error);
-                            });
+                        const data = await response.json();
+
+                        // Update kedua grafik dengan data baru
+                        updateStockChart({
+                            upSeratus: data.upSeratus,
+                            seratus: data.seratus,
+                            tujulima: data.tujulima,
+                            limapuluh: data.limapuluh,
+                            dualima: data.dualima,
+                            nol: data.nol
+                        });
+
+                        updatePoChart({
+                            qty_lt_now: data.qty_lt_now,
+                            amount_lt_now: data.amount_lt_now,
+                            qty_lt_prev: data.qty_lt_prev,
+                            amount_lt_prev: data.amount_lt_prev,
+                            qty_nlt_now: data.qty_nlt_now,
+                            amount_nlt_now: data.amount_nlt_now,
+                            qty_nlt_prev: data.qty_nlt_prev,
+                            amount_nlt_prev: data.amount_nlt_prev
+                        });
+                    } catch (error) {
+                        console.error('Error saat mengambil data:', error);
+                        alert('Terjadi kesalahan saat mengambil data. Silakan coba lagi.');
                     }
                 }
 
-                // Add event listeners for date inputs
                 startDateInput.addEventListener('change', updateCharts);
                 endDateInput.addEventListener('change', updateCharts);
 
-                // Initialize charts with initial data
                 const initialStockData = {
                     upSeratus: parseInt("{{ $upSeratus }}"),
                     seratus: parseInt("{{ $seratus }}"),
@@ -714,8 +821,24 @@
                     amount_nlt_prev: parseFloat("{{ $amount_nlt_prev }}")
                 };
 
+                const initialPlanProdData = {
+                    bulan_1: ("{{ $bulan_1 }}"),
+                    bulan_2: ("{{ $bulan_2 }}"),
+                    bulan_3: ("{{ $bulan_3 }}"),
+                    bulan_4: ("{{ $bulan_4 }}"),
+                    bulan_5: ("{{ $bulan_5 }}"),
+                    bulan_6: ("{{ $bulan_6 }}"),
+                    bulan_7: ("{{ $bulan_7 }}"),
+                    bulan_8: ("{{ $bulan_8 }}"),
+                    bulan_9: ("{{ $bulan_9 }}"),
+                    bulan_10: ("{{ $bulan_10 }}"),
+                    bulan_11: ("{{ $bulan_11 }}"),
+                    bulan_12: ("{{ $bulan_12 }}"),
+                }
+
                 initializeStockChart(initialStockData);
                 initializePoChart(initialPoData);
+                initializePlanProdChart(initialPlanProdData);
             });
         </script>
     @endpush

@@ -19,10 +19,10 @@ return new class extends Migration
             $table->string('part_number');
             $table->string('product_name');
             $table->string('lt')->nullable();
-            $table->float('stok');
+            $table->integer('stok');
             $table->string('li');
-            $table->float('qty_buffer');
-            $table->float('percentage');
+            $table->integer('qty_buffer');
+            $table->integer('percentage');
             $table->date('date');
             $table->timestamps();
         });

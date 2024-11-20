@@ -37,17 +37,17 @@ class BufferController extends Controller
                 return $bufferData->part_number;
             })->editColumn('product_name', function ($bufferData) {
                 return $bufferData->product_name;
-            })->editColumn('usage', function ($bufferData) {
-                return $bufferData->usage;
+                // })->editColumn('usage', function ($bufferData) {
+                //     return $bufferData->usage;
             })->editColumn('lt', function ($bufferData) {
                 return $bufferData->lt;
-            })->editColumn('kode', function ($bufferData) {
-                return $bufferData->kode;
+            })->editColumn('supplier', function ($bufferData) {
+                return $bufferData->supplier;
             })->editColumn('qty', function ($bufferData) {
                 return $bufferData->qty;
             })->editColumn('date', function ($bufferData) {
                 return $bufferData->date;
-            })->rawColumns(['item_number', 'part_number', 'product_name', 'usage', 'lt', 'kode', 'qty', 'date'])->make(true);
+            })->rawColumns(['item_number', 'part_number', 'product_name', 'lt', 'supplier', 'qty', 'date'])->make(true);
     }
 
     public function import(Request $request)
@@ -56,12 +56,78 @@ class BufferController extends Controller
             'file' => 'required|file|mimes:csv,txt,xlx,xlsx',
             'date' => 'required'
         ]);
-        $import = new BufferImport($request->date);
-        Excel::import($import, $request->file('file'));
 
-        $rowCount = $import->getRowCount();
-        return back()->with('rowCount', $rowCount);
+        $bufferVal = Excel::toArray(new BufferImport([], $request->date), $request->file('file'));
+        $tempData = [];
+        $rowCountBuffer = 0;
+        $ltBlank = [];
+
+        foreach ($bufferVal as $bv) {
+            foreach ($bv as $idx => $i) {
+                if ($idx > 0) {
+                    $duplicateInArray = collect($tempData)->contains(function ($value) use ($i, $request) {
+                        return $value['item_number'] == $i[0] && $value['date'] == $request->date;
+                    });
+
+                    if($i[4] == null || $i[4] == '0' || $i[4] == 0){
+                        $ltBlank[] = $i[4];
+                    }
+
+                    if ($duplicateInArray) {
+                        $errorMessage = 'Terdapat duplikasi dengan item number ' . $i[0] . ' pada bulan ini.';
+                        return back()->with([
+                            'swal' => [
+                                'type' => 'error',
+                                'title' => 'Import Gagal',
+                                'text' => $errorMessage,
+                            ]
+                        ]);
+                    }
+
+                    $tempData[] = [
+                        'item_number' => $i[0],
+                        'part_number' => $i[1],
+                        'product_name' => $i[2],
+                        'usage' => $i[3],
+                        'lt' => $i[4],
+                        'supplier' => $i[5],
+                        'qty' => intval($i[6]),
+                        'date' => $request->date
+                    ];
+                }
+            }
+        }
+
+        foreach ($tempData as $data) {
+            Buffer::create($data);
+            $rowCountBuffer++;
+        }
+        $countLt = count($ltBlank);
+        if($countLt > 0){
+            return back()->with([
+                'swal' => [
+                    'type' => 'warning',
+                    'title' => 'Import Berhasil dengan Catatan',
+                    'text' => "Jumlah {$countLt} LT yang kosong.",
+                ]
+            ]);
+        } else {
+            return back()->with([
+                'swal' => [
+                    'type' => 'success',
+                    'title' => 'Import Berhasil',
+                    'text' => "Berhasil mengimpor {$rowCountBuffer} baris data.",
+                ]
+            ]);
+        }
     }
+
+    public function choose_month(){
+        return view('buffer.choose', [
+            'title' => 'Choose Month Buffer'
+        ]);
+    }
+
 
     /**
      * Show the form for creating a new resource.

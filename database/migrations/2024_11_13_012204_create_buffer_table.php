@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('product_name');
             $table->string('usage')->nullable();
             $table->string('lt')->nullable();
-            $table->string('kode')->nullable();
-            $table->float('qty');
+            $table->string('supplier')->nullable();
+            $table->integer('qty');
             $table->date('date');
             $table->timestamps();
         });
