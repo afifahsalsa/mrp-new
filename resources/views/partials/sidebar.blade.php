@@ -20,18 +20,18 @@
                 <i class="mdi mdi-home menu-icon"></i>
             </a>
         </li>
-        <li class="nav-item {{ $title === 'Buffer' ? 'active' : '' }}">
+        <li class="nav-item {{ $title === 'Edit Buffer' || $title === 'Index Buffer' || $title === 'View Buffer' || $title === 'Visualization Buffer' ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('buffer.index') }}" aria-controls="icons">
                 <span class="menu-title">Buffer</span>
                 <i class="mdi mdi-contacts menu-icon"></i>
             </a>
         </li>
-        <li class="nav-item {{ $title === 'Choose Month Buffer' ? 'active' : '' }}">
-            <a class="nav-link" href="{{ route('buffer.choose-month') }}" aria-controls="icons">
+        {{-- <li class="nav-item {{ $title === 'Index Buffer' ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('buffer.index') }}" aria-controls="icons">
                 <span class="menu-title">Buffer Choose</span>
                 <i class="mdi mdi-contacts menu-icon"></i>
             </a>
-        </li>
+        </li> --}}
         <li class="nav-item {{ $title === 'Stok' ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('stok.index') }}" aria-controls="forms">
                 <span class="menu-title">Stock on Hand</span>

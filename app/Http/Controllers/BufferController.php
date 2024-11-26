@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\BufferExport;
 use App\Imports\BufferImport;
 use App\Models\Buffer;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -16,8 +18,41 @@ class BufferController extends Controller
      */
     public function index()
     {
+        $monthBuffer = Buffer::selectRaw('YEAR(date) as year, MONTH(date) as month')
+            ->groupByRaw('YEAR(date), MONTH(date)')
+            ->orderByRaw('YEAR(date) DESC, MONTH(date) DESC')
+            ->get();
+        return view('buffer.choose', [
+            'title' => 'Index Buffer',
+            'monthBuffer' => $monthBuffer
+        ]);
+    }
+
+    public function index_edit($year, $month)
+    {
         return view('buffer.index', [
-            'title' => 'Buffer'
+            'title' => 'Edit Buffer',
+            'year' => $year,
+            'month' => $month
+        ]);
+    }
+
+    public function index_view($year, $month)
+    {
+        return view('buffer.view', [
+            'title' => 'View Buffer',
+            'year' => $year,
+            'month' => $month
+        ]);
+    }
+
+    public function visualization() {
+        $bufferData = Buffer::selectRaw('MONTH([date]) as month, count(*) as count')
+            ->groupByRaw('MONTH([date])')
+            ->get();
+        return view('buffer.visualization', [
+            'title' => 'Visualization Buffer',
+            'bufferData' => $bufferData
         ]);
     }
 
@@ -27,9 +62,11 @@ class BufferController extends Controller
         return response()->download($filePath);
     }
 
-    public function get_data()
+    public function get_data($year, $month)
     {
-        $bufferData = Buffer::select('*');
+        $bufferData = Buffer::whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->select('*');
         return DataTables::of($bufferData)
             ->editColumn('item_number', function ($bufferData) {
                 return $bufferData->item_number;
@@ -37,8 +74,6 @@ class BufferController extends Controller
                 return $bufferData->part_number;
             })->editColumn('product_name', function ($bufferData) {
                 return $bufferData->product_name;
-                // })->editColumn('usage', function ($bufferData) {
-                //     return $bufferData->usage;
             })->editColumn('lt', function ($bufferData) {
                 return $bufferData->lt;
             })->editColumn('supplier', function ($bufferData) {
@@ -61,15 +96,17 @@ class BufferController extends Controller
         $tempData = [];
         $rowCountBuffer = 0;
         $ltBlank = [];
+        $cekDate = Buffer::where(DB::raw("FORMAT(date, 'yyyy MM')"), '=', date('Y m', strtotime($request->date)))->get();
 
         foreach ($bufferVal as $bv) {
             foreach ($bv as $idx => $i) {
                 if ($idx > 0) {
+
                     $duplicateInArray = collect($tempData)->contains(function ($value) use ($i, $request) {
                         return $value['item_number'] == $i[0] && $value['date'] == $request->date;
                     });
 
-                    if($i[4] == null || $i[4] == '0' || $i[4] == 0){
+                    if ($i[4] == null || $i[4] == '0' || $i[4] == 0) {
                         $ltBlank[] = $i[4];
                     }
 
@@ -98,21 +135,36 @@ class BufferController extends Controller
             }
         }
 
-        foreach ($tempData as $data) {
-            Buffer::create($data);
-            $rowCountBuffer++;
+        if ($cekDate) {
+            foreach ($tempData as $data) {
+                $itemInCekDate = collect($cekDate)->firstWhere('item_number', $data['item_number']);
+                if ($itemInCekDate) {
+                    Buffer::where('item_number', $data['item_number'])->update($data);
+                } else {
+                    Buffer::create($data);
+                }
+                $rowCountBuffer++;
+            }
+        } else {
+            foreach ($tempData as $data) {
+                Buffer::create($data);
+                $rowCountBuffer++;
+            }
         }
+
+        $year = date('Y', strtotime($request->date));
+        $month = date('m', strtotime($request->date));
         $countLt = count($ltBlank);
-        if($countLt > 0){
-            return back()->with([
+        if ($countLt > 0) {
+            return redirect()->route('buffer.view', ['year' => $year, 'month' => $month])->with([
                 'swal' => [
                     'type' => 'warning',
                     'title' => 'Import Berhasil dengan Catatan',
-                    'text' => "Jumlah {$countLt} LT yang kosong.",
+                    'text' => "Berhasil impor {$rowCountBuffer} baris data buffer dengan jumlah {$countLt} LT yang kosong.",
                 ]
             ]);
         } else {
-            return back()->with([
+            return redirect()->route('buffer.view', ['year' => $year, 'month' => $month])->with([
                 'swal' => [
                     'type' => 'success',
                     'title' => 'Import Berhasil',
@@ -122,10 +174,9 @@ class BufferController extends Controller
         }
     }
 
-    public function choose_month(){
-        return view('buffer.choose', [
-            'title' => 'Choose Month Buffer'
-        ]);
+    public function export($year, $month)
+    {
+        return Excel::download(new BufferExport($year, $month), 'Buffer ' . now()->format('d-m-Y') . '.xlsx');
     }
 
 
@@ -164,10 +215,28 @@ class BufferController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $validated = $request->validate([
+            'qty' => 'required|numeric|min:0',
+            'id' => 'required'
+        ]);
+        $buffer = Buffer::findOrFail($id);
+
+        $buffer->update([
+            'qty' => $validated['qty'],
+        ]);
+
+        // return response()->json(['message' => 'Update successful']);
+        return response()->json([
+            'swal' => [
+                'type' => 'success',
+                'title' => 'Berhasil!',
+                'message' => 'Quantity berhasil diperbarui!',
+            ]
+        ]);
     }
+
 
     /**
      * Remove the specified resource from storage.

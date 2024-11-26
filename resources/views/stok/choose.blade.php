@@ -1,9 +1,9 @@
 @extends('layouts.main')
 @section('content')
     <div class="content-wrapper">
-        <a href="{{ route('buffer.index') }}" style="text-decoration: none" >Customization Data | </a>
-        <a href="{{ route('buffer.visualisasi') }}" style="text-decoration: none" >Visualization</a>
-        <div class="col-lg-12 grid-margin stretch-card mt-3">
+        <a href="{{ route('buffer.index') }}" style="margin-bottom: 5px;">Customization Data | </a>
+        <a href="{{ route('buffer.index') }}" style="margin-bottom: 5px;">Visualization</a>
+        <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="page-header ms-4 mt-3">
                     <h3>Choose Month</h3>

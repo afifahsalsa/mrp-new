@@ -4,12 +4,9 @@ use App\Http\Controllers\BufferController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OpenPoController;
 use App\Http\Controllers\OrderOriginalController;
-use App\Http\Controllers\OrderUnit;
 use App\Http\Controllers\OrderUnitController;
 use App\Http\Controllers\PlanningController;
 use App\Http\Controllers\StokController;
-use App\Models\OrderOriginal;
-use App\Models\ProductionPlanning;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -39,11 +36,15 @@ Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])
 Route::get('/dashboard/data', [HomeController::class, 'getChartData'])->name('dashboard.data');
 Route::prefix('/ppic')->group(function () {
     Route::prefix('/buffer')->group(function () {
-        Route::get('/', [BufferController::class, 'choose_month'])->name('buffer.choose-month');
-        Route::get('/index', [BufferController::class, 'index'])->name('buffer.index');
+        Route::get('/', [BufferController::class, 'index'])->name('buffer.index');
+        Route::get('edit/{year}/{month}', [BufferController::class, 'index_edit'])->name('buffer.index-edit');
+        Route::get('view/{year}/{month}', [BufferController::class, 'index_view'])->name('buffer.view');
+        Route::get('visualization', [BufferController::class, 'visualization'])->name('buffer.visualisasi');
         Route::get('format-import', [BufferController::class, 'format_buffer'])->name('buffer.format-import');
-        Route::get('load-data', [BufferController::class, 'get_data'])->name('buffer.data');
+        Route::get('load-data/{year}/{month}', [BufferController::class, 'get_data'])->name('buffer.data');
+        Route::put('update/{id}', [BufferController::class, 'update'])->name('buffer.update');
         Route::post('import', [BufferController::class, 'import'])->name('buffer.import');
+        Route::get('export/{year}/{month}', [BufferController::class, 'export'])->name('buffer.export');
         Route::delete('delete', [BufferController::class, 'destroy'])->name('buffer.delete');
     });
     Route::prefix('/stok')->group(function(){

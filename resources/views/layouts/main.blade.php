@@ -67,6 +67,14 @@
                 }
             });
         }
+
+        @if (session('swal'))
+            Swal.fire({
+                icon: '{{ session('swal.type') }}',
+                title: '{{ session('swal.title') }}',
+                text: '{{ session('swal.text') }}',
+            });
+        @endif
     </script>
 </body>
 

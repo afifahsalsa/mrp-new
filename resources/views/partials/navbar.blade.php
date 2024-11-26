@@ -1,4 +1,4 @@
-@if (!Auth::check() || Auth::user()->type === null)
+@if (!Auth::check() || Auth::user()->user_code === null)
     {{ route('login') }}
 @endif
 <nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
@@ -17,13 +17,19 @@
                 <a class="nav-link dropdown-toggle" id="profileDropdown" href="#" data-bs-toggle="dropdown"
                     aria-expanded="false">
                     <div class="nav-profile-text">
-                        <div class="bg-primary rounded-circle font-weight-bold text-white"
-                            style="margin-right:-1rem; font-size:1.7rem; text-align:center; width: 50px; height: 50px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);">
-                            {{ Auth::user()->user_code }}
-                        </div>
+                        @if (Auth::check() && Auth::user()->user_code)
+                            <div class="bg-primary rounded-circle font-weight-bold text-white"
+                                style="margin-right:-1rem; font-size:1.7rem; text-align:center; width: 50px; height: 50px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);">
+                                {{ Auth::user()->user_code }}
+                            </div>
+                        @else
+                            <script>
+                                window.location = "{{ route('login') }}";
+                            </script>
+                        @endif
                     </div>
                 </a>
-                <div class="dropdown-menu navbar-dropdown" >
+                <div class="dropdown-menu navbar-dropdown">
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
                         <button class="dropdown-item" type="submit"><i
