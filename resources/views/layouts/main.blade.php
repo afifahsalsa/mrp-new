@@ -24,8 +24,8 @@
         <!-- partial -->
         <div class="container-fluid page-body-wrapper">
             <!-- partial:partials/_sidebar.html -->
-            @include('partials.sidebar')
             <!-- partial -->
+            @include('partials.sidebar')
             <div class="main-panel">
                 @yield('content')
                 <!-- partial -->

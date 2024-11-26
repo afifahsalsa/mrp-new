@@ -49,8 +49,11 @@ Route::prefix('/ppic')->group(function () {
     });
     Route::prefix('/stok')->group(function(){
         Route::get('/', [StokController::class, 'index'])->name('stok.index');
+        Route::get('edit/{year}/{month}', [StokController::class, 'index_edit'])->name('stok.index-edit');
+        Route::get('view/{year}/{month}', [StokController::class, 'index_view'])->name('stok.view');
         Route::get('format-import', [StokController::class, 'format_stok'])->name('stok.format');
-        Route::get('load-data', [StokController::class, 'get_data'])->name('stok.data');
+        Route::get('load-data/{year}/{month}', [StokController::class, 'get_data'])->name('stok.data');
+        Route::put('update/{id}', [StokController::class, 'update'])->name('stok.update');
         Route::post('import', [StokController::class, 'import'])->name('stok.import');
         Route::delete('delete', [StokController::class, 'destroy'])->name('stok.delete');
     });

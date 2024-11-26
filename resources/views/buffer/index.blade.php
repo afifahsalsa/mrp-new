@@ -5,20 +5,24 @@
             {{-- <h3 class="page-title">Buffer Table</h3> --}}
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <a href="{{ route('buffer.index') }}"><button class="btn btn-inverse-dark px-4"
-                            style="margin-left: -15px;"><i class="mdi mdi-arrow-left-bold-circle"></i></button></a>
+                    <a href="{{ route('buffer.index') }}">
+                        <button class="btn btn-inverse-dark px-3" style="margin-left: -15px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
+                        onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';">
+                        <i class="mdi mdi-arrow-left-bold-circle"></i>
+                        </button>
+                    </a>
+                    <h3 class="ms-2 mt-2">Edit Buffer in : <span class="text-danger">{{ $monthName . ',  ' . $year }}</span></h3>
                 </ol>
             </nav>
             {{-- Button Import | Export --}}
             <div class="d-flex">
-                <button id="dropdownButton" type="button" class="btn btn-gradient-primary" data-bs-toggle="dropdown"
+                {{-- <button id="dropdownButton" type="button" class="btn btn-gradient-primary" data-bs-toggle="dropdown"
                     aria-expanded="false" onclick="toggleArrow()"
                     style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
                     onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';">
                     Import | Export <span id="dropdownArrow" class="arrow">&#9656;</span>
                 </button>
 
-                {{-- Dropdown File --}}
                 <div class="dropdown-menu navbar-dropdown" aria-labelledby="profileDropdown">
                     <a class="dropdown-item" href="{{ route('buffer.format-import') }}">
                         <i class="mdi mdi-cloud-download me-2 text-success"></i> Download Format </a>
@@ -29,7 +33,7 @@
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="#">
                         <i class="mdi mdi-cloud-download me-2 text-primary"></i> Download Hasil Excel </a>
-                </div>
+                </div> --}}
 
                 {{-- Button Delete --}}
                 <form action="{{ route('buffer.delete') }}" method="DELETE" id="delBuff">
@@ -62,8 +66,10 @@
                             <input class="form-control" type="file" id="file" name="file" required>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-dark" data-bs-dismiss="modal" style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);">Close</button>
-                            <button type="submit" class="btn btn-primary" id="submitButton" style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);">Submit</button>
+                            <button type="button" class="btn btn-dark" data-bs-dismiss="modal"
+                                style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);">Close</button>
+                            <button type="submit" class="btn btn-primary" id="submitButton"
+                                style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);">Submit</button>
                         </div>
                     </form>
                 </div>
@@ -73,10 +79,10 @@
         <div class="card shadow mb-4">
             <div class="col-lg-12 grid-margin stretch-card">
                 <div class="card">
+                    {{-- <p mb-0 ms-3>*Click form input quantity to edit value quantity.</p> --}}
                     <div class="card-body">
-                        {{-- <h4 class="card-title">Striped Table</h4>
-                        <p class="card-description"> Add class <code>.table-striped</code>
-                        </p> --}}
+                        {{-- <h4 class="card-title">Buffer</h4>
+                        <p class="card-description"> Add class <code>.table-striped</code></p> --}}
                         <div class="table-responsive">
                             <table class="table display" id="bufferTable" style="width: 100%">
                                 <thead>
@@ -180,7 +186,7 @@
 
             $('#bufferTable').on('click', '.qty-input', function() {
                 $(this).siblings('.save-btn').css({
-                    'display': 'inline-block', // Atur sesuai kebutuhan
+                    'display': 'inline-block',
                     'opacity': '1',
                     'transition': 'opacity 0.3s ease',
                     'width': '15%',
@@ -189,7 +195,6 @@
                     'box-shadow': '0px 4px 8px rgba(0, 0, 0, 0.2)',
                 });
             });
-
 
             // Event listener for save button click
             $('#bufferTable').on('click', '.save-btn', function() {
@@ -201,7 +206,7 @@
 
                 Swal.fire({
                     title: `Konfirmasi Pembaruan`,
-                    text: `Apakah Anda yakin ingin memperbarui Quantity untuk ItemNumber ${itemNumber}?`,
+                    text: `Apakah Anda yakin ingin memperbarui Quantity untuk Item Number ${itemNumber}?`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Ya, Perbarui!',

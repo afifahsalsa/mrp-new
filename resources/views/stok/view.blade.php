@@ -5,10 +5,8 @@
             {{-- <h3 class="page-title">Buffer Table</h3> --}}
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <a href="{{ route('buffer.index') }}"><button class="btn btn-inverse-dark px-4" style="margin-left: -15px;">
-                        <i class="mdi mdi-arrow-left-bold-circle"></i>
-                    </button></a>
-                    <h3 class="ms-2 mt-2">Buffer in : <span class="text-danger">{{ $monthName . ',  ' . $year }}</span></h3>
+                    <a href="{{ route('stok.index') }}"><button class="btn btn-inverse-dark px-4"
+                            style="margin-left: -15px;"><i class="mdi mdi-arrow-left-bold-circle"></i></button></a>
                 </ol>
             </nav>
             <div class="d-flex">
@@ -25,7 +23,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table display" id="bufferTable" style="width: 100%">
+                            <table class="table display" id="stokTable" style="width: 100%">
                                 <thead>
                                     <tr>
                                         <th><input type="checkbox" class="select-checkbox" id="selectAll"></th>
@@ -33,8 +31,8 @@
                                         <th>Part Number</th>
                                         <th>Product Name</th>
                                         <th>LT</th>
-                                        <th>Supplier</th>
-                                        <th style="float: left;">Quantity</th>
+                                        <th>Local / Impor</th>
+                                        <th>Stok</th>
                                         <th>Date</th>
                                     </tr>
                                 </thead>
@@ -48,20 +46,20 @@
             </div>
         </div>
     </div>
-    @push('scriptBuffer')
+    @push('scriptStok')
         <script>
-            $(document).ready(function() {
+            $(document).ready(function(){
                 const year = {{ $year }};
                 const month = {{ $month }};
 
-                $('#bufferTable').DataTable({
+                $('#stokTable').DataTable({
                     "lengthMenu": [10, 25, 50, 100, 500, 1000],
                     processing: true,
                     serverSide: true,
                     searching: true,
                     scrollX: true,
                     ajax: {
-                        url: `/ppic/buffer/load-data/${year}/${month}`,
+                        url: `/ppic/stok/load-data/${year}/${month}`,
                         type: 'GET',
                     },
                     columns: [{
@@ -90,12 +88,12 @@
                             name: 'lt'
                         },
                         {
-                            data: 'supplier',
-                            name: 'supplier'
+                            data: 'li',
+                            name: 'li'
                         },
                         {
-                            data: 'qty',
-                            name: 'qty',
+                            data: 'stok',
+                            name: 'stok'
                         },
                         {
                             data: 'date',
@@ -115,7 +113,6 @@
                         selector: 'td:first-child'
                     }
                 });
-
             });
         </script>
     @endpush

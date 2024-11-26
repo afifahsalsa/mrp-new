@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Imports\StokImport;
 use App\Models\Buffer;
 use App\Models\Stok;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -18,8 +19,31 @@ class StokController extends Controller
      */
     public function index()
     {
+        $monthStok = Stok::selectRaw('YEAR(date) as year, MONTH(date) as month')
+            ->groupByRaw('YEAR(date), MONTH(date)')
+            ->orderByRaw('YEAR(date), MONTH(date) DESC')
+            ->get();
+        return view('stok.choose', [
+            'title' => 'Index Stok',
+            'monthStok' => $monthStok
+        ]);
+    }
+
+    public function index_edit($year, $month){
+        $monthName = DateTime::createFromFormat('!m', $month)->format('F');
         return view('stok.index', [
-            'title' => 'Stok'
+            'title' => 'Edit Stok',
+            'year' => $year,
+            'month' => $month,
+            'monthName' => $monthName
+        ]);
+    }
+
+    public function index_view($year, $month){
+        return view('stok.view', [
+            'title' => 'View Stok',
+            'year' => $year,
+            'month' => $month
         ]);
     }
 
@@ -29,9 +53,11 @@ class StokController extends Controller
         return response()->download($filePath);
     }
 
-    public function get_data()
+    public function get_data($year, $month)
     {
-        $stokData = Stok::select(['item_number', 'part_number', 'product_name', 'lt', 'li', 'stok', 'qty_buffer', 'percentage', 'date']);
+        $stokData = Stok::whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->select('*');
         return DataTables::of($stokData)
             ->editColumn('item_number', function ($stokData) {
                 return $stokData->item_number;
@@ -205,7 +231,16 @@ class StokController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'stok' => 'required',
+            'id' => 'required'
+        ]);
+        $stok = Stok::findOrFail($id);
+        $percentage = $stok->stok / $stok->qty_buffer;
+        $stok->update([
+            'stok' => $validated['stok'],
+            'percentage' => $percentage
+        ]);
     }
 
     /**

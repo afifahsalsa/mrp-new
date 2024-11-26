@@ -5,13 +5,16 @@
             {{-- <h3 class="page-title">stok Table</h3> --}}
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="#">First Step</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Stock on Hand</li>
+                    <a href="{{ route('stok.index') }}"><button class="btn btn-inverse-dark px-4" style="margin-left: -15px;">
+                        <i class="mdi mdi-arrow-left-bold-circle"></i></button>
+                    </a>
+                    <h3 class="ms-2 mt-2">Edit Stock in : <span class="text-danger">{{ $monthName . ',  ' . $year }}</span></h3>
                 </ol>
             </nav>
             <div class="d-flex">
-                <button id="dropdownButton" type="button" class="btn btn-gradient-primary" data-bs-toggle="dropdown"
-                    aria-expanded="false" onclick="toggleArrow()" style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
+                {{-- <button id="dropdownButton" type="button" class="btn btn-gradient-primary" data-bs-toggle="dropdown"
+                    aria-expanded="false" onclick="toggleArrow()"
+                    style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
                     onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';">
                     Import | Export <span id="dropdownArrow" class="arrow">&#9656;</span>
                 </button>
@@ -26,14 +29,14 @@
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="#">
                         <i class="mdi mdi-cloud-download me-2 text-primary"></i> Download Hasil Excel </a>
-                </div>
+                </div> --}}
                 <form action="{{ route('stok.delete') }}" method="DELETE" id="deleteStock">
                     @csrf
                     @method('delete')
-                    <button class="btn btn-gradient-danger ms-2 px-3" type="button"
+                    <button class="btn btn-danger ms-2 px-3" type="button"
                         style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
-                    onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';" onclick="deleteConfirm('deleteStock')"><i
-                            class="mdi mdi-delete"></i></button>
+                        onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';"
+                        onclick="deleteConfirm('deleteStock')"><i class="mdi mdi-delete"></i></button>
                 </form>
             </div>
         </div>
@@ -68,8 +71,8 @@
             <div class="col-lg-12 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
-                        <h4 class="card-title">Striped Table</h4>
-                        <p class="card-description"> Add class <code>.table-striped</code>
+                        {{-- <h4 class="card-title">Striped Table</h4>
+                        <p class="card-description"> Add class <code>.table-striped</code> --}}
                         </p>
                         <div class="table-responsive">
                             <table class="table display" id="stokTable" style="width: 100%">
@@ -82,9 +85,7 @@
                                         <th>Product Name</th>
                                         <th>LT</th>
                                         <th>Local / Impor</th>
-                                        <th>Stok</th>
-                                        <th>Qty Buffer</th>
-                                        <th>Percentage</th>
+                                        <th class="float-start">Stok</th>
                                         <th>Date</th>
                                     </tr>
                                 </thead>
@@ -100,75 +101,153 @@
     </div>
     @push('scriptStok')
         <script>
-
-            let stokTable = $('#stokTable').DataTable({
-                "lengthMenu": [10, 25, 50, 100, 500, 1000],
-                processing: true,
-                serverSide: true,
-                searching: true,
-                scrollX: true,
-                ajax: {
-                    url: "{{ route('stok.data') }}",
-                    type: 'GET'
-                },
-                columns: [{
-                        data: null,
+            $(document).ready(function() {
+                const year = {{ $year }};
+                const month = {{ $month }};
+                $('#stokTable').DataTable({
+                    "lengthMenu": [10, 25, 50, 100, 500, 1000],
+                    processing: true,
+                    serverSide: true,
+                    searching: true,
+                    scrollX: true,
+                    ajax: {
+                        url: `/ppic/stok/load-data/${year}/${month}`,
+                        type: 'GET'
+                    },
+                    columns: [{
+                            data: null,
+                            orderable: false,
+                            className: 'select-checkbox',
+                            defaultContent: '',
+                            render: function(data, type, row) {
+                                return `<input type="checkbox" class="select-checkbox">`;
+                            }
+                        },
+                        {
+                            data: 'item_number',
+                            name: 'item_number'
+                        },
+                        {
+                            data: 'part_number',
+                            name: 'part_number'
+                        },
+                        {
+                            data: 'product_name',
+                            name: 'product_name'
+                        },
+                        {
+                            data: 'lt',
+                            name: 'lt'
+                        },
+                        {
+                            data: 'li',
+                            name: 'li'
+                        },
+                        {
+                            data: 'stok',
+                            name: 'stok',
+                            render: function(data, type, row) {
+                                data = data || '';
+                                return type === 'display' ?
+                                    `<div class = "edit-container">
+                                <input type = "number" style = "width: 50%; display: inline;" class="form-control stok-input float-start px-1" data-id="${row.id}"
+                                value="${data}">
+                                <button class="btn btn-success save-btn" data-id="${row.id}" data-item_number="${row.item_number}" style="display: none;">
+                                    <i class="mdi mdi-content-save"></i></button>
+                                    </div>` : data;
+                            }
+                        },
+                        {
+                            data: 'date',
+                            name: 'date'
+                        }
+                    ],
+                    columnDefs: [{
+                        targets: 0,
                         orderable: false,
                         className: 'select-checkbox',
-                        defaultContent: '',
-                        render: function(data, type, row) {
-                            return `<input type="checkbox" class="select-checkbox">`;
+                        checkboxes: {
+                            selectRow: true
                         }
+                    }],
+                    select: {
+                        style: 'multi',
+                        selector: 'td:first-child'
                     },
-                    {
-                        data: 'item_number',
-                        name: 'item_number'
-                    },
-                    {
-                        data: 'part_number',
-                        name: 'part_number'
-                    },
-                    {
-                        data: 'product_name',
-                        name: 'product_name'
-                    },
-                    {
-                        data: 'lt',
-                        name: 'lt'
-                    },
-                    {
-                        data: 'li',
-                        name: 'li'
-                    },
-                    {
-                        data: 'stok',
-                        name: 'stok'
-                    },
-                    {
-                        data: 'qty_buffer',
-                        name: 'qty_buffer'
-                    },
-                    {
-                        data: 'percentage',
-                        name: 'percentage'
-                    },
-                    {
-                        data: 'date',
-                        name: 'date'
+                });
+            });
+
+            $('#stokTable').on('click', '.stok-input', function() {
+                $(this).siblings('.save-btn').css({
+                    'display': 'inline-block',
+                    'opacity': '1',
+                    'transition': 'opacity 0.3s ease',
+                    'width': '15%',
+                    'padding-start': '23px',
+                    'margin-right': '2.5rem',
+                    'box-shadow': '0px 4px 8px rgba(0, 0, 0, 0.2)',
+                });
+            });
+
+            // Event listener for save button click
+            $('#stokTable').on('click', '.save-btn', function() {
+                const id = $(this).data('id');
+                const newStok = $(this).siblings('.stok-input').val();
+                const itemNumber = $(this).data('item_number');
+                console.log(id, newStok, itemNumber);
+                const button = $(this);
+                const table = $('#stokTable').DataTable();
+
+                Swal.fire({
+                    title: `Konfirmasi Pembaruan`,
+                    text: `Apakah Anda yakin ingin memperbarui Quantity untuk ItemNumber ${itemNumber}?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Perbarui!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: `/ppic/stok/update/${id}`,
+                            type: 'PUT',
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                stok: newStok,
+                                id: id
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: response.swal.type,
+                                    title: response.swal.title,
+                                    text: response.swal.message,
+                                    timer: 1500,
+                                    showConfirmButton: true
+                                });
+                                table.ajax.reload(null, false);
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: 'Terjadi kesalahan saat memperbarui data!',
+                                    footer: xhr.responseJSON?.message ||
+                                        'Silakan coba lagi nanti.'
+                                });
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Dibatalkan',
+                            text: 'Tidak ada perubahan yang dilakukan.',
+                            icon: 'info',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                        table.ajax.reload(null, false);
                     }
-                ],
-                columnDefs: [{
-                    targets: 0,
-                    orderable: false,
-                    className: 'select-checkbox',
-                    checkboxes: {
-                        selectRow: true
-                    }
-                }],
-                select: {
-                    style: 'multi',
-                    selector: 'td:first-child'
-                },
+                });
+                button.hide();
+                // button.siblings('.qty-input').prop('enable', true);
             });
 
             @if (session('status'))

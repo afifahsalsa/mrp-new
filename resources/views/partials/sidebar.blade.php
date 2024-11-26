@@ -32,7 +32,7 @@
                 <i class="mdi mdi-contacts menu-icon"></i>
             </a>
         </li> --}}
-        <li class="nav-item {{ $title === 'Stok' ? 'active' : '' }}">
+        <li class="nav-item {{ $title === 'Index Stok' || $title === 'Edit Stok' ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('stok.index') }}" aria-controls="forms">
                 <span class="menu-title">Stock on Hand</span>
                 <i class="mdi mdi-format-list-bulleted menu-icon"></i>

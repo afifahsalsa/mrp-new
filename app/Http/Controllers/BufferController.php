@@ -6,6 +6,7 @@ use App\Exports\BufferExport;
 use App\Imports\BufferImport;
 use App\Models\Buffer;
 use Carbon\Carbon;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -30,19 +31,23 @@ class BufferController extends Controller
 
     public function index_edit($year, $month)
     {
+        $monthName = DateTime::createFromFormat('!m', $month)->format('F');
         return view('buffer.index', [
             'title' => 'Edit Buffer',
             'year' => $year,
-            'month' => $month
+            'month' => $month,
+            'monthName' => $monthName
         ]);
     }
 
     public function index_view($year, $month)
     {
+        $monthName = DateTime::createFromFormat('!m', $month)->format('F');
         return view('buffer.view', [
             'title' => 'View Buffer',
             'year' => $year,
-            'month' => $month
+            'month' => $month,
+            'monthName' => $monthName
         ]);
     }
 
