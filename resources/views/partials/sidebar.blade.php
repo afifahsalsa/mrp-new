@@ -38,7 +38,7 @@
                 <i class="mdi mdi-format-list-bulleted menu-icon"></i>
             </a>
         </li> --}}
-        <li class="nav-item {{ $title === 'Index Open PO' || $title === 'Edit Open PO' || $title === 'View Open PO' ? 'active' : '' }}">
+        <li class="nav-item {{ $title === 'Index Open PO' || $title === 'Edit Open PO' || $title === 'Index Open PR' || $title === 'Edit Open PR' ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('open-po.index') }}" aria-controls="charts">
                 <span class="menu-title">Outstanding PO | PR</span>
                 <i class="mdi mdi-chart-bar menu-icon"></i>

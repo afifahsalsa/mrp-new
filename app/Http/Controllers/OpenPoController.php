@@ -18,9 +18,9 @@ class OpenPoController extends Controller
      * Display a listing of the resource.
      */
     public function index(){
-        $monthPO = OpenPo::selectRaw('YEAR(created_at) as year, MONTH(created_at) as month')
-            ->groupByRaw('YEAR(created_at), MONTH(created_at)')
-            ->orderByRaw('YEAR(created_at), MONTH(created_at) DESC')
+        $monthPO = OpenPo::selectRaw('YEAR(date) as year, MONTH(date) as month')
+            ->groupByRaw('YEAR(date), MONTH(date)')
+            ->orderByRaw('YEAR(date), MONTH(date) DESC')
             ->get();
         return view('open-po.choose', [
             'title' => 'Index Open PO',
@@ -214,7 +214,7 @@ class OpenPoController extends Controller
             return back()->with([
                 'swal' => [
                     'type' => 'success',
-                    'message' => 'Berhasil Import dan Update data dengan Catatan',
+                    'message' => 'Berhasil Import dan Update data',
                     'text' => "Berhasil mengimpor {$rowCountPo} baris data dan update {$updatePO} baris data."
                 ]
             ]);

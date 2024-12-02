@@ -3,6 +3,7 @@
 use App\Http\Controllers\BufferController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OpenPoController;
+use App\Http\Controllers\OpenPrController;
 use App\Http\Controllers\OrderOriginalController;
 use App\Http\Controllers\OrderUnitController;
 use App\Http\Controllers\PlanningController;
@@ -66,15 +67,21 @@ Route::prefix('/ppic')->group(function () {
         Route::get('edit/{year}/{month}', [OpenPoController::class, 'index_edit'])->name('open-po.index-edit');
         Route::put('update/{id}', [OpenPoController::class, 'update'])->name('open-po.update');
         Route::get('format-import', [OpenPoController::class, 'get_format'])->name('open-po.format');
-        Route::get('format', [OpenPoController::class, 'get_format'])->name('po.format');
         Route::get('load-data/{year}/{month}', [OpenPoController::class, 'get_data'])->name('open-po.data');
         Route::post('import', [OpenPoController::class, 'import'])->name('open-po.import');
         Route::get('export/{year}/{month}', [OpenPoController::class, 'export'])->name('open-po.export');
         Route::delete('delete', [OpenPoController::class, 'destroy'])->name('open-po.delete');
         Route::get('get-unique-po/{year}/{month}', [OpenPoController::class, 'get_unique_po'])->name('open-po.unique-po');
     });
-    Route::prefix('/pr')->group(function(){
-        Route::get('/')->name('pr.index');
+    Route::prefix('/purchase-requisition')->group(function(){
+        Route::get('/', [OpenPrController::class, 'index'])->name('open-pr.index');
+        Route::get('edit/{year}/{month}', [OpenPrController::class, 'index_edit'])->name('open-pr.index-edit');
+        Route::put('update/{id}', [OpenPrController::class, 'update'])->name('open-pr.update');
+        Route::get('format-import', [OpenPrController::class, 'get_format'])->name('open-pr.format');
+        Route::get('load-data/{year}/{month}', [OpenPrController::class, 'get_data'])->name('open-pr.data');
+        Route::post('import', [OpenPrController::class, 'import'])->name('open-pr.import');
+        Route::delete('delete', [OpenPrController::class, 'destroy'])->name('open-pr.delete');
+        Route::get('get-unique-status/{year}/{month}', [OpenPrController::class, 'get_uniqe_status'])->name('open-pr.unique-status');
     });
     Route::prefix('/mpp')->group(function(){
         Route::prefix('/order-original')->group(function(){

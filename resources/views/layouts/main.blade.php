@@ -59,6 +59,7 @@
     @stack('scriptStok')
     @stack('scriptDashboard')
     @stack('scriptPo')
+    @stack('scriptPr')
     @stack('scriptPP')
     @stack('scriptOrderOriginal')
     <!-- End custom js for this page -->
