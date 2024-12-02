@@ -20,9 +20,9 @@
                 <i class="mdi mdi-home menu-icon"></i>
             </a>
         </li>
-        <li class="nav-item {{ $title === 'Edit Buffer' || $title === 'Index Buffer' || $title === 'View Buffer' || $title === 'Visualization Buffer' ? 'active' : '' }}">
+        <li class="nav-item {{ $title === 'Edit Buffer' || $title === 'Index Buffer' || $title === 'View Buffer' || $title === 'Visualization Buffer & Stock' || $title === 'Index Stok' || $title === 'Edit Stok' || $title === 'View Stok'  ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('buffer.index') }}" aria-controls="icons">
-                <span class="menu-title">Buffer</span>
+                <span class="menu-title">Buffer | Stock on Hand</span>
                 <i class="mdi mdi-contacts menu-icon"></i>
             </a>
         </li>
@@ -32,15 +32,15 @@
                 <i class="mdi mdi-contacts menu-icon"></i>
             </a>
         </li> --}}
-        <li class="nav-item {{ $title === 'Index Stok' || $title === 'Edit Stok' ? 'active' : '' }}">
+        {{-- <li class="nav-item {{ $title === 'Index Stok' || $title === 'Edit Stok' ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('stok.index') }}" aria-controls="forms">
                 <span class="menu-title">Stock on Hand</span>
                 <i class="mdi mdi-format-list-bulleted menu-icon"></i>
             </a>
-        </li>
-        <li class="nav-item {{ $title === 'Open Po' ? 'active' : '' }}">
+        </li> --}}
+        <li class="nav-item {{ $title === 'Index Open PO' || $title === 'Edit Open PO' || $title === 'View Open PO' ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('open-po.index') }}" aria-controls="charts">
-                <span class="menu-title">Outstanding PO</span>
+                <span class="menu-title">Outstanding PO | PR</span>
                 <i class="mdi mdi-chart-bar menu-icon"></i>
             </a>
         </li>

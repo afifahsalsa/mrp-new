@@ -196,7 +196,6 @@
                 });
             });
 
-            // Event listener for save button click
             $('#bufferTable').on('click', '.save-btn', function() {
                 const id = $(this).data('id');
                 const newQty = $(this).siblings('.qty-input').val();
@@ -226,6 +225,7 @@
                                     icon: response.swal.type,
                                     title: response.swal.title,
                                     text: response.swal.message,
+                                    html: response.swal.html,
                                     timer: 1500,
                                     showConfirmButton: true
                                 });
@@ -253,7 +253,6 @@
                     }
                 });
                 button.hide();
-                // button.siblings('.qty-input').prop('enable', true);
             });
 
             function deleteConfirm(formId) {

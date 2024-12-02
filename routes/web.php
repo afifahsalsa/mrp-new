@@ -7,6 +7,7 @@ use App\Http\Controllers\OrderOriginalController;
 use App\Http\Controllers\OrderUnitController;
 use App\Http\Controllers\PlanningController;
 use App\Http\Controllers\StokController;
+use App\Http\Controllers\VisualizationController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -35,17 +36,18 @@ Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])
     ->middleware('auth');
 Route::get('/dashboard/data', [HomeController::class, 'getChartData'])->name('dashboard.data');
 Route::prefix('/ppic')->group(function () {
+    Route::get('visualization-buffer-stock', [VisualizationController::class, 'bufferStokChart'])->name('buffer.stok.visualisasi');
     Route::prefix('/buffer')->group(function () {
         Route::get('/', [BufferController::class, 'index'])->name('buffer.index');
         Route::get('edit/{year}/{month}', [BufferController::class, 'index_edit'])->name('buffer.index-edit');
         Route::get('view/{year}/{month}', [BufferController::class, 'index_view'])->name('buffer.view');
-        Route::get('visualization', [BufferController::class, 'visualization'])->name('buffer.visualisasi');
         Route::get('format-import', [BufferController::class, 'format_buffer'])->name('buffer.format-import');
         Route::get('load-data/{year}/{month}', [BufferController::class, 'get_data'])->name('buffer.data');
         Route::put('update/{id}', [BufferController::class, 'update'])->name('buffer.update');
         Route::post('import', [BufferController::class, 'import'])->name('buffer.import');
         Route::get('export/{year}/{month}', [BufferController::class, 'export'])->name('buffer.export');
         Route::delete('delete', [BufferController::class, 'destroy'])->name('buffer.delete');
+        Route::get('get-unique-lt/{year}/{month}', [BufferController::class, 'get_unique_lt'])->name('buffer.unique-lt');
     });
     Route::prefix('/stok')->group(function(){
         Route::get('/', [StokController::class, 'index'])->name('stok.index');
@@ -55,15 +57,24 @@ Route::prefix('/ppic')->group(function () {
         Route::get('load-data/{year}/{month}', [StokController::class, 'get_data'])->name('stok.data');
         Route::put('update/{id}', [StokController::class, 'update'])->name('stok.update');
         Route::post('import', [StokController::class, 'import'])->name('stok.import');
+        Route::get('export/{year}/{month}', [StokController::class, 'export'])->name('stok.export');
         Route::delete('delete', [StokController::class, 'destroy'])->name('stok.delete');
+        Route::get('get-unique-lt/{year}/{month}', [StokController::class, 'get_unique_lt'])->name('stok.unique-lt');
     });
-    Route::prefix('/open-po')->group(function(){
+    Route::prefix('/purchase-order')->group(function(){
         Route::get('/', [OpenPoController::class, 'index'])->name('open-po.index');
+        Route::get('edit/{year}/{month}', [OpenPoController::class, 'index_edit'])->name('open-po.index-edit');
+        Route::put('update/{id}', [OpenPoController::class, 'update'])->name('open-po.update');
         Route::get('format-import', [OpenPoController::class, 'get_format'])->name('open-po.format');
-        Route::get('load-data', [OpenPoController::class, 'get_data'])->name('open-po.data');
+        Route::get('format', [OpenPoController::class, 'get_format'])->name('po.format');
+        Route::get('load-data/{year}/{month}', [OpenPoController::class, 'get_data'])->name('open-po.data');
         Route::post('import', [OpenPoController::class, 'import'])->name('open-po.import');
-        Route::get('export', [OpenPoController::class, 'export'])->name('open-po.export');
+        Route::get('export/{year}/{month}', [OpenPoController::class, 'export'])->name('open-po.export');
         Route::delete('delete', [OpenPoController::class, 'destroy'])->name('open-po.delete');
+        Route::get('get-unique-po/{year}/{month}', [OpenPoController::class, 'get_unique_po'])->name('open-po.unique-po');
+    });
+    Route::prefix('/pr')->group(function(){
+        Route::get('/')->name('pr.index');
     });
     Route::prefix('/mpp')->group(function(){
         Route::prefix('/order-original')->group(function(){

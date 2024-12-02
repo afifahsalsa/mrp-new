@@ -14,7 +14,10 @@
         href="{{ asset('purple-free/src/assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('purple-free/src/assets/css/style.css') }}">
     <link rel="shortcut icon" href="{{ asset('purple-free/src/assets/images/favicon.png') }}">
-    <link rel="stylesheet" href="{{ asset('purple-free/src/assets/css/dataTables.dataTables.css') }}">
+    {{-- <link rel="stylesheet" href="{{ asset('purple-free/src/assets/css/dataTables.dataTables.css') }}"> --}}
+    <link rel="stylesheet" href="{{ asset('datatables/dataTables.dataTables.css') }}">
+    {{-- <link rel="stylesheet" href="{{ asset('datatables/dataTables.dateTime.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('datatables/searchBuilder.dataTables.css') }}"> --}}
 </head>
 
 <body>
@@ -36,9 +39,14 @@
     </div>
     <script src="{{ asset('purple-free/src/assets/js/sweetalert2@11.js') }}"></script>
     <script src="{{ asset('purple-free/src/assets/vendors/js/vendor.bundle.base.js') }}"></script>
-    <script src="{{ asset('purple-free/src/assets/js/jquery-3.7.1.js') }}"></script>
+    {{-- <script src="{{ asset('purple-free/src/assets/js/jquery-3.7.1.js') }}"></script>
     <script src="{{ asset('purple-free/src/assets/js/dataTables.js') }}"></script>
-    <script src="{{ asset('purple-free/src/assets/js/datatables.min.js') }}"></script>
+    <script src="{{ asset('purple-free/src/assets/js/datatables.min.js') }}"></script> --}}
+    <script src="{{ asset('datatables/jquery-3.7.1.js') }}"></script>
+    <script src="{{ asset('datatables/dataTables.js') }}"></script>
+    {{-- <script src="{{ asset('datatables/searchBuilder.dataTables.js') }}"></script>
+    <script src="{{ asset('datatables/dataTables.searchBuilder.js') }}"></script>
+    <script src="{{ asset('datatables/dataTables.dateTime.min.js') }}"></script> --}}
     <script src="{{ asset('purple-free/src/assets/vendors/chart.js/chart.umd.js') }}"></script>
     <script src="{{ asset('purple-free/src/assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.js') }}"></script>
     <script src="{{ asset('purple-free/src/assets/js/off-canvas.js') }}"></script>
@@ -73,6 +81,7 @@
                 icon: '{{ session('swal.type') }}',
                 title: '{{ session('swal.title') }}',
                 text: '{{ session('swal.text') }}',
+                html: '{{ session('swal.html') }}'
             });
         @endif
     </script>

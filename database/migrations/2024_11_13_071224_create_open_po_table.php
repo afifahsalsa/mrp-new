@@ -33,8 +33,7 @@ return new class extends Migration
             $table->string('lt');
             $table->string('ket_late');
             $table->string('ket_lt');
-            $table->float('price');
-            $table->float('amount');
+            $table->date('date');
             $table->timestamps();
         });
     }

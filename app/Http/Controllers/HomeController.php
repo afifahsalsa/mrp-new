@@ -29,15 +29,15 @@ class HomeController extends Controller
         $endDate = $request->input('endDate');
 
         $stockData = $this->getStockData($startDate, $endDate);
-        $poData = $this->getPoData($startDate, $endDate);
+        // $poData = $this->getPoData($startDate, $endDate);
         $planProdData = $this->getPlanProdData();
 
         return view('dashboard', array_merge([
             'title' => 'Dashboard',
             'startDate' => $startDate,
             'endDate' => $endDate,
-            'poData' => $poData
-        ], $stockData, $poData, $planProdData));
+            // 'poData' => $poData
+        ], $stockData, $planProdData));
     }
 
     public function getChartData(Request $request)
@@ -46,10 +46,10 @@ class HomeController extends Controller
         $endDate = $request->input('endDate');
 
         $stockData = $this->getStockData($startDate, $endDate);
-        $poData = $this->getPoData($startDate, $endDate);
+        // $poData = $this->getPoData($startDate, $endDate);
         $planProdData = $this->getPlanProdData();
 
-        return response()->json(array_merge($stockData, $poData, $planProdData));
+        return response()->json(array_merge($stockData, $planProdData));
     }
 
     private function getStockData($startDate = null, $endDate = null)
@@ -98,56 +98,56 @@ class HomeController extends Controller
         ];
     }
 
-    private function getPoData($startDate = null, $endDate = null)
-    {
-        $filterDate = $startDate ? Carbon::parse($startDate) : Carbon::now();
-        $filterMonth = $filterDate->format('m');
-        $filterYear = $filterDate->format('Y');
-        $prevMonth = $filterDate->copy()->subMonth();
+    // private function getPoData($startDate = null, $endDate = null)
+    // {
+    //     $filterDate = $startDate ? Carbon::parse($startDate) : Carbon::now();
+    //     $filterMonth = $filterDate->format('m');
+    //     $filterYear = $filterDate->format('Y');
+    //     $prevMonth = $filterDate->copy()->subMonth();
 
-        $query = DB::table('open_po')
-            ->select(
-                DB::raw("
-                SUM(CASE WHEN MONTH(created_at) = {$filterMonth}
-                         AND YEAR(created_at) = {$filterYear}
-                         AND ket_lt = 'LEAD TIME' THEN delivery_reminder ELSE 0 END) AS qty_lt_now,
-                SUM(CASE WHEN MONTH(created_at) = {$filterMonth}
-                         AND YEAR(created_at) = {$filterYear}
-                         AND ket_lt = 'LEAD TIME' THEN amount ELSE 0 END) AS amount_lt_now,
-                SUM(CASE WHEN MONTH(created_at) = {$prevMonth->format('m')}
-                         AND YEAR(created_at) = {$prevMonth->format('Y')}
-                         AND ket_lt = 'LEAD TIME' THEN delivery_reminder ELSE 0 END) AS qty_lt_prev,
-                SUM(CASE WHEN MONTH(created_at) = {$prevMonth->format('m')}
-                         AND YEAR(created_at) = {$prevMonth->format('Y')}
-                         AND ket_lt = 'LEAD TIME' THEN amount ELSE 0 END) AS amount_lt_prev,
-                SUM(CASE WHEN MONTH(created_at) = {$filterMonth}
-                         AND YEAR(created_at) = {$filterYear}
-                         AND ket_lt = 'NON LEAD TIME' THEN delivery_reminder ELSE 0 END) AS qty_nlt_now,
-                SUM(CASE WHEN MONTH(created_at) = {$filterMonth}
-                         AND YEAR(created_at) = {$filterYear}
-                         AND ket_lt = 'NON LEAD TIME' THEN amount ELSE 0 END) AS amount_nlt_now,
-                SUM(CASE WHEN MONTH(created_at) = {$prevMonth->format('m')}
-                         AND YEAR(created_at) = {$prevMonth->format('Y')}
-                         AND ket_lt = 'NON LEAD TIME' THEN delivery_reminder ELSE 0 END) AS qty_nlt_prev,
-                SUM(CASE WHEN MONTH(created_at) = {$prevMonth->format('m')}
-                         AND YEAR(created_at) = {$prevMonth->format('Y')}
-                         AND ket_lt = 'NON LEAD TIME' THEN amount ELSE 0 END) AS amount_nlt_prev
-            ")
-            )->first();
+    //     $query = DB::table('open_po')
+    //         ->select(
+    //             DB::raw("
+    //             SUM(CASE WHEN MONTH(created_at) = {$filterMonth}
+    //                      AND YEAR(created_at) = {$filterYear}
+    //                      AND ket_lt = 'LEAD TIME' THEN delivery_reminder ELSE 0 END) AS qty_lt_now,
+    //             SUM(CASE WHEN MONTH(created_at) = {$filterMonth}
+    //                      AND YEAR(created_at) = {$filterYear}
+    //                      AND ket_lt = 'LEAD TIME' THEN amount ELSE 0 END) AS amount_lt_now,
+    //             SUM(CASE WHEN MONTH(created_at) = {$prevMonth->format('m')}
+    //                      AND YEAR(created_at) = {$prevMonth->format('Y')}
+    //                      AND ket_lt = 'LEAD TIME' THEN delivery_reminder ELSE 0 END) AS qty_lt_prev,
+    //             SUM(CASE WHEN MONTH(created_at) = {$prevMonth->format('m')}
+    //                      AND YEAR(created_at) = {$prevMonth->format('Y')}
+    //                      AND ket_lt = 'LEAD TIME' THEN amount ELSE 0 END) AS amount_lt_prev,
+    //             SUM(CASE WHEN MONTH(created_at) = {$filterMonth}
+    //                      AND YEAR(created_at) = {$filterYear}
+    //                      AND ket_lt = 'NON LEAD TIME' THEN delivery_reminder ELSE 0 END) AS qty_nlt_now,
+    //             SUM(CASE WHEN MONTH(created_at) = {$filterMonth}
+    //                      AND YEAR(created_at) = {$filterYear}
+    //                      AND ket_lt = 'NON LEAD TIME' THEN amount ELSE 0 END) AS amount_nlt_now,
+    //             SUM(CASE WHEN MONTH(created_at) = {$prevMonth->format('m')}
+    //                      AND YEAR(created_at) = {$prevMonth->format('Y')}
+    //                      AND ket_lt = 'NON LEAD TIME' THEN delivery_reminder ELSE 0 END) AS qty_nlt_prev,
+    //             SUM(CASE WHEN MONTH(created_at) = {$prevMonth->format('m')}
+    //                      AND YEAR(created_at) = {$prevMonth->format('Y')}
+    //                      AND ket_lt = 'NON LEAD TIME' THEN amount ELSE 0 END) AS amount_nlt_prev
+    //         ")
+    //         )->first();
 
-        return [
-            'qty_lt_now' => $query->qty_lt_now ?? 0,
-            'amount_lt_now' => $query->amount_lt_now ?? 0,
-            'qty_lt_prev' => $query->qty_lt_prev ?? 0,
-            'amount_lt_prev' => $query->amount_lt_prev ?? 0,
-            'qty_nlt_now' => $query->qty_nlt_now ?? 0,
-            'amount_nlt_now' => $query->amount_nlt_now ?? 0,
-            'qty_nlt_prev' => $query->qty_nlt_prev ?? 0,
-            'amount_nlt_prev' => $query->amount_nlt_prev ?? 0,
-            'filter_month' => $filterDate->format('M Y'),
-            'prev_month' => $prevMonth->format('M Y')
-        ];
-    }
+    //     return [
+    //         'qty_lt_now' => $query->qty_lt_now ?? 0,
+    //         'amount_lt_now' => $query->amount_lt_now ?? 0,
+    //         'qty_lt_prev' => $query->qty_lt_prev ?? 0,
+    //         'amount_lt_prev' => $query->amount_lt_prev ?? 0,
+    //         'qty_nlt_now' => $query->qty_nlt_now ?? 0,
+    //         'amount_nlt_now' => $query->amount_nlt_now ?? 0,
+    //         'qty_nlt_prev' => $query->qty_nlt_prev ?? 0,
+    //         'amount_nlt_prev' => $query->amount_nlt_prev ?? 0,
+    //         'filter_month' => $filterDate->format('M Y'),
+    //         'prev_month' => $prevMonth->format('M Y')
+    //     ];
+    // }
 
     private function getPlanProdData()
     {

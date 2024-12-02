@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\PurchaseOrderExport;
 use App\Imports\PoImport;
 use App\Models\OpenPo;
 use App\Models\Stok;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -15,69 +17,72 @@ class OpenPoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        return view('open-po.index', [
-            'title' => 'Open Po'
+    public function index(){
+        $monthPO = OpenPo::selectRaw('YEAR(created_at) as year, MONTH(created_at) as month')
+            ->groupByRaw('YEAR(created_at), MONTH(created_at)')
+            ->orderByRaw('YEAR(created_at), MONTH(created_at) DESC')
+            ->get();
+        return view('open-po.choose', [
+            'title' => 'Index Open PO',
+            'monthPO' => $monthPO
         ]);
     }
 
-    public function get_format()
+    public function index_edit($year, $month)
     {
-        $filePath = public_path('doc/format-open-po.xlsx');
+        $monthName = DateTime::createFromFormat('!m', $month)->format('F');
+        return view('open-po.index', [
+            'title' => 'Edit Open PO',
+            'year' => $year,
+            'month' => $month,
+            'monthName' => $monthName
+        ]);
+    }
+
+    public function get_format(){
+        $filePath = public_path('doc/Format Purchase Order.xlsx');
         return response()->download($filePath);
     }
 
-    public function get_data()
+    public function get_unique_po($year, $month){
+        $uniquePO = OpenPo::whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->distinct('purchase_order')
+            ->pluck('purchase_order')
+            ->filter(function ($value){
+                return $value !== null;
+            })
+            ->values()
+            ->toArray();
+        return response()->json($uniquePO);
+    }
+
+    public function get_data(Request $request, $year, $month)
     {
-        $poData = OpenPo::select('*');
-        return DataTables::of($poData)
-            ->editColumn('purchase_order', function ($poData) {
-                return $poData->purchase_order;
-            })->editColumn('item_number', function ($poData) {
-                return $poData->item_number;
-            })->editColumn('product_name', function ($poData) {
-                return $poData->product_name;
-            })->editColumn('purchase_requisition', function ($poData) {
-                return $poData->purchase_requisition;
-            })->editColumn('supplier_name', function ($poData) {
-                return $poData->supplier_name;
-            })->editColumn('created_date_and_time', function ($poData) {
-                return $poData->created_date_and_time;
-            })->editColumn('delivery_date', function ($poData) {
-                return $poData->delivery_date;
-            })->editColumn('delivery_reminder', function ($poData) {
-                return $poData->delivery_reminder;
-            })->editColumn('line_status', function ($poData) {
-                return $poData->line_status;
-            })->editColumn('old_number_format', function ($poData) {
-                return $poData->old_number_format;
-            })->editColumn('lt', function ($poData) {
-                return $poData->lt;
-            })->editColumn('standar_datang', function ($poData) {
-                return $poData->standar_datang;
-            })->editColumn('bulan_datang', function ($poData) {
-                return $poData->bulan_datang;
-            })->editColumn('ket_late', function ($poData) {
-                return $poData->ket_late;
-            })->editColumn('ket_lt', function ($poData) {
-                return $poData->ket_lt;
-            })->editColumn('price', function ($poData) {
-                return $poData->price;
-            })->editColumn('amount', function ($poData) {
-                return $poData->amount;
-            })->rawColumns(['purchase_order', 'item_number', 'product_name', 'purchase_requisition', 'supplier_name', 'created_date_and_time', 'delivery_date', 'delivery_reminder', 'line_status', 'old_number_format', 'lt', 'standar_datang', 'bulan_datang', 'ket_late', 'ket_lt', 'price', 'amount'])->make(true);
+        $poData = OpenPo::whereYear('date', $year)
+            ->whereMonth('date', $month);
+        if ($request->has('purchase_order') && $request->purchase_order !== ''){
+            $poData = $poData->where('purchase_order', $request->purchase_order);
+        }
+        return DataTables::of($poData)->make(true);
     }
 
     public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:csv,xlsx'
+            'file' => 'required|file|mimes:csv,xlsx',
+            'date' => 'required'
         ]);
-        $import = new PoImport($import);
+        $dataArray = [];
+        $import = new PoImport($dataArray, $request->date);
         $poVal = Excel::toArray($import, $request->file('file'));
         $emptyPRItems = [];
         $rowCountPo = 0;
+        $updatePO = 0;
+        $duplicateItems = [];
+        $duplicatePO = [];
+        $tempData = [];
+        $cekDate = OpenPo::where(DB::raw("FORMAT(date, 'yyyy MM')"), '=', date('Y m', strtotime($request->date)))->get();
 
         foreach ($poVal as $pv) {
             foreach ($pv as $idx => $i) {
@@ -109,55 +114,125 @@ class OpenPoController extends Controller
                         $late = 'ON PROCESS';
                     }
 
-                    // $ket_late = ($monthDelivery == date(now('m'))) ? 'LATE' : 'NOT LATE';
                     $ket_lt = ($convertDelivery <= $standarDatang) ? 'LEAD TIME' : 'NON LEAD TIME';
 
                     if (empty($i[3]) || $i[3] == 'NaN') {
                         $emptyPRItems[] = $i[1];
                     }
 
-                    OpenPo::create([
-                        'purchase_order' => $i[0],
-                        'item_number' => $i[1],
-                        'product_name' => $i[2],
-                        'purchase_requisition' => $i[3] ?? 'NaN',
-                        'tpqty' => $i[4],
-                        'tpunit' => $i[5],
-                        'tpsite' => $i[6],
-                        'tpvendor' => $i[7],
-                        'delivery_date' => $convertDelivery,
-                        'delivery_reminder' => $i[9],
-                        'old_number_format' => $i[10],
-                        'created_date_and_time' => $convertCreated,
-                        'tpstatus' => $i[12],
-                        'line_status' => $i[13],
-                        'supplier_name' => $i[14],
-                        'standar_datang' => $standarDatangFormatted,
-                        'bulan_datang' => $monthDelivery,
-                        'lt' => $lt,
-                        'ket_late' => $late,
-                        'ket_lt' => $ket_lt,
-                        'price' => round($i[15], 3),
-                        'amount' => $i[15] * $i[9]
-                    ]);
-                    $rowCountPo++;
+                    $duplicateInArray = collect($tempData)->contains(function ($value) use ($i, $request){
+                        return $value['item_number'] == $i[1] && $value['purchase_order'] == $i[0];
+                    });
+
+                    if($duplicateInArray){
+                        $duplicatePO[] = $i[0];
+                        $duplicateItems[] = $i[1];
+                    } else {
+                        $tempData[] = [
+                            'purchase_order' => $i[0],
+                            'item_number' => $i[1],
+                            'product_name' => $i[2],
+                            'purchase_requisition' => $i[3] ?? 'NaN',
+                            'tpqty' => $i[4],
+                            'tpunit' => $i[5],
+                            'tpsite' => $i[6],
+                            'tpvendor' => $i[7],
+                            'delivery_date' => $convertDelivery,
+                            'delivery_reminder' => $i[9],
+                            'old_number_format' => $i[10],
+                            'created_date_and_time' => $convertCreated,
+                            'tpstatus' => $i[12],
+                            'line_status' => $i[13],
+                            'supplier_name' => $i[14],
+                            'standar_datang' => $standarDatangFormatted,
+                            'bulan_datang' => $monthDelivery,
+                            'lt' => $lt,
+                            'ket_late' => $late,
+                            'ket_lt' => $ket_lt,
+                            'date' => $request->date
+                        ];
+                    }
                 }
             }
         }
-        if (!empty($emptyPRItems)) {
+        if (!empty($duplicateItems) && !empty($duplicatePO)) {
+            $uniqueDuplicateItems = array_unique($duplicateItems);
+            $uniqueDuplicatePO = array_unique($duplicatePO);
+            $duplicateItemList = implode(', ', $uniqueDuplicateItems);
+            $duplicatePOList = implode(', ', $uniqueDuplicatePO);
             return back()->with([
-                'status' => 'warning',
-                'message' => 'Import berhasil dengan catatan',
-                'emptyPRItems' => $emptyPRItems,
-                'rowCountPo' => $rowCountPo
+                'swal' => [
+                    'type' => 'error',
+                    'title' => 'Import Gagal!',
+                    'text' => "Terdapat duplikasi pada Item Number berikut: {$duplicateItemList} dengan Purchase Order berikut: {$duplicatePOList}."
+                ]
             ]);
         }
 
-        return back()->with([
-            'status' => 'success',
-            'message' => 'Import berhasil',
-            'rowCountPo' => $rowCountPo
-        ]);
+        if($cekDate){
+            foreach($tempData as $data){
+                $itemInCekDate = collect($cekDate)->first(function ($value) use ($data) {
+                    return $value['purchase_order'] === $data['purchase_order'] && $value['item_number'] === $data['item_number'];
+                });
+                if ($itemInCekDate) {
+                    OpenPo::where([
+                        ['purchase_order', '=', $data['purchase_order']],
+                        ['item_number', '=', $data['item_number']]
+                    ])->update($data);
+                    $updatePO++;
+                } else {
+                    OpenPo::create($data);
+                    $rowCountPo++;
+                }
+            }
+        } else {
+            foreach ($tempData as $data){
+                OpenPo::create($data);
+            }
+            $rowCountPo++;
+        }
+
+        if (!empty($emptyPRItems)) {
+            $emptyPRItemsList = implode(', ', $emptyPRItems);
+            return back()->with([
+                'swal' => [
+                    'type' => 'warning',
+                    'message' => 'Import Berhasil dengan catatan',
+                    'text' => "Berhasil mengimpor {$rowCountPo} baris data Purchase Order dengan Purchase Requisiton {$emptyPRItemsList} yang blank."
+                ]
+            ]);
+        } else if (!empty($emptyPRItems) && $updatePO > 0){
+            $emptyPRItemsList = implode(', ', $emptyPRItems);
+            return back()->with([
+                'swal' => [
+                    'type' => 'warning',
+                    'message' => 'Berhasil Import dan Update data dengan Catatan',
+                    'text' => "Berhasil mengimpor {$rowCountPo} baris data dan update {$updatePO} baris data dengan Purchase Requisition ($emptyPRItemsList} yang blank."
+                ]
+            ]);
+        } else if ($updatePO > 0){
+            return back()->with([
+                'swal' => [
+                    'type' => 'success',
+                    'message' => 'Berhasil Import dan Update data dengan Catatan',
+                    'text' => "Berhasil mengimpor {$rowCountPo} baris data dan update {$updatePO} baris data."
+                ]
+            ]);
+        } else {
+            return back()->with([
+                'swal' => [
+                    'type' => 'success',
+                    'message' => 'Import Berhasil',
+                    'text' => "Berhasil mengimpor {$rowCountPo} baris data."
+                ]
+            ]);
+        }
+    }
+
+    public function export($year, $month)
+    {
+        $monthName = DateTime::createFromFormat('!m', $month)->format('F');
+        return Excel::download(new PurchaseOrderExport($year, $month), 'Purchase Order '. $monthName . ' - ' . $year . '.xlsx');
     }
 
     /**
@@ -197,7 +272,21 @@ class OpenPoController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'delivery_reminder' => 'required',
+            'id' => 'required'
+        ]);
+        $poData = OpenPo::findOrFail($id);
+        $poData->update([
+            'delivery_reminder' => $validated['delivery_reminder']
+        ]);
+        return response()->json([
+            'swal' => [
+                'type' => 'success',
+                'title' => 'Berhasil',
+                'message' => 'Quantity Purchase Order berhasil diperbaharui'
+            ]
+        ]);
     }
 
     /**

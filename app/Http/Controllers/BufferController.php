@@ -5,11 +5,11 @@ namespace App\Http\Controllers;
 use App\Exports\BufferExport;
 use App\Imports\BufferImport;
 use App\Models\Buffer;
-use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Rels;
 use Yajra\DataTables\Facades\DataTables;
 
 class BufferController extends Controller
@@ -51,43 +51,37 @@ class BufferController extends Controller
         ]);
     }
 
-    public function visualization() {
-        $bufferData = Buffer::selectRaw('MONTH([date]) as month, count(*) as count')
-            ->groupByRaw('MONTH([date])')
-            ->get();
-        return view('buffer.visualization', [
-            'title' => 'Visualization Buffer',
-            'bufferData' => $bufferData
-        ]);
-    }
-
     public function format_buffer()
     {
         $filePath = public_path('doc/format-buffer.xlsx');
         return response()->download($filePath);
     }
 
-    public function get_data($year, $month)
+    public function get_unique_lt($year, $month)
+    {
+        $uniqueLTs = Buffer::whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->distinct('lt')
+            ->pluck('lt')
+            ->filter(function ($value) {
+                return $value !== null;
+            })
+            ->values()
+            ->toArray();
+
+        return response()->json($uniqueLTs);
+    }
+
+    public function get_data(Request $request, $year, $month)
     {
         $bufferData = Buffer::whereYear('date', $year)
-            ->whereMonth('date', $month)
-            ->select('*');
-        return DataTables::of($bufferData)
-            ->editColumn('item_number', function ($bufferData) {
-                return $bufferData->item_number;
-            })->editColumn('part_number', function ($bufferData) {
-                return $bufferData->part_number;
-            })->editColumn('product_name', function ($bufferData) {
-                return $bufferData->product_name;
-            })->editColumn('lt', function ($bufferData) {
-                return $bufferData->lt;
-            })->editColumn('supplier', function ($bufferData) {
-                return $bufferData->supplier;
-            })->editColumn('qty', function ($bufferData) {
-                return $bufferData->qty;
-            })->editColumn('date', function ($bufferData) {
-                return $bufferData->date;
-            })->rawColumns(['item_number', 'part_number', 'product_name', 'lt', 'supplier', 'qty', 'date'])->make(true);
+            ->whereMonth('date', $month);
+
+        if ($request->has('lt') && $request->lt !== '') {
+            $bufferData = $bufferData->where('lt', $request->lt);
+        }
+
+        return DataTables::of($bufferData)->make(true);
     }
 
     public function import(Request $request)
@@ -101,43 +95,57 @@ class BufferController extends Controller
         $tempData = [];
         $rowCountBuffer = 0;
         $ltBlank = [];
+        $duplicateItems = [];
         $cekDate = Buffer::where(DB::raw("FORMAT(date, 'yyyy MM')"), '=', date('Y m', strtotime($request->date)))->get();
 
         foreach ($bufferVal as $bv) {
             foreach ($bv as $idx => $i) {
                 if ($idx > 0) {
-
                     $duplicateInArray = collect($tempData)->contains(function ($value) use ($i, $request) {
                         return $value['item_number'] == $i[0] && $value['date'] == $request->date;
                     });
 
-                    if ($i[4] == null || $i[4] == '0' || $i[4] == 0) {
-                        $ltBlank[] = $i[4];
-                    }
-
                     if ($duplicateInArray) {
-                        $errorMessage = 'Terdapat duplikasi dengan item number ' . $i[0] . ' pada bulan ini.';
-                        return back()->with([
-                            'swal' => [
-                                'type' => 'error',
-                                'title' => 'Import Gagal',
-                                'text' => $errorMessage,
-                            ]
-                        ]);
+                        $duplicateItems[] = $i[0];
+                    } else if ($i[4] === null) {
+                        $ltBlank[] = $i[4];
+                        $tempData[] = [
+                            'item_number' => $i[0],
+                            'part_number' => $i[1],
+                            'product_name' => $i[2],
+                            'usage' => $i[3],
+                            'lt' => '-',
+                            'supplier' => $i[5],
+                            'qty' => intval($i[6]),
+                            'date' => $request->date
+                        ];
+                    } else {
+                        $tempData[] = [
+                            'item_number' => $i[0],
+                            'part_number' => $i[1],
+                            'product_name' => $i[2],
+                            'usage' => $i[3],
+                            'lt' => $i[4],
+                            'supplier' => $i[5],
+                            'qty' => intval($i[6]),
+                            'date' => $request->date
+                        ];
                     }
-
-                    $tempData[] = [
-                        'item_number' => $i[0],
-                        'part_number' => $i[1],
-                        'product_name' => $i[2],
-                        'usage' => $i[3],
-                        'lt' => $i[4],
-                        'supplier' => $i[5],
-                        'qty' => intval($i[6]),
-                        'date' => $request->date
-                    ];
                 }
             }
+        }
+
+        if (!empty($duplicateItems)) {
+            $duplicateItems = array_unique($duplicateItems);
+            $duplicateList = implode(', ', $duplicateItems);
+
+            return back()->with([
+                'swal' => [
+                    'type' => 'error',
+                    'title' => 'Import Gagal',
+                    'text' => "Terdapat duplikasi pada item number berikut: {$duplicateList}.",
+                ]
+            ]);
         }
 
         if ($cekDate) {
@@ -165,7 +173,7 @@ class BufferController extends Controller
                 'swal' => [
                     'type' => 'warning',
                     'title' => 'Import Berhasil dengan Catatan',
-                    'text' => "Berhasil impor {$rowCountBuffer} baris data buffer dengan jumlah {$countLt} LT yang kosong.",
+                    'text' => "Berhasil impor {$rowCountBuffer} baris data buffer dengan jumlah {$countLt} LT yang blanks.",
                 ]
             ]);
         } else {
@@ -178,6 +186,7 @@ class BufferController extends Controller
             ]);
         }
     }
+
 
     public function export($year, $month)
     {
@@ -227,12 +236,10 @@ class BufferController extends Controller
             'id' => 'required'
         ]);
         $buffer = Buffer::findOrFail($id);
-
         $buffer->update([
             'qty' => $validated['qty'],
         ]);
 
-        // return response()->json(['message' => 'Update successful']);
         return response()->json([
             'swal' => [
                 'type' => 'success',

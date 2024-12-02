@@ -1,8 +1,9 @@
 @extends('layouts.main')
 @section('content')
     <div class="content-wrapper">
-        <a href="{{ route('buffer.index') }}" style="text-decoration: none;">Customization Data |</a>
-        <a href="{{ route('buffer.visualisasi') }}" style="text-decoration: none;">Visualization</a>
+        <a href="{{ route('buffer.index') }}" style="text-decoration: none; color: {{ request()->routeIs('buffer.index') ? 'purple' : 'blue' }}">Buffer |</a>
+        <a href="{{ route('stok.index') }}" style="text-decoration: none; color: {{ request()->routeIs('stok.index') ? 'purple' : 'blue' }}"> Stock | </a>
+        <a href="{{ route('buffer.stok.visualisasi') }}" style="text-decoration: none; color: {{ request()->routeIs('buffer.stok.visualisasi') ? 'purple' : 'blue' }}"> Visualization</a>
 
         <div class="row mt-3">
             <div class="col-md-7 grid-margin stretch-card">

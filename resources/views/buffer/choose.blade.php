@@ -1,12 +1,14 @@
 @extends('layouts.main')
 @section('content')
     <div class="content-wrapper">
-        <a href="{{ route('buffer.index') }}" style="text-decoration: none" >Customization Data | </a>
-        <a href="{{ route('buffer.visualisasi') }}" style="text-decoration: none" >Visualization</a>
+        <a href="{{ route('buffer.index') }}" style="text-decoration: none; color: {{ request()->routeIs('buffer.index') ? 'purple' : 'blue' }}">Buffer |</a>
+        <a href="{{ route('stok.index') }}" style="text-decoration: none; color: {{ request()->routeIs('stok.index') ? 'purple' : 'blue' }}"> Stock | </a>
+        <a href="{{ route('buffer.stok.visualisasi') }}" style="text-decoration: none; color: {{ request()->routeIs('buffer.stok.visualisasi') ? 'purple' : 'blue' }}"> Visualization</a>
+
         <div class="col-lg-12 grid-margin stretch-card mt-3">
             <div class="card">
                 <div class="page-header ms-4 mt-3">
-                    <h3>Choose Month to <span class="text-primary">View</span> or <span class="text-primary">Edit</span> Data Stock</h3>
+                    <h3>Choose Month to <span class="text-primary">View</span> or <span class="text-primary">Edit</span> Data Buffer</h3>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li><button type="button" class="btn btn-gradient-danger btn-rounded"
@@ -39,8 +41,7 @@
                                 @csrf
                                 <div class="modal-body">
                                     <label for="date" class="form-label"><strong>Date</strong></label>
-                                    <input type="date" name="date" id="date" class="form-control"
-                                        value="<?php echo date('Y-m-d'); ?>" required>
+                                    <input type="date" name="date" id="date" class="form-control" value="<?php echo date('Y-m-d'); ?>" required>
                                     <label for="date" class="form-label mt-2"><strong>Choose File</strong></label>
                                     <input class="form-control" type="file" id="file" name="file" required>
                                 </div>

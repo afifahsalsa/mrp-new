@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\StokExport;
 use App\Imports\StokImport;
 use App\Models\Buffer;
 use App\Models\Stok;
@@ -29,7 +30,8 @@ class StokController extends Controller
         ]);
     }
 
-    public function index_edit($year, $month){
+    public function index_edit($year, $month)
+    {
         $monthName = DateTime::createFromFormat('!m', $month)->format('F');
         return view('stok.index', [
             'title' => 'Edit Stok',
@@ -39,11 +41,14 @@ class StokController extends Controller
         ]);
     }
 
-    public function index_view($year, $month){
+    public function index_view($year, $month)
+    {
+        $monthName = DateTime::createFromFormat('!m', $month)->format('F');
         return view('stok.view', [
             'title' => 'View Stok',
             'year' => $year,
-            'month' => $month
+            'month' => $month,
+            'monthName' => $monthName
         ]);
     }
 
@@ -53,31 +58,31 @@ class StokController extends Controller
         return response()->download($filePath);
     }
 
-    public function get_data($year, $month)
+    public function get_unique_lt($year, $month)
+    {
+        $uniqueLTs = Stok::whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->distinct('lt')
+            ->pluck('lt')
+            ->filter(function ($value) {
+                return $value !== null;
+            })
+            ->values()
+            ->toArray();
+
+        return response()->json($uniqueLTs);
+    }
+
+    public function get_data(Request $request, $year, $month)
     {
         $stokData = Stok::whereYear('date', $year)
-            ->whereMonth('date', $month)
-            ->select('*');
-        return DataTables::of($stokData)
-            ->editColumn('item_number', function ($stokData) {
-                return $stokData->item_number;
-            })->editColumn('part_number', function ($stokData) {
-                return $stokData->part_number;
-            })->editColumn('product_name', function ($stokData) {
-                return $stokData->product_name;
-            })->editColumn('lt', function ($stokData) {
-                return $stokData->lt;
-            })->editColumn('li', function ($stokData) {
-                return $stokData->li;
-            })->editColumn('stok', function ($stokData) {
-                return $stokData->stok;
-            })->editColumn('qty_buffer', function ($stokData) {
-                return $stokData->qty_buffer;
-            })->editColumn('percentage', function ($stokData) {
-                return $stokData->percentage;
-            })->editColumn('date', function ($stokData) {
-                return $stokData->date;
-            })->rawColumns(['item_number', 'part_number', 'product_name','lt', 'li', 'stok', 'qty_buffer', 'percentage', 'date'])->make(true);
+            ->whereMonth('date', $month);
+
+        if ($request->has('lt') && $request->lt !== '') {
+            $stokData = $stokData->where('lt', $request->lt);
+        }
+
+        return DataTables::of($stokData)->make(true);
     }
 
     public function import(Request $request)
@@ -90,108 +95,109 @@ class StokController extends Controller
         $dataArray = [];
         $import = new StokImport($dataArray, $request->date);
         $stokVal = Excel::toArray($import, $request->file('file'));
+
         $month = date('m', strtotime($request->date));
+        $year = date('Y', strtotime($request->date));
+
+        $tempData = [];
+        $duplicateItems = [];
+        $ltBlank = [];
         $rowCountStok = 0;
+
+        $cekDate = Stok::whereRaw("YEAR(date) = ? AND MONTH(date) = ?", [$year, $month])->get();
 
         foreach ($stokVal as $sv) {
             foreach ($sv as $idx => $i) {
-                if ($idx > 0) {
-                    $cekItem = Buffer::where('item_number', $i[0])->first();
-                    if(!$cekItem){
-                        return back()->with([
-                            'status' => 'error',
-                            'message' => 'Item Number Stok tidak ditemukan pada database Buffer'
-                        ]);
-                    }
-                    $monthItem = date('m', strtotime($cekItem->date));
+                if ($idx === 0) continue;
 
-                    if($i[3] == null){
-                        $lt = '0';
-                    } else {
-                        $lt = $i[3];
-                    }
-
-                    if ($cekItem && $month == $monthItem) {
-                        if($cekItem->qty == 0 || $cekItem->qty == '0'){
-                            Stok::create([
-                                'buffer_id' => $cekItem->id,
-                                'item_number' => $i[0],
-                                'part_number' => $i[1],
-                                'product_name' => $i[2],
-                                'lt' => $lt,
-                                'li' => $i[5],
-                                'stok' => intval($i[4]),
-                                'qty_buffer' => $cekItem->qty,
-                                'percentage' => 0,
-                                'date' => $request->date
-                            ]);
-                        } else{
-                            $percentage = ($i[4] / $cekItem->qty) * 100;
-                            Stok::create([
-                                'buffer_id' => $cekItem->id,
-                                'item_number' => $i[0],
-                                'part_number' => $i[1],
-                                'product_name' => $i[2],
-                                'lt' => $lt,
-                                'li' => $i[5],
-                                'stok' => intval($i[4]),
-                                'qty_buffer' => $cekItem->qty,
-                                'percentage' =>  intval($percentage),
-                                'date' => $request->date
-                            ]);
-                        }
-                    } else if ($cekItem) {
-                        if($cekItem->qty == 0 || $cekItem->qty == '0'){
-                            Stok::create([
-                                'buffer_id' => $cekItem->id,
-                                'item_number' => $i[0],
-                                'part_number' => $i[1],
-                                'product_name' => $i[2],
-                                'lt' => $lt,
-                                'li' => $i[5],
-                                'stok' => intval($i[4]),
-                                'qty_buffer' => $cekItem->qty,
-                                'percentage' => 0,
-                                'date' => $request->date
-                            ]);
-                        } else{
-                            $percentage = round(($i[4] / $cekItem->qty) * 100, 2);
-                            Stok::create([
-                                'buffer_id' => $cekItem->id,
-                                'item_number' => $i[0],
-                                'part_number' => $i[1],
-                                'product_name' => $i[2],
-                                'lt' => $lt,
-                                'li' => $i[5],
-                                'stok' => intval($i[4]),
-                                'qty_buffer' => $cekItem->qty,
-                                'percentage' => intval($percentage),
-                                'date' => $request->date
-                            ]);
-                        }
-                    } else {
-                        Stok::create([
-                            'buffer_id' => null,
-                            'item_number' => $i[0],
-                            'part_number' => $i[1],
-                            'product_name' => $i[2],
-                            'lt' => $lt,
-                            'li' => $i[5],
-                            'stok' => intval($i[4]),
-                            'qty_buffer' => null,
-                            'percentage' => null,
-                            'date' => $request->date
-                        ]);
-                    }
-                    $rowCountStok++;
+                $cekItem = Buffer::where('item_number', $i[0])->first();
+                if (!$cekItem) {
+                    return back()->with([
+                        'status' => 'error',
+                        'message' => "Item Number {$i[0]} tidak ditemukan pada database Buffer"
+                    ]);
                 }
+
+                $duplicateInArray = collect($tempData)->contains(function ($value) use ($i, $request) {
+                    return $value['item_number'] == $i[0] && $value['date'] == $request->date;
+                });
+
+                if ($duplicateInArray) {
+                    $duplicateItems[] = $i[0];
+                    continue;
+                }
+
+                $itemData = [
+                    'buffer_id' => $cekItem->id,
+                    'item_number' => $i[0],
+                    'part_number' => $i[1],
+                    'product_name' => $i[2],
+                    'lt' => $i[3] ?? '-',
+                    'li' => $i[5],
+                    'stok' => intval($i[4]),
+                    'qty_buffer' => $cekItem->qty,
+                    'percentage' => $cekItem->qty > 0 ? intval((intval($i[4]) / intval($cekItem->qty)) * 100) : 0,
+                    'date' => $request->date
+                ];
+
+                if ($itemData['lt'] === '-') {
+                    $ltBlank[] = $i[0];
+                }
+
+                $tempData[] = $itemData;
             }
         }
-        return back()->with([
-            'status' => 'success',
-            'message' => 'Import Sukses!!!',
-            'rowCountStok' => $rowCountStok
+
+        if (!empty($duplicateItems)) {
+            $duplicateItems = array_unique($duplicateItems);
+            $duplicateList = implode(', ', $duplicateItems);
+            return back()->with([
+                'swal' => [
+                    'type' => 'error',
+                    'title' => 'Import Gagal!',
+                    'text' => "Terdapat duplikasi pada item number berikut: {$duplicateList}. Silakan periksa kembali file Anda.",
+                ]
+            ]);
+        }
+
+        $importResult = DB::transaction(function () use ($tempData, $cekDate, &$rowCountStok) {
+            foreach ($tempData as $data) {
+                $existingRecord = $cekDate->firstWhere('item_number', $data['item_number']);
+
+                if ($existingRecord) {
+                    Stok::where('item_number', $data['item_number'])
+                        ->whereRaw("YEAR(date) = ? AND MONTH(date) = ?", [
+                            date('Y', strtotime($data['date'])),
+                            date('m', strtotime($data['date']))
+                        ])
+                        ->update($data);
+                } else {
+                    Stok::create($data);
+                }
+                $rowCountStok++;
+            }
+            return $rowCountStok;
+        });
+
+        $countLt = count($ltBlank);
+        $messageType = $countLt > 0 ? 'warning' : 'success';
+        $messageText = $countLt > 0
+            ? "Berhasil impor {$importResult} baris data stok dengan jumlah {$countLt} LT yang blank."
+            : "Berhasil mengimpor {$importResult} baris data.";
+
+        return redirect()->route('stok.view', ['year' => $year, 'month' => $month])->with([
+            'swal' => [
+                'type' => $messageType,
+                'title' => $countLt > 0 ? 'Import Berhasil dengan Catatan' : 'Import Berhasil!',
+                'text' => $messageText
+            ]
         ]);
+    }
+
+    public function export($year, $month)
+    {
+        $monthName = DateTime::createFromFormat('!m', $month)->format('F');
+        return Excel::download(new StokExport($year, $month), 'Stok ' . $monthName .' - '. $year . '.xlsx');
     }
 
     /**
@@ -236,10 +242,21 @@ class StokController extends Controller
             'id' => 'required'
         ]);
         $stok = Stok::findOrFail($id);
-        $percentage = $stok->stok / $stok->qty_buffer;
+        if($stok->qty_buffer == 0){
+            $percentage = 0;
+        } else {
+            $percentage = intval($stok->stok) / intval($stok->qty_buffer) * 100;
+        }
         $stok->update([
             'stok' => $validated['stok'],
-            'percentage' => $percentage
+            'percentage' =>  intval($percentage)
+        ]);
+        return response()->json([
+            'swal' => [
+                'type' => 'success',
+                'title' => 'Berhasil!',
+                'message' => 'Stok berhasil diperbaharui!'
+            ]
         ]);
     }
 

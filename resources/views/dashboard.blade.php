@@ -810,17 +810,6 @@
                     nol: parseInt("{{ $nol }}")
                 };
 
-                const initialPoData = {
-                    qty_lt_now: parseInt("{{ $qty_lt_now }}"),
-                    amount_lt_now: parseFloat("{{ $amount_lt_now }}"),
-                    qty_lt_prev: parseInt("{{ $qty_lt_prev }}"),
-                    amount_lt_prev: parseFloat("{{ $amount_lt_prev }}"),
-                    qty_nlt_now: parseInt("{{ $qty_nlt_now }}"),
-                    amount_nlt_now: parseFloat("{{ $amount_nlt_now }}"),
-                    qty_nlt_prev: parseInt("{{ $qty_nlt_prev }}"),
-                    amount_nlt_prev: parseFloat("{{ $amount_nlt_prev }}")
-                };
-
                 const initialPlanProdData = {
                     bulan_1: ("{{ $bulan_1 }}"),
                     bulan_2: ("{{ $bulan_2 }}"),

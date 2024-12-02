@@ -189,12 +189,10 @@
                 });
             });
 
-            // Event listener for save button click
             $('#stokTable').on('click', '.save-btn', function() {
                 const id = $(this).data('id');
                 const newStok = $(this).siblings('.stok-input').val();
                 const itemNumber = $(this).data('item_number');
-                console.log(id, newStok, itemNumber);
                 const button = $(this);
                 const table = $('#stokTable').DataTable();
 
@@ -250,26 +248,26 @@
                 // button.siblings('.qty-input').prop('enable', true);
             });
 
-            @if (session('status'))
-                @if (session('status') === 'success')
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Import successfull!',
-                        text: `${@json(session('rowCountStok'))} data success imported!`,
-                        timer: 3000,
-                        showConfirmButton: true
-                    }).then(() => {
-                        $('#poTable').DataTable().ajax.reload();
-                    });
-                @elseif (session('status') === 'error')
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Item Number Stok tidak ditemukan pada database Buffer',
-                        timer: 3000,
-                        showConfirmButton: true
-                    });
-                @endif
-            @endif
+            // @if (session('status'))
+            //     @if (session('status') === 'success')
+            //         Swal.fire({
+            //             icon: 'success',
+            //             title: 'Import successfull!',
+            //             text: `${@json(session('rowCountStok'))} data success imported!`,
+            //             timer: 3000,
+            //             showConfirmButton: true
+            //         }).then(() => {
+            //             $('#poTable').DataTable().ajax.reload();
+            //         });
+            //     @elseif (session('status') === 'error')
+            //         Swal.fire({
+            //             icon: 'error',
+            //             title: 'Item Number Stok tidak ditemukan pada database Buffer',
+            //             timer: 3000,
+            //             showConfirmButton: true
+            //         });
+            //     @endif
+            // @endif
 
             function deleteConfirm(formId) {
                 // Dapatkan semua checkbox yang dipilih

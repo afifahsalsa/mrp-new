@@ -2,7 +2,6 @@
 @section('content')
     <div class="content-wrapper">
         <div class="page-header">
-            {{-- <h3 class="page-title">Buffer Table</h3> --}}
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <a href="{{ route('buffer.index') }}"><button class="btn btn-inverse-dark px-4" style="margin-left: -15px;">
@@ -25,10 +24,15 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="table-responsive">
+                            <div class="d-flex">
+                                <h4 class="mt-3">Filter: </h4>
+                                <select id="filter-lt" class="form-select mt-2" style="width: 20%; margin-left: 20px;">
+                                    <option value="">Filter LT</option>
+                                </select>
+                            </div>
                             <table class="table display" id="bufferTable" style="width: 100%">
                                 <thead>
                                     <tr>
-                                        <th><input type="checkbox" class="select-checkbox" id="selectAll"></th>
                                         <th>Item Number</th>
                                         <th>Part Number</th>
                                         <th>Product Name</th>
@@ -39,7 +43,6 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-
                                 </tbody>
                             </table>
                         </div>
@@ -49,74 +52,51 @@
         </div>
     </div>
     @push('scriptBuffer')
-        <script>
-            $(document).ready(function() {
-                const year = {{ $year }};
-                const month = {{ $month }};
+    <script>
+        $(document).ready(function() {
+            const year = {{ $year }};
+            const month = {{ $month }};
 
-                $('#bufferTable').DataTable({
-                    "lengthMenu": [10, 25, 50, 100, 500, 1000],
-                    processing: true,
-                    serverSide: true,
-                    searching: true,
-                    scrollX: true,
-                    ajax: {
-                        url: `/ppic/buffer/load-data/${year}/${month}`,
-                        type: 'GET',
-                    },
-                    columns: [{
-                            data: null,
-                            orderable: false,
-                            className: 'select-checkbox',
-                            defaultContent: '',
-                            render: function(data, type, row) {
-                                return `<input type="checkbox" class="select-checkbox">`;
-                            }
-                        },
-                        {
-                            data: 'item_number',
-                            name: 'item_number'
-                        },
-                        {
-                            data: 'part_number',
-                            name: 'part_number'
-                        },
-                        {
-                            data: 'product_name',
-                            name: 'product_name'
-                        },
-                        {
-                            data: 'lt',
-                            name: 'lt'
-                        },
-                        {
-                            data: 'supplier',
-                            name: 'supplier'
-                        },
-                        {
-                            data: 'qty',
-                            name: 'qty',
-                        },
-                        {
-                            data: 'date',
-                            name: 'date'
-                        }
-                    ],
-                    columnDefs: [{
-                        targets: 0,
-                        orderable: false,
-                        className: 'select-checkbox',
-                        checkboxes: {
-                            selectRow: true
-                        }
-                    }],
-                    select: {
-                        style: 'multi',
-                        selector: 'td:first-child'
+            const table = $('#bufferTable').DataTable({
+                "lengthMenu": [10, 25, 50, 100, 500, 1000],
+                processing: true,
+                serverSide: true,
+                searching: true,
+                scrollX: true,
+                ajax: {
+                    url: `/ppic/buffer/load-data/${year}/${month}`,
+                    type: 'GET',
+                    data: function(d) {
+                        var ltValue = $('#filter-lt').val();
+            if (ltValue) {
+                d.lt = ltValue;
+            }
                     }
-                });
-
+                },
+                columns: [
+                    { data: 'item_number', name: 'item_number' },
+                    { data: 'part_number', name: 'part_number' },
+                    { data: 'product_name', name: 'product_name' },
+                    { data: 'lt', name: 'lt' },
+                    { data: 'supplier', name: 'supplier' },
+                    { data: 'qty', name: 'qty' },
+                    { data: 'date', name: 'date' }
+                ],
+                initComplete: function () {
+                    $.get(`/ppic/buffer/get-unique-lt/${year}/${month}`, function(data) {
+                        var select = $('#filter-lt');
+                        select.empty().append('<option value="">Filter LT</option>');
+                        $.each(data, function(index, value) {
+                            select.append(`<option value="${value}">${value}</option>`);
+                        });
+                    });
+                }
             });
-        </script>
+
+            $('#filter-lt').on('change', function(){
+                table.ajax.reload();
+            });
+        });
+    </script>
     @endpush
 @endsection
