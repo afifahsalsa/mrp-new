@@ -133,7 +133,7 @@
                                                     <div class="modal-header">
                                                         <h3 class="modal-title" id="viewModalLabel">Purchase Order in :
                                                             <span
-                                                                class="text-danger">{{ $mo->month . ', ' . $mo->year }}</span>
+                                                                class="text-danger">{{ \Carbon\Carbon::create()->month($mo->month)->format('F') . ', ' . $mo->year }}</span>
                                                         </h3>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>

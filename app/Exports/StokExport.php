@@ -51,13 +51,13 @@ class StokExport implements FromQuery, WithEvents, WithCustomStartCell
 
                 $event->sheet->setAutoFilter('A1:I1');
                 $event->sheet->getColumnDimension('A')->setAutoSize(true);
-                $event->sheet->getColumnDimension('B')->setAutoSize(true);
-                $event->sheet->getColumnDimension('C')->setAutoSize(true);
+                // $event->sheet->getColumnDimension('B')->setAutoSize(true);
+                // $event->sheet->getColumnDimension('C')->setAutoSize(true);
                 $event->sheet->getColumnDimension('D')->setAutoSize(true);
                 $event->sheet->getColumnDimension('E')->setAutoSize(true);
                 $event->sheet->getColumnDimension('F')->setAutoSize(true);
-                $event->sheet->getColumnDimension('G')->setAutoSize(true);
-                $event->sheet->getColumnDimension('H')->setAutoSize(true);
+                // $event->sheet->getColumnDimension('G')->setAutoSize(true);
+                // $event->sheet->getColumnDimension('H')->setAutoSize(true);
                 $event->sheet->getColumnDimension('I')->setAutoSize(true);
             }
         ];

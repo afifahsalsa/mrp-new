@@ -40,17 +40,6 @@ class BufferController extends Controller
         ]);
     }
 
-    public function index_view($year, $month)
-    {
-        $monthName = DateTime::createFromFormat('!m', $month)->format('F');
-        return view('buffer.view', [
-            'title' => 'View Buffer',
-            'year' => $year,
-            'month' => $month,
-            'monthName' => $monthName
-        ]);
-    }
-
     public function format_buffer()
     {
         $filePath = public_path('doc/format-buffer.xlsx');

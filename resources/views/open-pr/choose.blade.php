@@ -135,7 +135,7 @@
                                                         <h3 class="modal-title" id="viewModalLabel">Purchase Requisition
                                                             in :
                                                             <span
-                                                                class="text-danger">{{ $mp->month . ', ' . $mp->year }}</span>
+                                                                class="text-danger">{{ \Carbon\Carbon::create()->month($mp->month)->format('F') . ', ' . $mp->year }}</span>
                                                         </h3>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>

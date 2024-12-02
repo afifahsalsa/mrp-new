@@ -1,10 +1,14 @@
 @extends('layouts.main')
 @section('content')
     <div class="content-wrapper">
-        <a href="{{ route('buffer.index') }}" style="text-decoration: none; color: {{ request()->routeIs('buffer.index') ? 'purple' : 'blue' }}">Buffer |</a>
-        <a href="{{ route('stok.index') }}" style="text-decoration: none; color: {{ request()->routeIs('stok.index') ? 'purple' : 'blue' }}"> Stock | </a>
-        <a href="{{ route('buffer.stok.visualisasi') }}" style="text-decoration: none; color: {{ request()->routeIs('buffer.stok.visualisasi') ? 'purple' : 'blue' }}"> Visualization</a>
-        
+        <a href="{{ route('buffer.index') }}"
+            style="text-decoration: none; color: {{ request()->routeIs('buffer.index') ? 'purple' : 'blue' }}">Buffer |</a>
+        <a href="{{ route('stok.index') }}"
+            style="text-decoration: none; color: {{ request()->routeIs('stok.index') ? 'purple' : 'blue' }}"> Stock | </a>
+        <a href="{{ route('buffer.stok.visualisasi') }}"
+            style="text-decoration: none; color: {{ request()->routeIs('buffer.stok.visualisasi') ? 'purple' : 'blue' }}">
+            Visualization</a>
+
         <div class="col-lg-12 grid-margin stretch-card mt-3">
             <div class="card">
                 <div class="page-header ms-4 mt-3">
@@ -116,13 +120,78 @@
                                             data-bs-target="#modalUpdateStok">
                                             <i class="mdi mdi-cloud-sync"></i> Update
                                         </button>
-                                        <a href="{{ route('stok.view', ['year' => $ms->year, 'month' => $ms->month]) }}">
+                                        <button class="btn btn-inverse-primary px-4" data-bs-toggle="modal"
+                                            data-bs-target="#viewModal" data-year="{{ $ms->year }}"
+                                            data-month="{{ $ms->month }}">
+                                            <i class="mdi mdi-magnify"></i> View
+                                        </button>
+                                        <div class="modal fade" id="viewModal" tabindex="-1"
+                                            aria-labelledby="viewModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl"
+                                                style="width: 100rem;">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h3 class="modal-title" id="viewModalLabel">Stok in :
+                                                            <span
+                                                                class="text-danger">{{ \Carbon\Carbon::create($ms->year, $ms->month)->format('F') . ', ' . $ms->year }}</span>
+                                                        </h3>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="table-responsive">
+                                                            <table class="table display" id="stokTable"
+                                                                style="width: 100%">
+                                                                <div class="d-flex mb-4">
+                                                                    <h4 class="mt-3">Filter: </h4>
+                                                                    <select id="filter-lt" class="form-select mt-2"
+                                                                        style="width: 20%; margin-left: 20px;">
+                                                                        <option value="">Filter LT</option>
+                                                                    </select>
+                                                                    <a href="{{ route('stok.export', ['year' => $ms->year, 'month' => $ms->month]) }}"
+                                                                        class="ms-auto">
+                                                                        <button type="button"
+                                                                            class="btn btn-gradient-success"
+                                                                            style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
+                                                                            onmouseover="this.style.transform='scale(1.05)';"
+                                                                            onmouseout="this.style.transform='scale(1)';">
+                                                                            <i class="mdi mdi-cloud-download"></i>
+                                                                            Download Excel
+                                                                        </button>
+                                                                    </a>
+                                                                </div>
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Item Number</th>
+                                                                        <th>Part Number</th>
+                                                                        <th>Product Name</th>
+                                                                        <th>LT</th>
+                                                                        <th>Local / Impor</th>
+                                                                        <th>Stok</th>
+                                                                        <th>Date</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-dark"
+                                                            data-bs-dismiss="modal"
+                                                            style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);">Close</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {{-- <a href="{{ route('stok.view', ['year' => $ms->year, 'month' => $ms->month]) }}">
                                             <button class="btn btn-inverse-primary px-4">
                                                 <i class="mdi mdi-magnify"></i> View
                                             </button>
                                             <input type="hidden" id="year" name="year">
                                             <input type="hidden" id="month" name="month">
-                                        </a>
+                                        </a> --}}
                                     </td>
                                 </tr>
                             @empty
@@ -136,4 +205,77 @@
             </div>
         </div>
     </div>
+    @push('scriptStok')
+        <script>
+            $(document).ready(function() {
+                $('#viewModal').on('show.bs.modal', function(event) {
+                    let button = $(event.relatedTarget);
+                    let year = button.data('year');
+                    let month = button.data('month');
+
+                    const table = $('#stokTable').DataTable({
+                        "lengthMenu": [10, 25, 50, 100],
+                        processing: true,
+                        serverSide: true,
+                        scrollX: true,
+                        ajax: {
+                            url: `/ppic/stok/load-data/${year}/${month}`,
+                            type: 'GET',
+                            data: function(d) {
+                                var ltValue = $('#filter-lt').val();
+                                if (ltValue) {
+                                    d.lt = ltValue;
+                                }
+                            }
+                        },
+                        columns: [{
+                                data: 'item_number'
+                            },
+                            {
+                                data: 'part_number'
+                            },
+                            {
+                                data: 'product_name'
+                            },
+                            {
+                                data: 'lt'
+                            },
+                            {
+                                data: 'li'
+                            },
+                            {
+                                data: 'stok'
+                            },
+                            {
+                                data: 'date'
+                            }
+                        ],
+                        initComplete: function() {
+                            $.get(`/ppic/stok/get-unique-lt/${year}/${month}`, function(
+                                data) {
+                                var select = $('#filter-lt');
+                                select.empty().append(
+                                    '<option value="">Filter LT</option>');
+                                $.each(data, function(index, value) {
+                                    select.append(
+                                        `<option value="${value}">${value}</option>`
+                                    );
+                                });
+                            });
+                        },
+                        responsive: true,
+                        autoWidth: false
+                    });
+                    $('#filter-lt').on('change', function() {
+                        table.ajax.reload();
+                    });
+                });
+                $('#viewModal').on('hidden.bs.modal', function() {
+                    if ($.fn.DataTable.isDataTable('#stokTable')) {
+                        $('#stokTable').DataTable().destroy();
+                    }
+                });
+            });
+        </script>
+    @endpush
 @endsection
