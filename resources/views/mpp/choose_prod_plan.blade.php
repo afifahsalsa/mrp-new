@@ -1,27 +1,29 @@
 @extends('layouts.main')
 @section('content')
     <div class="content-wrapper">
-        <a href="{{ route('buffer.index') }}"
-            style="text-decoration: none; color: {{ request()->routeIs('buffer.index') ? 'purple' : 'blue' }}">Buffer |</a>
-        <a href="{{ route('stok.index') }}"
-            style="text-decoration: none; color: {{ request()->routeIs('stok.index') ? 'purple' : 'blue' }}"> Stock | </a>
-        <a href="{{ route('buffer.stok.visualisasi') }}"
-            style="text-decoration: none; color: {{ request()->routeIs('buffer.stok.visualisasi') ? 'purple' : 'blue' }}">
-            Visualization</a>
+        <a href="{{ route('order-customer.index') }}"
+            style="text-decoration: none; color: {{ request()->routeIs('order-customer.index') ? 'purple' : 'blue' }}">Order
+            Customer |</a>
+        <a href="{{ route('prod-plan.index') }}"
+            style="text-decoration: none; color: {{ request()->routeIs('prod-plan.index') ? 'purple' : 'blue' }}">
+            Production Planning | </a>
+        <a href="{{ route('max.index') }}"
+            style="text-decoration: none; color: {{ request()->routeIs('max.index') ? 'purple' : 'blue' }}">
+            Maximum Unit</a>
 
         <div class="col-lg-12 grid-margin stretch-card mt-3">
             <div class="card">
                 <div class="page-header ms-4 mt-3">
                     <h3>Choose Month to <span class="text-primary">View</span> or <span class="text-primary">Edit</span>
-                        Data Stock</h3>
+                        Data Production Planning</h3>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li><button type="button" class="btn btn-gradient-danger btn-rounded"
                                     style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
                                     onmouseover="this.style.transform='scale(1.05)';"
                                     onmouseout="this.style.transform='scale(1)';" data-bs-toggle="modal"
-                                    data-bs-target="#modalImportStok">Add New</button></li>
-                            <li> <a href="{{ route('stok.format') }}">
+                                    data-bs-target="#modalImportMpp">Add New</button></li>
+                            <li> <a href="{{ route('mpp.format') }}">
                                     <button type="button" class="btn btn-gradient-info btn-rounded ms-2"
                                         style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
                                         onmouseover="this.style.transform='scale(1.05)';"
@@ -32,23 +34,23 @@
                 </div>
 
                 {{-- Modal Import --}}
-                <div class="modal fade" id="modalImportStok" tabindex="-1" aria-labelledby="modalLabelStok"
-                    aria-hidden="true">
+                <div class="modal fade" id="modalImportMpp" tabindex="-1" aria-labelledby="modalLabelMpp"
+                    aria-hidden="true" onsubmit="showLoading()">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="modalLabelStok">Import File Stok</h1>
+                                <h1 class="modal-title fs-5" id="modalLabelMpp">Import File MPP</h1>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Close"></button>
                             </div>
-                            <form action="{{ route('stok.import') }}" enctype="multipart/form-data" method="POST"
-                                id="importStok">
+                            <form action="{{ route('mpp.import') }}" enctype="multipart/form-data" method="POST"
+                                id="importMpp">
                                 @csrf
                                 <div class="modal-body">
-                                    <label for="date" class="form-label"><strong>Date</strong></label>
-                                    <input type="date" name="date" id="date" class="form-control"
-                                        value="<?php echo date('Y-m-d'); ?>" required>
-                                    <label for="date" class="form-label mt-2"><strong>Choose File</strong></label>
+                                    <label for="month" class="form-label"><strong>Choose Month</strong></label>
+                                    <input type="month" name="month" id="month" class="form-control"
+                                        value="<?php echo date('Y-m'); ?>" required>
+                                    <label for="file" class="form-label mt-2"><strong>Choose File</strong></label>
                                     <input class="form-control" type="file" id="file" name="file" required>
                                 </div>
                                 <div class="modal-footer">
@@ -61,23 +63,23 @@
                 </div>
 
                 <!-- Modal Update -->
-                <div class="modal fade" id="modalUpdateStok" tabindex="-1" aria-labelledby="exampleModalLabel"
+                <div class="modal fade" id="modalUpdateMpp" tabindex="-1" aria-labelledby="exampleModalLabel"
                     aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="exampleModalLabel">Update Data Stok</h1>
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Update Data MPP</h1>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Close"></button>
                             </div>
-                            <form action="{{ route('stok.import') }}" enctype="multipart/form-data" method="POST"
-                                id="importStok">
+                            <form action="{{ route('mpp.import') }}" enctype="multipart/form-data" method="POST"
+                                id="importMpp">
                                 @csrf
                                 <div class="modal-body">
-                                    <label for="date" class="form-label"><strong>Date</strong></label>
-                                    <input type="date" name="date" id="date" class="form-control"
-                                        value="<?php echo date('Y-m-d'); ?>" required>
-                                    <label for="date" class="form-label mt-2"><strong>Choose File</strong></label>
+                                    <label for="month" class="form-label"><strong>Choose Month</strong></label>
+                                    <input type="month" name="month" id="month" class="form-control"
+                                        value="<?php echo date('Y-m'); ?>" required>
+                                    <label for="file" class="form-label mt-2"><strong>Choose File</strong></label>
                                     <input class="form-control" type="file" id="file" name="file" required>
                                     <p class="ms-1 text-danger">Upload file dengan format yang sesuai saat import!</p>
                                 </div>
@@ -101,45 +103,46 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($monthStok as $index => $ms)
+                            @forelse ($monthProdPlan as $index => $mp)
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
                                     <td>
-                                        {{ \Carbon\Carbon::create($ms->year, $ms->month)->format('F Y') }}
+                                        {{ \Carbon\Carbon::create($mp->year, $mp->month)->format('F Y') }}
                                     </td>
                                     <td>
-                                        <a
-                                            href="{{ route('stok.index-edit', ['year' => $ms->year, 'month' => $ms->month]) }}">
+                                        {{-- <a
+                                            href="{{ route('buffer.index-edit', ['year' => $mp->year, 'month' => $mp->month]) }}">
                                             <button class="btn btn-inverse-dark px-4">
                                                 <i class="mdi mdi-table-edit"></i> Edit
                                             </button>
                                             <input type="hidden" id="year" name="year">
                                             <input type="hidden" id="month" name="month">
-                                        </a>
+                                        </a> --}}
                                         <button class="btn btn-inverse-success px-4" data-bs-toggle="modal"
-                                            data-bs-target="#modalUpdateStok">
+                                            data-bs-target="#modalUpdateMpp">
                                             <i class="mdi mdi-cloud-sync"></i> Update
                                         </button>
                                         <button class="btn btn-inverse-primary px-4" data-bs-toggle="modal"
-                                            data-bs-target="#viewModal" data-year="{{ $ms->year }}"
-                                            data-month="{{ $ms->month }}">
+                                            data-bs-target="#viewModal" data-year="{{ $mp->year }}"
+                                            data-month="{{ $mp->month }}">
                                             <i class="mdi mdi-magnify"></i> View
                                         </button>
                                         <div class="modal fade" id="viewModal" tabindex="-1"
-                                            aria-labelledby="viewModalLabel" aria-hidden="true">
+                                            aria-labelledby="viewModalMpp" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl"
                                                 style="width: 100rem;">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h3 class="modal-title" id="viewModalLabel">Stok in :
-                                                            <span id="modalMonthYear" class="text-danger"></span>
+                                                        <h3 class="modal-title" id="viewModalMpp">Production Planning in :
+                                                            <span
+                                                                class="text-danger">{{ \Carbon\Carbon::create()->month($mp->month)->format('F') .', ' .$mp->year }}</span>
                                                         </h3>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
                                                         <div class="table-responsive">
-                                                            <table class="table display" id="stokTable"
+                                                            <table class="table display" id="prodPlanTable"
                                                                 style="width: 100%">
                                                                 <div class="d-flex mb-4">
                                                                     <h4 class="mt-3">Filter: </h4>
@@ -147,25 +150,26 @@
                                                                         style="width: 20%; margin-left: 20px;">
                                                                         <option value="">Filter LT</option>
                                                                     </select>
-                                                                    <a href="#" id="downloadLink" class="ms-auto">
-                                                                        <button type="button" class="btn btn-gradient-success"
-                                                                            style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
-                                                                            onmouseover="this.style.transform='scale(1.05)';"
-                                                                            onmouseout="this.style.transform='scale(1)';">
-                                                                            <i class="mdi mdi-cloud-download"></i>
-                                                                            Download Excel
-                                                                        </button>
-                                                                    </a>
                                                                 </div>
                                                                 <thead>
                                                                     <tr>
-                                                                        <th>Item Number</th>
+                                                                        <th>Customer</th>
+                                                                        <th>Model</th>
+                                                                        <th>Kode FGS</th>
                                                                         <th>Part Number</th>
-                                                                        <th>Product Name</th>
-                                                                        <th>LT</th>
-                                                                        <th>Local / Impor</th>
-                                                                        <th>Stok</th>
-                                                                        <th>Date</th>
+                                                                        <th>Kategori</th>
+                                                                        <th>Bulan 1</th>
+                                                                        <th>Bulan 2</th>
+                                                                        <th>Bulan 3</th>
+                                                                        <th>Bulan 4</th>
+                                                                        <th>Bulan 5</th>
+                                                                        <th>Bulan 6</th>
+                                                                        <th>Bulan 7</th>
+                                                                        <th>Bulan 8</th>
+                                                                        <th>Bulan 9</th>
+                                                                        <th>Bulan 10</th>
+                                                                        <th>Bulan 11</th>
+                                                                        <th>Bulan 12</th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
@@ -182,13 +186,6 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        {{-- <a href="{{ route('stok.view', ['year' => $ms->year, 'month' => $ms->month]) }}">
-                                            <button class="btn btn-inverse-primary px-4">
-                                                <i class="mdi mdi-magnify"></i> View
-                                            </button>
-                                            <input type="hidden" id="year" name="year">
-                                            <input type="hidden" id="month" name="month">
-                                        </a> --}}
                                     </td>
                                 </tr>
                             @empty
@@ -202,7 +199,7 @@
             </div>
         </div>
     </div>
-    @push('scriptStok')
+    @push('scriptMpp')
         <script>
             $(document).ready(function() {
                 $('#viewModal').on('show.bs.modal', function(event) {
@@ -210,81 +207,109 @@
                     let year = button.data('year');
                     let month = button.data('month');
 
-                    const table = $('#stokTable').DataTable({
+                    function generateMonthNames(startMonth, startYear) {
+                        let monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                            'July', 'August', 'September', 'October', 'November', 'December'
+                        ];
+                        let monthLabels = [];
+
+                        for (let i = 0; i < 12; i++) {
+                            let currentMonth = (parseInt(startMonth) + i - 1) % 12;
+                            let currentYear = startYear + Math.floor((parseInt(startMonth) + i - 1) / 12);
+                            monthLabels.push(`${monthNames[currentMonth]} ${currentYear}`);
+                        }
+                        return monthLabels;
+                    }
+
+                    const monthLabels = generateMonthNames(month, year);
+
+                    const table = $('#prodPlanTable').DataTable({
                         "lengthMenu": [10, 25, 50, 100],
                         processing: true,
                         serverSide: true,
                         scrollX: true,
                         ajax: {
-                            url: `/ppic/stok/load-data/${year}/${month}`,
+                            url: `/ppic/mpp/order-original/load-data/${year}/${month}`,
                             type: 'GET',
-                            data: function(d) {
-                                var ltValue = $('#filter-lt').val();
-                                if (ltValue) {
-                                    d.lt = ltValue;
-                                }
-                            }
                         },
                         columns: [{
-                                data: 'item_number'
+                                data: 'customer'
                             },
                             {
-                                data: 'part_number'
+                                data: 'model'
                             },
                             {
-                                data: 'product_name'
+                                data: 'kodefgs'
                             },
                             {
-                                data: 'lt'
+                                data: 'partnumber'
                             },
                             {
-                                data: 'li'
+                                data: 'kategori'
                             },
                             {
-                                data: 'stok'
+                                data: 'prod_plan_bulan_1',
+                                title: monthLabels[0]
                             },
                             {
-                                data: 'date'
+                                data: 'prod_plan_bulan_2',
+                                title: monthLabels[1]
+                            },
+                            {
+                                data: 'prod_plan_bulan_3',
+                                title: monthLabels[2]
+                            },
+                            {
+                                data: 'prod_plan_bulan_4',
+                                title: monthLabels[3]
+                            },
+                            {
+                                data: 'prod_plan_bulan_5',
+                                title: monthLabels[4]
+                            },
+                            {
+                                data: 'prod_plan_bulan_6',
+                                title: monthLabels[5]
+                            },
+                            {
+                                data: 'prod_plan_bulan_7',
+                                title: monthLabels[6]
+                            },
+                            {
+                                data: 'prod_plan_bulan_8',
+                                title: monthLabels[7]
+                            },
+                            {
+                                data: 'prod_plan_bulan_9',
+                                title: monthLabels[8]
+                            },
+                            {
+                                data: 'prod_plan_bulan_10',
+                                title: monthLabels[9]
+                            },
+                            {
+                                data: 'prod_plan_bulan_11',
+                                title: monthLabels[10]
+                            },
+                            {
+                                data: 'prod_plan_bulan_12',
+                                title: monthLabels[11]
                             }
                         ],
-                        initComplete: function() {
-                            $.get(`/ppic/stok/get-unique-lt/${year}/${month}`, function(
-                                data) {
-                                var select = $('#filter-lt');
-                                select.empty().append(
-                                    '<option value="">Filter LT</option>');
-                                $.each(data, function(index, value) {
-                                    select.append(
-                                        `<option value="${value}">${value}</option>`
-                                    );
-                                });
+                        headerCallback: function(thead) {
+                            $(thead).find('th').each(function(index) {
+                                if (index > 4) {
+                                    $(this).text(monthLabels[index - 5]);
+                                }
                             });
-                        },
-                        responsive: true,
-                        autoWidth: false
-                    });
-                    $('#filter-lt').on('change', function() {
-                        table.ajax.reload();
+                        }
                     });
                 });
-                $('#viewModal').on('hidden.bs.modal', function() {
-                    if ($.fn.DataTable.isDataTable('#stokTable')) {
-                        $('#stokTable').DataTable().destroy();
-                    }
-                });
-            });
-            document.addEventListener('DOMContentLoaded', function () {
-                const viewModal = document.getElementById('viewModal');
-                const modalMonthYear = document.getElementById('modalMonthYear');
-                const downloadLink = document.getElementById('downloadLink');
 
-                viewModal.addEventListener('show.bs.modal', function (event) {
-                    const button = event.relatedTarget;
-                    const year = button.getAttribute('data-year');
-                    const month = button.getAttribute('data-month');
-                    const monthName = new Date(year, month - 1).toLocaleString('default', { month: 'long' });
-                    modalMonthYear.textContent = `${monthName}, ${year}`;
-                    downloadLink.href = `/ppic/stok/export/${year}/${month}`;
+                $('#viewModal').on('hidden.bs.modal', function() {
+                    if ($.fn.DataTable.isDataTable('#prodPlanTable')) {
+                        $('#prodPlanTable').DataTable().destroy();
+                    }
                 });
             });
         </script>

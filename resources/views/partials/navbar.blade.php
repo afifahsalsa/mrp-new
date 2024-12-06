@@ -3,9 +3,9 @@
 @endif
 <nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
     <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
-        <a class="navbar-brand brand-logo" href="{{ asset('purple-free/src/index.html') }}"><img
-                src="{{ asset('purple-free/src/assets/images/logo.svg') }}" alt="logo" /></a>
-        <a class="navbar-brand brand-logo-mini" href="{{ asset('purple-free/src/index.html') }}"><img
+        <a class="navbar-brand brand-logo" href="{{ route('dashboard') }}"><img
+                src="{{ asset('img/logo-mrp-new.png') }}" alt="logo" style="height: 100%; margin-top: 10px; margin-bottm: 10px;" /></a>
+        <a class="navbar-brand brand-logo-mini" href="{{ route('dashboard') }}"><img
                 src="{{ asset('purple-free/src/assets/images/logo-mini.svg') }}" alt="logo" /></a>
     </div>
     <div class="navbar-menu-wrapper d-flex align-items-stretch">

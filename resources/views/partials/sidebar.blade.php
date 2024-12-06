@@ -5,7 +5,6 @@
                 <div class="nav-profile-image">
                     <img src="{{ asset('purple-free/src/assets/images/faces/face1.jpg') }}" alt="profile" />
                     <span class="login-status online"></span>
-                    <!--change to offline or busy as needed-->
                 </div>
                 <div class="nav-profile-text d-flex flex-column">
                     <span class="font-weight-bold mb-2">David Grey. H</span>
@@ -44,7 +43,7 @@
                 <i class="mdi mdi-chart-bar menu-icon"></i>
             </a>
         </li>
-        <li class="nav-item {{ $title === 'Production Planning' || $title === 'Order Original' || $title === 'Order In Unit' ? 'active' : '' }}">
+        {{-- <li class="nav-item {{ $title === 'Production Planning' || $title === 'Order Original' || $title === 'Order In Unit' ? 'active' : '' }}">
             <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
                 <span class="menu-title">MPP</span>
                 <i class="menu-arrow"></i>
@@ -63,6 +62,12 @@
                     </li>
                 </ul>
             </div>
+        </li> --}}
+        <li class="nav-item {{ $title === 'Index Order Customer' || $title === 'Index Production Planning' ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('order-customer.index') }}" aria-controls="charts">
+                <span class="menu-title">MPP</span>
+                <i class="mdi mdi-chart-bar menu-icon"></i>
+            </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" data-bs-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">

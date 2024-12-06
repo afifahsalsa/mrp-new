@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BufferController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MppController;
 use App\Http\Controllers\OpenPoController;
 use App\Http\Controllers\OpenPrController;
 use App\Http\Controllers\OrderOriginalController;
@@ -85,18 +86,18 @@ Route::prefix('/ppic')->group(function () {
     });
     Route::prefix('/mpp')->group(function(){
         Route::prefix('/order-original')->group(function(){
-            Route::get('/', [OrderOriginalController::class, 'index'])->name('order-original.index');
-            Route::get('format-import', [OrderOriginalController::class, 'get_format'])->name('order-original.format');
-            Route::get('load-data', [OrderOriginalController::class, 'get_data'])->name('order-original.data');
-            Route::post('import', [OrderOriginalController::class, 'import'])->name('order-original.import');
+            Route::get('/', [MppController::class, 'index_choose_order_customer'])->name('order-customer.index');
+            Route::get('format-import', [MppController::class, 'get_format'])->name('mpp.format');
+            Route::post('import', [MppController::class, 'import'])->name('mpp.import');
+            Route::get('load-data/{year}/{month}', [MppController::class, 'get_data'])->name('mpp.data');
         });
-        Route::prefix('/planning-production')->group(function(){
-            Route::get('/', [PlanningController::class, 'index'])->name('planning-production.index');
+        Route::prefix('/production-planning')->group(function(){
+            Route::get('/', [MppController::class, 'index_choose_prod_plan'])->name('prod-plan.index');
             Route::get('load-data', [PlanningController::class, 'get_data'])->name('planning-production.data');
             Route::post('import', [PlanningController::class, 'import'])->name('planning-production.import');
         });
         Route::prefix('/order-unit')->group(function(){
-            Route::get('/', [OrderUnitController::class, 'index'])->name('order-unit.index');
+            Route::get('/', [MppController::class, 'index_choose_max_unit'])->name('max.index');
             Route::get('/load-data', [OrderUnitController::class, 'get_data'])->name('order-unit.data');
         });
     });

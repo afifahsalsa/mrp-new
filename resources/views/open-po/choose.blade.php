@@ -4,7 +4,8 @@
         <a href="{{ route('open-po.index') }}"
             style="text-decoration: none; color: {{ request()->routeIs('open-po.index') ? 'purple' : 'blue' }}">Purchase
             Order |</a>
-        <a href="{{ route('open-pr.index') }}" style="text-decoration: none; color: {{ request()->routeIs('open-pr.index') ? 'purple' : 'blue' }}">
+        <a href="{{ route('open-pr.index') }}"
+            style="text-decoration: none; color: {{ request()->routeIs('open-pr.index') ? 'purple' : 'blue' }}">
             Purchase Requisition | </a>
         <a href="#"
             style="text-decoration: none; color: {{ request()->routeIs('buffer.stok.visualisasi') ? 'purple' : 'blue' }}">
@@ -133,7 +134,7 @@
                                                     <div class="modal-header">
                                                         <h3 class="modal-title" id="viewModalLabel">Purchase Order in :
                                                             <span
-                                                                class="text-danger">{{ \Carbon\Carbon::create()->month($mo->month)->format('F') . ', ' . $mo->year }}</span>
+                                                                class="text-danger">{{ \Carbon\Carbon::create()->month($mo->month)->format('F') .', ' .$mo->year }}</span>
                                                         </h3>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>
@@ -142,14 +143,41 @@
                                                         <div class="table-responsive">
                                                             <table class="table display" id="poTable"
                                                                 style="width: 100%">
-                                                                <div class="d-flex mb-4">
-                                                                    <h4 class="mt-3">Filter: </h4>
-                                                                    <select id="filter-po" class="form-select mt-2"
-                                                                        style="width: 20%; margin-left: 20px;">
-                                                                        <option value="">Purchase Order</option>
-                                                                    </select>
-                                                                    <a
-                                                                        href="{{ route('open-po.export', ['year' => $mo->year, 'month' => $mo->month]) }}" class="ms-auto">
+                                                                <div class="d-flex mb-4 position-relative">
+                                                                    <h4 class="mt-2 me-1">Filter: </h4>
+                                                                    <div class="dropdown" style="position: relative;">
+                                                                        <input type="text" class="form-control dropdown-toggle"
+                                                                            id="searchDropdown" data-bs-toggle="dropdown" aria-expanded="false" placeholder="Select Purchase Order" readonly
+                                                                            style=" background-color: white; cursor: pointer; border: 1px solid #ced4da; border-radius: 0.375rem;">
+                                                                        <div class="dropdown-menu custom-dropdown-menu"
+                                                                            aria-labelledby="searchDropdown"
+                                                                            style="width: 100%; max-height: 350px; overflow-y: auto;
+                                                                                    padding: 0; margin-top: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e0e0e0; border-radius: 0.375rem;">
+                                                                            <div class="search-container"
+                                                                                style="padding: 10px; background-color: #f8f9fa; border-bottom: 1px solid #e0e0e0;
+                                                                                        position: sticky; top: 0; z-index: 10;">
+                                                                                <input type="text" class="form-control" id="filterInput" placeholder="Search in list..."
+                                                                                    onkeyup="filterList()" style="border-radius: 0.25rem; border: 1px solid #ced4da; padding: 0.25rem 0.5rem;">
+                                                                            </div>
+                                                                            <ul class="list-group list-group-flush" id="dropdownMenuItems" style="max-height: 250px; overflow-y: auto;">
+                                                                                <li class="list-group-item list-group-item-action"
+                                                                                    style="cursor: pointer; padding: 0.5rem 1rem; transition: background-color 0.2s;"
+                                                                                    data-value="All">
+                                                                                    <span class="text-muted">All Purchase Orders</span>
+                                                                                </li>
+                                                                                @foreach ($uniquePOs as $po)
+                                                                                    <li class="list-group-item list-group-item-action"
+                                                                                        style="cursor: pointer; padding: 0.5rem 1rem; transition: background-color 0.2s;"
+                                                                                        data-value="{{ $po }}">
+                                                                                        {{ $po }}
+                                                                                    </li>
+                                                                                @endforeach
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <a href="{{ route('open-po.export', ['year' => $mo->year, 'month' => $mo->month]) }}"
+                                                                        class="ms-auto">
                                                                         <button type="button"
                                                                             class="btn btn-gradient-success"
                                                                             style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
@@ -284,6 +312,51 @@
                         $('#poTable').DataTable().destroy();
                     }
                 });
+            });
+
+            function filterList() {
+                var input = document.getElementById('filterInput');
+                var filter = input.value.toUpperCase();
+                var dropdownItems = document.getElementById('dropdownMenuItems').getElementsByTagName('li');
+
+                for (var i = 0; i < dropdownItems.length; i++) {
+                    var txtValue = dropdownItems[i].textContent || dropdownItems[i].innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        dropdownItems[i].style.display = "";
+                    } else {
+                        dropdownItems[i].style.display = "none";
+                    }
+                }
+            }
+
+            document.getElementById('dropdownMenuItems').addEventListener('click', function(e) {
+                var listItem = e.target.closest('li');
+                if (listItem) {
+                    var selectedValue = listItem.getAttribute('data-value');
+                    var searchDropdown = document.getElementById('searchDropdown');
+                    searchDropdown.value = selectedValue === 'All' ? 'Select Purchase Order' : selectedValue;
+                    if ($.fn.DataTable.isDataTable('#poTable')) {
+                        var table = $('#poTable').DataTable();
+                        table.column(0).search(selectedValue === 'All' ? '' : selectedValue).draw();
+                    }
+                    var dropdownMenu = listItem.closest('.dropdown-menu');
+                    var dropdown = bootstrap.Dropdown.getInstance(searchDropdown);
+                    dropdown.hide();
+                }
+            });
+
+            document.getElementById('dropdownMenuItems').addEventListener('mouseover', function(e) {
+                var listItem = e.target.closest('li');
+                if (listItem) {
+                    listItem.style.backgroundColor = '#f1f3f5';
+                }
+            });
+
+            document.getElementById('dropdownMenuItems').addEventListener('mouseout', function(e) {
+                var listItem = e.target.closest('li');
+                if (listItem) {
+                    listItem.style.backgroundColor = '';
+                }
             });
         </script>
     @endpush

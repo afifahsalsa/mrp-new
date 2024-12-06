@@ -9,7 +9,6 @@ use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Rels;
 use Yajra\DataTables\Facades\DataTables;
 
 class BufferController extends Controller

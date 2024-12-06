@@ -21,6 +21,11 @@
 </head>
 
 <body>
+    {{-- <div class='loader'>
+        <div class='spinner-grow text-primary' role='status'>
+          <span class='sr-only'>Loading...</span>
+        </div>
+      </div> --}}
     <div class="container-scroller">
         <!-- partial:partials/_navbar.html -->
         @include('partials.navbar')
@@ -31,6 +36,10 @@
             @include('partials.sidebar')
             <div class="main-panel">
                 @yield('content')
+                <div id="loading-overlay" class="loading-overlay">
+                    {{-- <div class="spinner"></div> --}}
+                    <span class="loader"></span>
+                </div>
                 <!-- partial -->
             </div>
             <!-- main-panel ends -->
@@ -62,21 +71,9 @@
     @stack('scriptPr')
     @stack('scriptPP')
     @stack('scriptOrderOriginal')
+    @stack('scriptMpp');
     <!-- End custom js for this page -->
     <script>
-        function toggleArrow() {
-            const button = document.getElementById("dropdownButton");
-            const arrow = document.getElementById("dropdownArrow");
-
-            button.addEventListener("click", function() {
-                if (button.getAttribute("aria-expanded") === "true") {
-                    arrow.innerHTML = "&#9662;"; // Downward arrow when open
-                } else {
-                    arrow.innerHTML = "&#9656;"; // Rightward arrow when closed
-                }
-            });
-        }
-
         @if (session('swal'))
             Swal.fire({
                 icon: '{{ session('swal.type') }}',
@@ -85,6 +82,22 @@
                 html: '{{ session('swal.html') }}'
             });
         @endif
+
+        function showLoading() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
+
+        document.querySelector('form').addEventListener('submit', function() {
+            showLoading();
+        });
+
+        window.addEventListener('load', function() {
+            hideLoading();
+        });
     </script>
 </body>
 

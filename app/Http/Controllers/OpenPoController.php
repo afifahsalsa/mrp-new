@@ -22,9 +22,16 @@ class OpenPoController extends Controller
             ->groupByRaw('YEAR(date), MONTH(date)')
             ->orderByRaw('YEAR(date), MONTH(date) DESC')
             ->get();
+
+        // Get unique purchase orders for the dropdown
+        $uniquePOs = OpenPo::distinct('purchase_order')
+            ->whereNotNull('purchase_order')
+            ->pluck('purchase_order');
+
         return view('open-po.choose', [
             'title' => 'Index Open PO',
-            'monthPO' => $monthPO
+            'monthPO' => $monthPO,
+            'uniquePOs' => $uniquePOs
         ]);
     }
 
@@ -197,7 +204,7 @@ class OpenPoController extends Controller
             return back()->with([
                 'swal' => [
                     'type' => 'warning',
-                    'message' => 'Import Berhasil dengan catatan',
+                    'title' => 'Import Berhasil dengan catatan',
                     'text' => "Berhasil mengimpor {$rowCountPo} baris data Purchase Order dengan Purchase Requisiton {$emptyPRItemsList} yang blank."
                 ]
             ]);
@@ -206,7 +213,7 @@ class OpenPoController extends Controller
             return back()->with([
                 'swal' => [
                     'type' => 'warning',
-                    'message' => 'Berhasil Import dan Update data dengan Catatan',
+                    'title' => 'Berhasil Import dan Update data dengan Catatan',
                     'text' => "Berhasil mengimpor {$rowCountPo} baris data dan update {$updatePO} baris data dengan Purchase Requisition ($emptyPRItemsList} yang blank."
                 ]
             ]);
@@ -214,7 +221,7 @@ class OpenPoController extends Controller
             return back()->with([
                 'swal' => [
                     'type' => 'success',
-                    'message' => 'Berhasil Import dan Update data',
+                    'title' => 'Berhasil Import dan Update data',
                     'text' => "Berhasil mengimpor {$rowCountPo} baris data dan update {$updatePO} baris data."
                 ]
             ]);
@@ -222,7 +229,7 @@ class OpenPoController extends Controller
             return back()->with([
                 'swal' => [
                     'type' => 'success',
-                    'message' => 'Import Berhasil',
+                    'title' => 'Import Berhasil',
                     'text' => "Berhasil mengimpor {$rowCountPo} baris data."
                 ]
             ]);
@@ -284,7 +291,7 @@ class OpenPoController extends Controller
             'swal' => [
                 'type' => 'success',
                 'title' => 'Berhasil',
-                'message' => 'Quantity Purchase Order berhasil diperbaharui'
+                'title' => 'Quantity Purchase Order berhasil diperbaharui'
             ]
         ]);
     }
@@ -304,7 +311,7 @@ class OpenPoController extends Controller
             ->delete();
         return response()->json([
             'success' => true,
-            'message' => 'Data berhasil dihapus'
+            'title' => 'Data berhasil dihapus'
         ]);
     }
 }

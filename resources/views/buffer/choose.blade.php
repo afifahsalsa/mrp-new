@@ -67,16 +67,14 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h1 class="modal-title fs-5" id="exampleModalLabel">Update Data Buffer</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <form action="{{ route('buffer.import') }}" enctype="multipart/form-data" method="POST"
                                 id="importBuffer">
                                 @csrf
                                 <div class="modal-body">
                                     <label for="date" class="form-label"><strong>Date</strong></label>
-                                    <input type="date" name="date" id="date" class="form-control"
-                                        value="<?php echo date('Y-m-d'); ?>" required>
+                                    <input type="date" name="date" id="date" class="form-control" value="<?php echo date('Y-m-d'); ?>" required>
                                     <label for="date" class="form-label mt-2"><strong>Choose File</strong></label>
                                     <input class="form-control" type="file" id="file" name="file" required>
                                     <p class="ms-1 text-danger">Upload file dengan format yang sesuai saat import!</p>
