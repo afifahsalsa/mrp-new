@@ -39,9 +39,9 @@ class BufferController extends Controller
         ]);
     }
 
-    public function format_buffer()
+    public function get_format()
     {
-        $filePath = public_path('doc/format-buffer.xlsx');
+        $filePath = public_path('doc/Format Impor Buffer.xlsx');
         return response()->download($filePath);
     }
 
@@ -93,36 +93,35 @@ class BufferController extends Controller
                         return $value['item_number'] == $i[0] && $value['date'] == $request->date;
                     });
 
+                    if (strtolower(substr($i[3], 1, 1) === 'l')) {
+                        $lt = substr($i[3], 0, 1);
+                    } else if (strtolower(substr($i[3], 1, 1) === 'i')){
+                        $lt = substr($i[3], 0, 1) + 1;
+                    } else if ($i[3] === null) {
+                        $ltBlank[] = $i[3];
+                        $lt = '-';
+                    } else {
+                        $lt = $i[3];
+                    }
+
                     if ($duplicateInArray) {
                         $duplicateItems[] = $i[0];
-                    } else if ($i[4] === null) {
-                        $ltBlank[] = $i[4];
-                        $tempData[] = [
-                            'item_number' => $i[0],
-                            'part_number' => $i[1],
-                            'product_name' => $i[2],
-                            'usage' => $i[3],
-                            'lt' => '-',
-                            'supplier' => $i[5],
-                            'qty' => intval($i[6]),
-                            'date' => $request->date
-                        ];
                     } else {
                         $tempData[] = [
                             'item_number' => $i[0],
                             'part_number' => $i[1],
                             'product_name' => $i[2],
-                            'usage' => $i[3],
-                            'lt' => $i[4],
-                            'supplier' => $i[5],
-                            'qty' => intval($i[6]),
+                            'lt' => $lt,
+                            'supplier' => $i[4],
+                            'li' => $i[5],
+                            'type' => $i[6],
+                            'qty' => intval($i[7]),
                             'date' => $request->date
                         ];
                     }
                 }
             }
         }
-
         if (!empty($duplicateItems)) {
             $duplicateItems = array_unique($duplicateItems);
             $duplicateList = implode(', ', $duplicateItems);
@@ -135,7 +134,15 @@ class BufferController extends Controller
                 ]
             ]);
         }
-
+        if ($i[7] === null) {
+            return back()->with([
+                'swal' => [
+                    'type' => 'error',
+                    'title' => 'Import Gagal!',
+                    'text' => "Quantity harus diisi"
+                ]
+            ]);
+        }
         if ($cekDate) {
             foreach ($tempData as $data) {
                 $itemInCekDate = collect($cekDate)->firstWhere('item_number', $data['item_number']);
@@ -152,12 +159,9 @@ class BufferController extends Controller
                 $rowCountBuffer++;
             }
         }
-
-        $year = date('Y', strtotime($request->date));
-        $month = date('m', strtotime($request->date));
         $countLt = count($ltBlank);
         if ($countLt > 0) {
-            return redirect()->route('buffer.view', ['year' => $year, 'month' => $month])->with([
+            return back()->with([
                 'swal' => [
                     'type' => 'warning',
                     'title' => 'Import Berhasil dengan Catatan',
@@ -165,7 +169,7 @@ class BufferController extends Controller
                 ]
             ]);
         } else {
-            return redirect()->route('buffer.view', ['year' => $year, 'month' => $month])->with([
+            return back()->with([
                 'swal' => [
                     'type' => 'success',
                     'title' => 'Import Berhasil',
@@ -174,7 +178,6 @@ class BufferController extends Controller
             ]);
         }
     }
-
 
     public function export($year, $month)
     {

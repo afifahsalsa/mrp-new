@@ -43,7 +43,7 @@
                                     aria-label="Close"></button>
                             </div>
                             <form action="{{ route('open-po.import') }}" enctype="multipart/form-data" method="POST"
-                                id="importPO">
+                                id="importPO" onsubmit="showLoading()">
                                 @csrf
                                 <div class="modal-body">
                                     <label for="date" class="form-label"><strong>Date</strong></label>
@@ -53,8 +53,8 @@
                                     <input class="form-control" type="file" id="file" name="file" required>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary" id="submitButton">Submit</button>
+                                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal" style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);">Close</button>
+                                    <button type="submit" class="btn btn-primary" id="submitButton" style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);">Submit</button>
                                 </div>
                             </form>
                         </div>
@@ -68,16 +68,14 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h1 class="modal-title fs-5" id="exampleModalLabel">Update Data Purchase Order</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <form action="{{ route('open-po.import') }}" enctype="multipart/form-data" method="POST"
                                 id="importPO">
                                 @csrf
                                 <div class="modal-body">
                                     <label for="date" class="form-label"><strong>Date</strong></label>
-                                    <input type="date" name="date" id="date" class="form-control"
-                                        value="<?php echo date('Y-m-d'); ?>" required>
+                                    <input type="date" name="date" id="date" class="form-control" value="<?php echo date('Y-m-d'); ?>" required>
                                     <label for="date" class="form-label mt-2"><strong>Choose File</strong></label>
                                     <input class="form-control" type="file" id="file" name="file" required>
                                     <p class="ms-1 text-danger">Upload file dengan format yang sesuai saat import!</p>
@@ -133,8 +131,7 @@
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h3 class="modal-title" id="viewModalLabel">Purchase Order in :
-                                                            <span
-                                                                class="text-danger">{{ \Carbon\Carbon::create()->month($mo->month)->format('F') .', ' .$mo->year }}</span>
+                                                            <span id="modalMonthYear" class="text-danger"></span>
                                                         </h3>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>
@@ -177,7 +174,7 @@
                                                                     </div>
 
                                                                     <a href="{{ route('open-po.export', ['year' => $mo->year, 'month' => $mo->month]) }}"
-                                                                        class="ms-auto">
+                                                                        class="ms-auto" onload="showLoading()">
                                                                         <button type="button"
                                                                             class="btn btn-gradient-success"
                                                                             style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
@@ -246,12 +243,6 @@
                         ajax: {
                             url: `/ppic/purchase-order/load-data/${year}/${month}`,
                             type: 'GET',
-                            data: function(d) {
-                                var poValue = $('#filter-po').val();
-                                if (poValue) {
-                                    d.purchase_order = poValue;
-                                }
-                            }
                         },
                         columns: [{
                                 data: 'purchase_order'
@@ -287,24 +278,8 @@
                                 data: 'old_number_format'
                             }
                         ],
-                        initComplete: function() {
-                            $.get(`/ppic/purchase-order/get-unique-po/${year}/${month}`, function(
-                                data) {
-                                var select = $('#filter-po');
-                                select.empty().append(
-                                    '<option value="">Filter Purchase Order</option>');
-                                $.each(data, function(index, value) {
-                                    select.append(
-                                        `<option value="${value}">${value}</option>`
-                                    );
-                                });
-                            });
-                        },
                         responsive: true,
                         autoWidth: false
-                    });
-                    $('#filter-po').on('change', function() {
-                        table.ajax.reload();
                     });
                 });
                 $('#viewModal').on('hidden.bs.modal', function() {
@@ -357,6 +332,21 @@
                 if (listItem) {
                     listItem.style.backgroundColor = '';
                 }
+            });
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const viewModal = document.getElementById('viewModal');
+                const modalMonthYear = document.getElementById('modalMonthYear');
+                const downloadLink = document.getElementById('downloadLink');
+
+                viewModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const year = button.getAttribute('data-year');
+                    const month = button.getAttribute('data-month');
+                    const monthName = new Date(year, month - 1).toLocaleString('default', { month: 'long' });
+                    modalMonthYear.textContent = `${monthName}, ${year}`;
+                    downloadLink.href = `/ppic/purchase-order/export/${year}/${month}`;
+                });
             });
         </script>
     @endpush

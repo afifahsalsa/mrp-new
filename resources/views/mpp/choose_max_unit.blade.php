@@ -9,7 +9,10 @@
             Production Planning | </a>
         <a href="{{ route('max.index') }}"
             style="text-decoration: none; color: {{ request()->routeIs('max.index') ? 'purple' : 'blue' }}">
-            Maximum Unit</a>
+            Maximum Unit | </a>
+        <a href="{{ route('max.index') }}"
+            style="text-decoration: none; color: {{ request()->routeIs('max.index') ? 'purple' : 'blue' }}">
+            Visualization   </a>
 
         <div class="col-lg-12 grid-margin stretch-card mt-3">
             <div class="card">

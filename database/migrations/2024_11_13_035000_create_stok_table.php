@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('stok', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('buffer_id');
-            $table->foreign('buffer_id')->references('id')->on('buffer');
             $table->string('item_number');
             $table->string('part_number');
             $table->string('product_name');
             $table->string('lt')->nullable();
-            $table->integer('stok');
+            $table->string('spl');
             $table->string('li');
+            $table->string('type');
+            $table->integer('stok');
             $table->integer('qty_buffer');
             $table->integer('percentage');
             $table->date('date');

@@ -52,9 +52,9 @@ class StokController extends Controller
         ]);
     }
 
-    public function format_stok()
+    public function get_format()
     {
-        $filePath = public_path('doc/format-stok.xlsx');
+        $filePath = public_path('doc/Format Impor Stock.xlsx');
         return response()->download($filePath);
     }
 
@@ -89,7 +89,7 @@ class StokController extends Controller
     {
         $request->validate([
             'file' => 'required|file|mimes:csv,xlx,xlsx',
-            'date' => 'required'
+            'date' => 'required|date'
         ]);
 
         $dataArray = [];
@@ -102,102 +102,139 @@ class StokController extends Controller
         $tempData = [];
         $duplicateItems = [];
         $ltBlank = [];
-        $rowCountStok = 0;
+        $cekItemNull = [];
 
-        $cekDate = Stok::whereRaw("YEAR(date) = ? AND MONTH(date) = ?", [$year, $month])->get();
+        $cekDate = Stok::whereYear('date', $year)->whereMonth('date', $month)->get();
 
-        foreach ($stokVal as $sv) {
-            foreach ($sv as $idx => $i) {
+        foreach ($stokVal as $sheet) {
+            foreach ($sheet as $idx => $row) {
                 if ($idx === 0) continue;
 
-                $cekItem = Buffer::where('item_number', $i[0])->first();
-                if (!$cekItem) {
-                    return back()->with([
-                        'status' => 'error',
-                        'message' => "Item Number {$i[0]} tidak ditemukan pada database Buffer"
-                    ]);
+                $itemNumber = $row[0] ?? null;
+                $partNumber = $row[1] ?? null;
+                $productName = $row[2] ?? null;
+                $lt = $row[3] ?? null;
+                $spl = $row[4] ?? null;
+                $li = $row[5] ?? null;
+                $type = $row[6] ?? null;
+                $stok = $row[7] ?? null;
+
+                if (strlen($itemNumber) != 18) {
+                    $itemNumber = substr($itemNumber, 0, 18);
                 }
 
-                $duplicateInArray = collect($tempData)->contains(function ($value) use ($i, $request) {
-                    return $value['item_number'] == $i[0] && $value['date'] == $request->date;
-                });
-
-                if ($duplicateInArray) {
-                    $duplicateItems[] = $i[0];
+                $cekItem = Buffer::where('item_number', $itemNumber)->first();
+                if (!$cekItem) {
+                    $cekItemNull[] = $itemNumber;
                     continue;
                 }
 
-                $itemData = [
-                    'buffer_id' => $cekItem->id,
-                    'item_number' => $i[0],
-                    'part_number' => $i[1],
-                    'product_name' => $i[2],
-                    'lt' => $i[3] ?? '-',
-                    'li' => $i[5],
-                    'stok' => intval($i[4]),
-                    'qty_buffer' => $cekItem->qty,
-                    'percentage' => $cekItem->qty > 0 ? intval((intval($i[4]) / intval($cekItem->qty)) * 100) : 0,
-                    'date' => $request->date
-                ];
+                $duplicateInArray = collect($tempData)->contains(function ($value) use ($itemNumber, $request) {
+                    return $value['item_number'] == $itemNumber && $value['date'] == $request->date;
+                });
 
-                if ($itemData['lt'] === '-') {
-                    $ltBlank[] = $i[0];
+                if ($duplicateInArray) {
+                    $duplicateItems[] = $itemNumber;
+                    continue;
                 }
 
-                $tempData[] = $itemData;
+                if ($stok === null) {
+                    return back()->with([
+                        'swal' => [
+                            'type' => 'error',
+                            'title' => 'Import Gagal!',
+                            'text' => 'Quantity stok harus terisi.'
+                        ]
+                    ]);
+                }
+
+                if ($lt === null) {
+                    $ltBlank[] = $itemNumber;
+                    $lt = '-';
+                } elseif (strtolower(substr($lt, 1, 1)) === 'l') {
+                    $lt = substr($lt, 0, 1);
+                } elseif (strtolower(substr($lt, 1, 1)) === 'i') {
+                    $lt = substr($lt, 0, 1) + 1;
+                }
+
+                $tempData[] = [
+                    'item_number' => $itemNumber,
+                    'part_number' => $partNumber,
+                    'product_name' => $productName,
+                    'lt' => $lt,
+                    'spl' => $spl,
+                    'li' => $li,
+                    'type' => $type,
+                    'stok' => intval($stok),
+                    'qty_buffer' => $cekItem->qty,
+                    'percentage' => intval((intval($stok) / intval($cekItem->qty)) * 100),
+                    'date' => $request->date,
+                ];
             }
         }
 
-        if (!empty($duplicateItems)) {
-            $duplicateItems = array_unique($duplicateItems);
-            $duplicateList = implode(', ', $duplicateItems);
+        if (!empty($cekItemNull)) {
+            $missingItems = implode(', ', array_unique($cekItemNull));
             return back()->with([
                 'swal' => [
                     'type' => 'error',
-                    'title' => 'Import Gagal!',
-                    'text' => "Terdapat duplikasi pada item number berikut: {$duplicateList}. Silakan periksa kembali file Anda.",
+                    'title' => 'Gagal Import',
+                    'text' => "Item Number berikut tidak ditemukan pada database Buffer: {$missingItems}"
                 ]
             ]);
         }
 
-        $importResult = DB::transaction(function () use ($tempData, $cekDate, &$rowCountStok) {
+        if (!empty($duplicateItems)) {
+            $duplicateList = implode(', ', array_unique($duplicateItems));
+            return back()->with([
+                'swal' => [
+                    'type' => 'error',
+                    'title' => 'Import Gagal!',
+                    'text' => "Terdapat duplikasi pada item number berikut: {$duplicateList}. Silakan periksa kembali file Anda."
+                ]
+            ]);
+        }
+
+        $importResult = DB::transaction(function () use ($tempData, $cekDate) {
+            $rowCountStok = 0;
+
             foreach ($tempData as $data) {
                 $existingRecord = $cekDate->firstWhere('item_number', $data['item_number']);
 
                 if ($existingRecord) {
                     Stok::where('item_number', $data['item_number'])
-                        ->whereRaw("YEAR(date) = ? AND MONTH(date) = ?", [
-                            date('Y', strtotime($data['date'])),
-                            date('m', strtotime($data['date']))
-                        ])
+                        ->whereYear('date', date('Y', strtotime($data['date'])))
+                        ->whereMonth('date', date('m', strtotime($data['date'])))
                         ->update($data);
                 } else {
                     Stok::create($data);
                 }
                 $rowCountStok++;
             }
+
             return $rowCountStok;
         });
 
-        $countLt = count($ltBlank);
-        $messageType = $countLt > 0 ? 'warning' : 'success';
-        $messageText = $countLt > 0
-            ? "Berhasil impor {$importResult} baris data stok dengan jumlah {$countLt} LT yang blank."
+        $countLtBlank = count($ltBlank);
+        $messageType = $countLtBlank > 0 ? 'warning' : 'success';
+        $messageText = $countLtBlank > 0
+            ? "Berhasil impor {$importResult} baris data stok dengan jumlah {$countLtBlank} LT yang blank."
             : "Berhasil mengimpor {$importResult} baris data.";
 
-        return redirect()->route('stok.view', ['year' => $year, 'month' => $month])->with([
+        return back()->with([
             'swal' => [
                 'type' => $messageType,
-                'title' => $countLt > 0 ? 'Import Berhasil dengan Catatan' : 'Import Berhasil!',
+                'title' => $countLtBlank > 0 ? 'Import Berhasil dengan Catatan' : 'Import Berhasil!',
                 'text' => $messageText
             ]
         ]);
     }
 
+
     public function export($year, $month)
     {
         $monthName = DateTime::createFromFormat('!m', $month)->format('F');
-        return Excel::download(new StokExport($year, $month), 'Stok ' . $monthName .' - '. $year . '.xlsx');
+        return Excel::download(new StokExport($year, $month), 'Stok ' . $monthName . ' - ' . $year . '.xlsx');
     }
 
     /**
@@ -242,7 +279,7 @@ class StokController extends Controller
             'id' => 'required'
         ]);
         $stok = Stok::findOrFail($id);
-        if($stok->qty_buffer == 0){
+        if ($stok->qty_buffer == 0) {
             $percentage = 0;
         } else {
             $percentage = intval($stok->stok) / intval($stok->qty_buffer) * 100;

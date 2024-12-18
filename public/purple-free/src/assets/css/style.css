@@ -26325,7 +26325,7 @@ dl li {
         width: 48px;
         height: 48px;
         background: #DA8CFF;
-        animation: rotate 1s linear infinite;
+        animation: rotate 1.5s linear infinite;
       }
 
       @keyframes rotate {
@@ -26342,5 +26342,7 @@ dl li {
           border-radius: 10%;
         }
       }
+
+
 
 

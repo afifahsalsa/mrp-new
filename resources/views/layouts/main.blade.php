@@ -47,6 +47,8 @@
         <!-- page-body-wrapper ends -->
     </div>
     <script src="{{ asset('purple-free/src/assets/js/sweetalert2@11.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script src="{{ asset('purple-free/src/assets/vendors/js/vendor.bundle.base.js') }}"></script>
     {{-- <script src="{{ asset('purple-free/src/assets/js/jquery-3.7.1.js') }}"></script>
     <script src="{{ asset('purple-free/src/assets/js/dataTables.js') }}"></script>

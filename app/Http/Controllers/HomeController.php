@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -67,7 +66,7 @@ class HomeController extends Controller
                         ELSE '<25%'
                     END AS percentage_range
                 "),
-                DB::raw('COUNT(buffer_id) AS quantity_percentage')
+                DB::raw('COUNT(id) AS quantity_percentage')
             );
 
         // Apply date filters if provided

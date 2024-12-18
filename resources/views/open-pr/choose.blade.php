@@ -23,18 +23,22 @@
                                     onmouseover="this.style.transform='scale(1.05)';"
                                     onmouseout="this.style.transform='scale(1)';" data-bs-toggle="modal"
                                     data-bs-target="#modalImportPR">Add New</button></li>
-                            <li> <a href="{{ route('open-pr.format') }}">
-                                    <button type="button" class="btn btn-gradient-info btn-rounded ms-2"
-                                        style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
-                                        onmouseover="this.style.transform='scale(1.05)';"
-                                        onmouseout="this.style.transform='scale(1)';"><i class="mdi mdi-download"></i>
-                                        Download Format</button></li></a>
+                            <form action="{{ route('open-pr.format') }}" enctype="multipart/form-data" method="GET">
+                                @csrf
+                                <button type="submit" class="btn btn-gradient-info btn-rounded ms-2"
+                                    style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
+                                    onmouseover="this.style.transform='scale(1.05)';"
+                                    onmouseout="this.style.transform='scale(1)';"><i class="mdi mdi-download"></i>
+                                    Download Format</button>
+                                </li>
+                            </form>
                         </ol>
                     </nav>
                 </div>
 
                 {{-- Modal Import --}}
-                <div class="modal fade" id="modalImportPR" tabindex="-1" aria-labelledby="modalLabelPR" aria-hidden="true">
+                <div class="modal fade" id="modalImportPR" tabindex="-1" aria-labelledby="modalLabelPR" aria-hidden="true"
+                    onsubmit="showLoading()">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -53,8 +57,10 @@
                                     <input class="form-control" type="file" id="file" name="file" required>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary" id="submitButton">Submit</button>
+                                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal"
+                                        style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);">Close</button>
+                                    <button type="submit" class="btn btn-primary" id="submitButton"
+                                        style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);">Submit</button>
                                 </div>
                             </form>
                         </div>
@@ -133,9 +139,7 @@
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h3 class="modal-title" id="viewModalLabel">Purchase Requisition
-                                                            in :
-                                                            <span
-                                                                class="text-danger">{{ \Carbon\Carbon::create()->month($mp->month)->format('F') . ', ' . $mp->year }}</span>
+                                                            in : <span id="modalMonthYear" class="text-danger"></span>
                                                         </h3>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>
@@ -150,17 +154,6 @@
                                                                         style="width: 20%; margin-left: 20px;">
                                                                         <option value="">PR Status</option>
                                                                     </select>
-                                                                    <a href="{{ route('open-po.export', ['year' => $mp->year, 'month' => $mp->month]) }}"
-                                                                        class="ms-auto">
-                                                                        <button type="button"
-                                                                            class="btn btn-gradient-success"
-                                                                            style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
-                                                                            onmouseover="this.style.transform='scale(1.05)';"
-                                                                            onmouseout="this.style.transform='scale(1)';">
-                                                                            <i class="mdi mdi-cloud-download"></i>
-                                                                            Download Excel
-                                                                        </button>
-                                                                    </a>
                                                                 </div>
                                                                 <thead>
                                                                     <tr>
@@ -250,17 +243,18 @@
                             }
                         ],
                         initComplete: function() {
-                            $.get(`/ppic/purchase-requisition/get-unique-status/${year}/${month}`, function(
-                                data) {
-                                var select = $('#filter-status');
-                                select.empty().append(
-                                    '<option value="">Filter PR Status</option>');
-                                $.each(data, function(index, value) {
-                                    select.append(
-                                        `<option value="${value}">${value}</option>`
-                                    );
+                            $.get(`/ppic/purchase-requisition/get-unique-status/${year}/${month}`,
+                                function(
+                                    data) {
+                                    var select = $('#filter-status');
+                                    select.empty().append(
+                                        '<option value="">Filter PR Status</option>');
+                                    $.each(data, function(index, value) {
+                                        select.append(
+                                            `<option value="${value}">${value}</option>`
+                                        );
+                                    });
                                 });
-                            });
                         },
                         responsive: true,
                         autoWidth: false
@@ -273,6 +267,21 @@
                     if ($.fn.DataTable.isDataTable('#prTable')) {
                         $('#prTable').DataTable().destroy();
                     }
+                });
+            });
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const viewModal = document.getElementById('viewModal');
+                const modalMonthYear = document.getElementById('modalMonthYear');
+
+                viewModal.addEventListener('show.bs.modal', function(event) {
+                    const button = event.relatedTarget;
+                    const year = button.getAttribute('data-year');
+                    const month = button.getAttribute('data-month');
+                    const monthName = new Date(year, month - 1).toLocaleString('default', {
+                        month: 'long'
+                    });
+                    modalMonthYear.textContent = `${monthName}, ${year}`;
                 });
             });
         </script>

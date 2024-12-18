@@ -21,19 +21,24 @@
                                     onmouseover="this.style.transform='scale(1.05)';"
                                     onmouseout="this.style.transform='scale(1)';" data-bs-toggle="modal"
                                     data-bs-target="#modalImportBuffer">Add New</button></li>
-                            <li> <a href="{{ route('buffer.format-import') }}">
-                                    <button type="button" class="btn btn-gradient-info btn-rounded ms-2"
+                            <li>
+                                <form action="{{ route('buffer.format-import') }}" enctype="multipart/form-data"
+                                    method="GET">
+                                    @csrf
+                                    <button type="submit" class="btn btn-gradient-info btn-rounded ms-2"
                                         style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
                                         onmouseover="this.style.transform='scale(1.05)';"
                                         onmouseout="this.style.transform='scale(1)';"><i class="mdi mdi-download"></i>
-                                        Download Format</button></li></a>
+                                        Download Format</button>
+                            </li>
+                            </form>
                         </ol>
                     </nav>
                 </div>
 
                 {{-- Modal Import --}}
                 <div class="modal fade" id="modalImportBuffer" tabindex="-1" aria-labelledby="modalLabelBuffer"
-                    aria-hidden="true">
+                    aria-hidden="true" onsubmit="showLoading()">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -52,8 +57,10 @@
                                     <input class="form-control" type="file" id="file" name="file" required>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary" id="submitButton">Submit</button>
+                                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal"
+                                        style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);">Close</button>
+                                    <button type="submit" class="btn btn-primary" id="submitButton"
+                                        style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);">Submit</button>
                                 </div>
                             </form>
                         </div>
@@ -67,14 +74,16 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h1 class="modal-title fs-5" id="exampleModalLabel">Update Data Buffer</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
                             </div>
                             <form action="{{ route('buffer.import') }}" enctype="multipart/form-data" method="POST"
                                 id="importBuffer">
                                 @csrf
                                 <div class="modal-body">
                                     <label for="date" class="form-label"><strong>Date</strong></label>
-                                    <input type="date" name="date" id="date" class="form-control" value="<?php echo date('Y-m-d'); ?>" required>
+                                    <input type="date" name="date" id="date" class="form-control"
+                                        value="<?php echo date('Y-m-d'); ?>" required>
                                     <label for="date" class="form-label mt-2"><strong>Choose File</strong></label>
                                     <input class="form-control" type="file" id="file" name="file" required>
                                     <p class="ms-1 text-danger">Upload file dengan format yang sesuai saat import!</p>
@@ -130,8 +139,7 @@
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h3 class="modal-title" id="viewModalLabel">Buffer in :
-                                                            <span
-                                                                class="text-danger">{{ \Carbon\Carbon::create()->month($mb->month)->format('F') . ', ' . $mb->year }}</span>
+                                                            <span id="modalMonthYear" class="text-danger"></span>
                                                         </h3>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>
@@ -186,8 +194,8 @@
         </div>
     </div>
     @push('scriptBuffer')
-    <script>
-        $(document).ready(function() {
+        <script>
+            $(document).ready(function() {
                 $('#viewModal').on('show.bs.modal', function(event) {
                     let button = $(event.relatedTarget);
                     let year = button.data('year');
@@ -256,6 +264,20 @@
                     }
                 });
             });
-    </script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const viewModal = document.getElementById('viewModal');
+                const modalMonthYear = document.getElementById('modalMonthYear');
+
+                viewModal.addEventListener('show.bs.modal', function(event) {
+                    const button = event.relatedTarget;
+                    const year = button.getAttribute('data-year');
+                    const month = button.getAttribute('data-month');
+                    const monthName = new Date(year, month - 1).toLocaleString('default', {
+                        month: 'long'
+                    });
+                    modalMonthYear.textContent = `${monthName}, ${year}`;
+                });
+            });
+        </script>
     @endpush
 @endsection

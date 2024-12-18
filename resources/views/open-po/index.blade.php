@@ -72,9 +72,38 @@
                             <table class="table display" id="poTable" style="width: 100%;">
                                 <div class="d-flex mb-4">
                                     <h4 class="mt-3">Filter: </h4>
-                                    <select id="filter-po" class="form-select mt-2" style="width: 20%; margin-left: 20px;">
-                                        <option value="">Filter Purchase Order</option>
-                                    </select>
+                                    <div class="dropdown" style="position: relative;">
+                                        <input type="text" class="form-control dropdown-toggle" id="searchDropdown"
+                                            data-bs-toggle="dropdown" aria-expanded="false"
+                                            placeholder="Select Purchase Order" readonly
+                                            style=" background-color: white; cursor: pointer; border: 1px solid #ced4da; border-radius: 0.375rem;">
+                                        <div class="dropdown-menu custom-dropdown-menu" aria-labelledby="searchDropdown"
+                                            style="width: 100%; max-height: 350px; overflow-y: auto;
+                                                    padding: 0; margin-top: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e0e0e0; border-radius: 0.375rem;">
+                                            <div class="search-container"
+                                                style="padding: 10px; background-color: #f8f9fa; border-bottom: 1px solid #e0e0e0;
+                                                        position: sticky; top: 0; z-index: 10;">
+                                                <input type="text" class="form-control" id="filterInput"
+                                                    placeholder="Search in list..." onkeyup="filterList()"
+                                                    style="border-radius: 0.25rem; border: 1px solid #ced4da; padding: 0.25rem 0.5rem;">
+                                            </div>
+                                            <ul class="list-group list-group-flush" id="dropdownMenuItems"
+                                                style="max-height: 250px; overflow-y: auto;">
+                                                <li class="list-group-item list-group-item-action"
+                                                    style="cursor: pointer; padding: 0.5rem 1rem; transition: background-color 0.2s;"
+                                                    data-value="All">
+                                                    <span class="text-muted">All Purchase Orders</span>
+                                                </li>
+                                                @foreach ($uniquePOs as $po)
+                                                    <li class="list-group-item list-group-item-action"
+                                                        style="cursor: pointer; padding: 0.5rem 1rem; transition: background-color 0.2s;"
+                                                        data-value="{{ $po }}">
+                                                        {{ $po }}
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
                                 <thead>
                                     <tr>
@@ -117,12 +146,6 @@
                     ajax: {
                         url: `/ppic/purchase-order/load-data/${year}/${month}`,
                         type: 'GET',
-                        data: function(d) {
-                            var poValue = $('#filter-po').val();
-                            if (poValue){
-                                d.purchase_order = poValue;
-                            }
-                        }
                     },
                     columns: [{
                             data: null,
@@ -184,32 +207,55 @@
                             name: 'old_number_format'
                         },
                     ],
-                    initComplete: function(){
-                        $.get(`/ppic/purchase-order/get-unique-po/${year}/${month}`, function(data){
-                            var select = $('#filter-po');
-                            select.empty().append('<option value="">Filter Purchase Order</option>');
-                            $.each(data, function(index, value){
-                                select.append(`<option value="${value}">${value}</option>`);
-                            });
-                        });
-                    },
-                    columnDefs: [{
-                        targets: 0,
-                        orderable: false,
-                        className: 'select-checkbox',
-                        checkboxes: {
-                            selectRow: true
-                        }
-                    }],
-                    select: {
-                        style: 'multi',
-                        selector: 'td:first-child'
+                    responsive: true,
+                    autoWidth: false
+                });
+            });
+
+            function filterList() {
+                var input = document.getElementById('filterInput');
+                var filter = input.value.toUpperCase();
+                var dropdownItems = document.getElementById('dropdownMenuItems').getElementsByTagName('li');
+
+                for (var i = 0; i < dropdownItems.length; i++) {
+                    var txtValue = dropdownItems[i].textContent || dropdownItems[i].innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        dropdownItems[i].style.display = "";
+                    } else {
+                        dropdownItems[i].style.display = "none";
                     }
-                });
-                $('#filter-po').on('change', function(){
-                    table.ajax.reload();
-                });
-            })
+                }
+            }
+
+            document.getElementById('dropdownMenuItems').addEventListener('click', function(e) {
+                var listItem = e.target.closest('li');
+                if (listItem) {
+                    var selectedValue = listItem.getAttribute('data-value');
+                    var searchDropdown = document.getElementById('searchDropdown');
+                    searchDropdown.value = selectedValue === 'All' ? 'Select Purchase Order' : selectedValue;
+                    if ($.fn.DataTable.isDataTable('#poTable')) {
+                        var table = $('#poTable').DataTable();
+                        table.column(1).search(selectedValue === 'All' ? '' : selectedValue).draw();
+                    }
+                    var dropdownMenu = listItem.closest('.dropdown-menu');
+                    var dropdown = bootstrap.Dropdown.getInstance(searchDropdown);
+                    dropdown.hide();
+                }
+            });
+
+            document.getElementById('dropdownMenuItems').addEventListener('mouseover', function(e) {
+                var listItem = e.target.closest('li');
+                if (listItem) {
+                    listItem.style.backgroundColor = '#f1f3f5';
+                }
+            });
+
+            document.getElementById('dropdownMenuItems').addEventListener('mouseout', function(e) {
+                var listItem = e.target.closest('li');
+                if (listItem) {
+                    listItem.style.backgroundColor = '';
+                }
+            });
 
             $('#poTable').on('click', '.delivery-reminder-input', function() {
                 $(this).siblings('.save-btn').css({
@@ -291,7 +337,6 @@
 
                 table.$('input[type="checkbox"]:checked').each(function() {
                     const row = table.row($(this).closest('tr'));
-                    // const itemNumber = row.data().item_number;
                     const Id = row.data().id;
                     selectedRows.push(Id);
                 });

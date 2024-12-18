@@ -16,9 +16,13 @@ class MppController extends Controller
             ->groupByRaw('YEAR(created_at), MONTH(created_at)')
             ->orderByRaw('YEAR(created_at) DESC, MONTH(created_at) DESC')
             ->get();
+        $uniquePartNumber = Mpp::distinct('partnumber')
+            ->whereNotNull('partnumber')
+            ->pluck('partnumber');
         return view('mpp.choose_order_customer', [
             'title' => 'Index Order Customer',
-            'monthCust' => $monthCust
+            'monthCust' => $monthCust,
+            'uniquePartNumber' => $uniquePartNumber
         ]);
     }
 
@@ -95,42 +99,42 @@ class MppController extends Controller
                             'kodefgs' => $i[2],
                             'partnumber' => $i[3],
                             'kategori' => $i[4] ?? 'NULL',
-                            'ori_cust_bulan_1' => $i[5] ?? 0,
-                            'ori_cust_bulan_2' => $i[6] ?? 0,
-                            'ori_cust_bulan_3' => $i[7] ?? 0,
-                            'ori_cust_bulan_4' => $i[8] ?? 0,
-                            'ori_cust_bulan_5' => $i[9] ?? 0,
-                            'ori_cust_bulan_6' => $i[10] ?? 0,
-                            'ori_cust_bulan_7' => $i[11] ?? 0,
-                            'ori_cust_bulan_8' => $i[12] ?? 0,
-                            'ori_cust_bulan_9' => $i[13] ?? 0,
-                            'ori_cust_bulan_10' => $i[14] ?? 0,
-                            'ori_cust_bulan_11' => $i[15] ?? 0,
-                            'ori_cust_bulan_12' => $i[16] ?? 0,
-                            'prod_plan_bulan_1' => $i[17] ?? 0,
-                            'prod_plan_bulan_2' => $i[18] ?? 0,
-                            'prod_plan_bulan_3' => $i[19] ?? 0,
-                            'prod_plan_bulan_4' => $i[20] ?? 0,
-                            'prod_plan_bulan_5' => $i[21] ?? 0,
-                            'prod_plan_bulan_6' => $i[22] ?? 0,
-                            'prod_plan_bulan_7' => $i[23] ?? 0,
-                            'prod_plan_bulan_8' => $i[24] ?? 0,
-                            'prod_plan_bulan_9' => $i[25] ?? 0,
-                            'prod_plan_bulan_10' => $i[26] ?? 0,
-                            'prod_plan_bulan_11' => $i[27] ?? 0,
-                            'prod_plan_bulan_12' => $i[28] ?? 0,
-                            'max_bulan_1' => max($i[5], $i[17]),
-                            'max_bulan_2' => max($i[6], $i[18]),
-                            'max_bulan_3' => max($i[7], $i[19]),
-                            'max_bulan_4' => max($i[8], $i[20]),
-                            'max_bulan_5' => max($i[9], $i[21]),
-                            'max_bulan_6' => max($i[10], $i[22]),
-                            'max_bulan_7' => max($i[11], $i[23]),
-                            'max_bulan_8' => max($i[12], $i[24]),
-                            'max_bulan_9' => max($i[13], $i[25]),
-                            'max_bulan_10' => max($i[14], $i[26]),
-                            'max_bulan_11' => max($i[15], $i[27]),
-                            'max_bulan_12' => max($i[16], $i[28]),
+                            'ori_cust_bulan_1' => intval($i[5]) ?? 0,
+                            'ori_cust_bulan_2' => intval($i[6])?? 0,
+                            'ori_cust_bulan_3' => intval($i[7])?? 0,
+                            'ori_cust_bulan_4' => intval($i[8])?? 0,
+                            'ori_cust_bulan_5' => intval($i[9])?? 0,
+                            'ori_cust_bulan_6' => intval($i[10]) ?? 0,
+                            'ori_cust_bulan_7' => intval($i[11]) ?? 0,
+                            'ori_cust_bulan_8' => intval($i[12]) ?? 0,
+                            'ori_cust_bulan_9' => intval($i[13]) ?? 0,
+                            'ori_cust_bulan_10' => intval($i[14]) ?? 0,
+                            'ori_cust_bulan_11' => intval($i[15]) ?? 0,
+                            'ori_cust_bulan_12' => intval($i[16]) ?? 0,
+                            'prod_plan_bulan_1' => intval($i[17]) ?? 0,
+                            'prod_plan_bulan_2' => intval($i[18]) ?? 0,
+                            'prod_plan_bulan_3' => intval($i[19]) ?? 0,
+                            'prod_plan_bulan_4' => intval($i[20]) ?? 0,
+                            'prod_plan_bulan_5' => intval($i[21]) ?? 0,
+                            'prod_plan_bulan_6' => intval($i[22]) ?? 0,
+                            'prod_plan_bulan_7' => intval($i[23]) ?? 0,
+                            'prod_plan_bulan_8' => intval($i[24]) ?? 0,
+                            'prod_plan_bulan_9' => intval($i[25]) ?? 0,
+                            'prod_plan_bulan_10' => intval($i[26]) ?? 0,
+                            'prod_plan_bulan_11' => intval($i[27]) ?? 0,
+                            'prod_plan_bulan_12' => intval($i[28]) ?? 0,
+                            'max_bulan_1' => intval(max($i[5], $i[17])),
+                            'max_bulan_2' => intval(max($i[6], $i[18])),
+                            'max_bulan_3' => intval(max($i[7], $i[19])),
+                            'max_bulan_4' => intval(max($i[8], $i[20])),
+                            'max_bulan_5' => intval(max($i[9], $i[21])),
+                            'max_bulan_6' => intval(max($i[10], $i[22])),
+                            'max_bulan_7' => intval(max($i[11], $i[23])),
+                            'max_bulan_8' => intval(max($i[12], $i[24])),
+                            'max_bulan_9' => intval(max($i[13], $i[25])),
+                            'max_bulan_10' => intval(max($i[14], $i[26])),
+                            'max_bulan_11' => intval(max($i[15], $i[27])),
+                            'max_bulan_12' => intval(max($i[16], $i[28])),
                             'bulan' => substr($request->month, 5, 2),
                             'tahun' => substr($request->month, 0, 4)
                         ];
@@ -189,6 +193,19 @@ class MppController extends Controller
             ]);
         }
 
+    }
+
+    public function get_unique_part_number($year, $month){
+        $uniquePartNumber = Mpp::where('tahun', $year)
+            ->where('bulan', $month)
+            ->distinct('partnumber')
+            ->pluck('partnumber')
+            ->filter(function ($value){
+                return $value !== null;
+            })
+            ->values()
+            ->toArray();
+        return response()->json($uniquePartNumber);
     }
 
     /**

@@ -23,7 +23,6 @@ class OpenPoController extends Controller
             ->orderByRaw('YEAR(date), MONTH(date) DESC')
             ->get();
 
-        // Get unique purchase orders for the dropdown
         $uniquePOs = OpenPo::distinct('purchase_order')
             ->whereNotNull('purchase_order')
             ->pluck('purchase_order');
@@ -38,16 +37,20 @@ class OpenPoController extends Controller
     public function index_edit($year, $month)
     {
         $monthName = DateTime::createFromFormat('!m', $month)->format('F');
+        $uniquePOs = OpenPo::distinct('purchase_order')
+            ->whereNotNull('purchase_order')
+            ->pluck('purchase_order');
         return view('open-po.index', [
             'title' => 'Edit Open PO',
             'year' => $year,
             'month' => $month,
-            'monthName' => $monthName
+            'monthName' => $monthName,
+            'uniquePOs' => $uniquePOs
         ]);
     }
 
     public function get_format(){
-        $filePath = public_path('doc/Format Purchase Order.xlsx');
+        $filePath = public_path('doc/Format Impor Purchase Order.xlsx');
         return response()->download($filePath);
     }
 

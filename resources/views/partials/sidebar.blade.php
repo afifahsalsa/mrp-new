@@ -22,7 +22,7 @@
         <li class="nav-item {{ $title === 'Edit Buffer' || $title === 'Index Buffer' || $title === 'View Buffer' || $title === 'Visualization Buffer & Stock' || $title === 'Index Stok' || $title === 'Edit Stok' || $title === 'View Stok'  ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('buffer.index') }}" aria-controls="icons">
                 <span class="menu-title">Buffer | Stock on Hand</span>
-                <i class="mdi mdi-contacts menu-icon"></i>
+                <i class="mdi mdi-database menu-icon"></i>
             </a>
         </li>
         {{-- <li class="nav-item {{ $title === 'Index Buffer' ? 'active' : '' }}">
@@ -40,7 +40,7 @@
         <li class="nav-item {{ $title === 'Index Open PO' || $title === 'Edit Open PO' || $title === 'Index Open PR' || $title === 'Edit Open PR' ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('open-po.index') }}" aria-controls="charts">
                 <span class="menu-title">Outstanding PO | PR</span>
-                <i class="mdi mdi-chart-bar menu-icon"></i>
+                <i class="mdi mdi-cube-send menu-icon"></i>
             </a>
         </li>
         {{-- <li class="nav-item {{ $title === 'Production Planning' || $title === 'Order Original' || $title === 'Order In Unit' ? 'active' : '' }}">
@@ -66,10 +66,10 @@
         <li class="nav-item {{ $title === 'Index Order Customer' || $title === 'Index Production Planning' ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('order-customer.index') }}" aria-controls="charts">
                 <span class="menu-title">MPP</span>
-                <i class="mdi mdi-chart-bar menu-icon"></i>
+                <i class="mdi mdi-package menu-icon"></i>
             </a>
         </li>
-        <li class="nav-item">
+        {{-- <li class="nav-item">
             <a class="nav-link" data-bs-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
                 <span class="menu-title">Tables</span>
                 <i class="mdi mdi-table-large menu-icon"></i>
@@ -82,7 +82,7 @@
                     </li>
                 </ul>
             </div>
-        </li>
+        </li> --}}
         {{-- <li class="nav-item">
             <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
                 <span class="menu-title">User Pages</span>
@@ -113,11 +113,11 @@
                 </ul>
             </div>
         </li> --}}
-        <li class="nav-item">
+        {{-- <li class="nav-item">
             <a class="nav-link" href="{{ asset('purple-free/src/docs/documentation.html') }}" target="_blank">
                 <span class="menu-title">Documentation</span>
                 <i class="mdi mdi-file-document-box menu-icon"></i>
             </a>
-        </li>
+        </li> --}}
     </ul>
 </nav>

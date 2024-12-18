@@ -16,9 +16,10 @@ return new class extends Migration
             $table->string('item_number');
             $table->string('part_number');
             $table->string('product_name');
-            $table->string('usage')->nullable();
-            $table->string('lt')->nullable();
-            $table->string('supplier')->nullable();
+            $table->integer('lt');
+            $table->string('supplier');
+            $table->string('li');
+            $table->string('type');
             $table->integer('qty');
             $table->date('date');
             $table->timestamps();

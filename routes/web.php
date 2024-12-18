@@ -5,7 +5,6 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MppController;
 use App\Http\Controllers\OpenPoController;
 use App\Http\Controllers\OpenPrController;
-use App\Http\Controllers\OrderOriginalController;
 use App\Http\Controllers\OrderUnitController;
 use App\Http\Controllers\PlanningController;
 use App\Http\Controllers\StokController;
@@ -42,8 +41,7 @@ Route::prefix('/ppic')->group(function () {
     Route::prefix('/buffer')->group(function () {
         Route::get('/', [BufferController::class, 'index'])->name('buffer.index');
         Route::get('edit/{year}/{month}', [BufferController::class, 'index_edit'])->name('buffer.index-edit');
-        Route::get('view/{year}/{month}', [BufferController::class, 'index_view'])->name('buffer.view');
-        Route::get('format-import', [BufferController::class, 'format_buffer'])->name('buffer.format-import');
+        Route::get('format-import', [BufferController::class, 'get_format'])->name('buffer.format-import');
         Route::get('load-data/{year}/{month}', [BufferController::class, 'get_data'])->name('buffer.data');
         Route::put('update/{id}', [BufferController::class, 'update'])->name('buffer.update');
         Route::post('import', [BufferController::class, 'import'])->name('buffer.import');
@@ -54,8 +52,7 @@ Route::prefix('/ppic')->group(function () {
     Route::prefix('/stok')->group(function(){
         Route::get('/', [StokController::class, 'index'])->name('stok.index');
         Route::get('edit/{year}/{month}', [StokController::class, 'index_edit'])->name('stok.index-edit');
-        Route::get('view/{year}/{month}', [StokController::class, 'index_view'])->name('stok.view');
-        Route::get('format-import', [StokController::class, 'format_stok'])->name('stok.format');
+        Route::get('format-import', [StokController::class, 'get_format'])->name('stok.format-import');
         Route::get('load-data/{year}/{month}', [StokController::class, 'get_data'])->name('stok.data');
         Route::put('update/{id}', [StokController::class, 'update'])->name('stok.update');
         Route::post('import', [StokController::class, 'import'])->name('stok.import');

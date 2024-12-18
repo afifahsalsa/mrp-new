@@ -55,8 +55,8 @@
                                     <input class="form-control" type="file" id="file" name="file" required>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary" id="submitButton">Submit</button>
+                                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal" style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);">Close</button>
+                                    <button type="submit" class="btn btn-primary" id="submitButton" style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);">Submit</button>
                                 </div>
                             </form>
                         </div>
@@ -65,7 +65,7 @@
 
                 <!-- Modal Update -->
                 <div class="modal fade" id="modalUpdateMpp" tabindex="-1" aria-labelledby="exampleModalLabel"
-                    aria-hidden="true">
+                    aria-hidden="true" onsubmit="showLoading()">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -135,8 +135,7 @@
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h3 class="modal-title" id="viewModalMpp">Order Customer in :
-                                                            <span
-                                                                class="text-danger">{{ \Carbon\Carbon::create()->month($mc->month)->format('F') .', ' .$mc->year }}</span>
+                                                            <span id="modalMonthYear" class="text-danger"></span>
                                                         </h3>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>
@@ -146,11 +145,37 @@
                                                             <table class="table display" id="mppTable"
                                                                 style="width: 100%">
                                                                 <div class="d-flex mb-4">
-                                                                    <h4 class="mt-3">Filter: </h4>
-                                                                    <select id="filter-lt" class="form-select mt-2"
-                                                                        style="width: 20%; margin-left: 20px;">
-                                                                        <option value="">Filter LT</option>
-                                                                    </select>
+                                                                    <h4 class="mt-2 me-2">Filter: </h4>
+                                                                    <div class="dropdown" style="position: relative;">
+                                                                        <input type="text" class="form-control dropdown-toggle"
+                                                                            id="searchDropdown" data-bs-toggle="dropdown" aria-expanded="false" placeholder="Select Part Number" readonly
+                                                                            style=" background-color: white; cursor: pointer; border: 1px solid #ced4da; border-radius: 0.375rem;">
+                                                                        <div class="dropdown-menu custom-dropdown-menu"
+                                                                            aria-labelledby="searchDropdown"
+                                                                            style="width: 100%; max-height: 350px; overflow-y: auto;
+                                                                                    padding: 0; margin-top: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e0e0e0; border-radius: 0.375rem;">
+                                                                            <div class="search-container"
+                                                                                style="padding: 10px; background-color: #f8f9fa; border-bottom: 1px solid #e0e0e0;
+                                                                                        position: sticky; top: 0; z-index: 10;">
+                                                                                <input type="text" class="form-control" id="filterInput" placeholder="Search in list..."
+                                                                                    onkeyup="filterList()" style="border-radius: 0.25rem; border: 1px solid #ced4da; padding: 0.25rem 0.5rem;">
+                                                                            </div>
+                                                                            <ul class="list-group list-group-flush" id="dropdownMenuItems" style="max-height: 250px; overflow-y: auto;">
+                                                                                <li class="list-group-item list-group-item-action"
+                                                                                    style="cursor: pointer; padding: 0.5rem 1rem; transition: background-color 0.2s;"
+                                                                                    data-value="All">
+                                                                                    <span class="text-muted">All Part Number</span>
+                                                                                </li>
+                                                                                @foreach ($uniquePartNumber as $upn)
+                                                                                    <li class="list-group-item list-group-item-action"
+                                                                                        style="cursor: pointer; padding: 0.5rem 1rem; transition: background-color 0.2s;"
+                                                                                        data-value="{{ $upn }}">
+                                                                                        {{ $upn }}
+                                                                                    </li>
+                                                                                @endforeach
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
                                                                 <thead>
                                                                     <tr>
@@ -312,6 +337,50 @@
                         $('#mppTable').DataTable().destroy();
                     }
                 });
+            });
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const viewModal = document.getElementById('viewModal');
+                const modalMonthYear = document.getElementById('modalMonthYear');
+
+                viewModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const year = button.getAttribute('data-year');
+                    const month = button.getAttribute('data-month');
+                    const monthName = new Date(year, month - 1).toLocaleString('default', { month: 'long' });
+                    modalMonthYear.textContent = `${monthName}, ${year}`;
+                });
+            });
+
+            function filterList() {
+                var input = document.getElementById('filterInput');
+                var filter = input.value.toUpperCase();
+                var dropdownItems = document.getElementById('dropdownMenuItems').getElementsByTagName('li');
+
+                for (var i = 0; i < dropdownItems.length; i++) {
+                    var txtValue = dropdownItems[i].textContent || dropdownItems[i].innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        dropdownItems[i].style.display = "";
+                    } else {
+                        dropdownItems[i].style.display = "none";
+                    }
+                }
+            }
+
+            document.getElementById('dropdownMenuItems').addEventListener('click', function(e) {
+                var listItem = e.target.closest('li');
+                if (listItem) {
+                    var selectedValue = listItem.getAttribute('data-value');
+                    var searchDropdown = document.getElementById('searchDropdown');
+                    searchDropdown.value = selectedValue === 'All' ? 'Select Part Number' : selectedValue;
+                    if ($.fn.DataTable.isDataTable('#mppTable')) {
+                        var table = $('#mppTable').DataTable();
+                        table.column(3).search(selectedValue === 'All' ? '' : selectedValue).draw();
+                    }
+                    var dropdownMenu = listItem.closest('.dropdown-menu');
+                    var dropdown = bootstrap.Dropdown.getInstance(searchDropdown);
+                    dropdown.hide();
+                }
             });
         </script>
     @endpush

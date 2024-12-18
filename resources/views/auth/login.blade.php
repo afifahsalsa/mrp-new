@@ -5,10 +5,10 @@
             <div class="row flex-grow">
                 <div class="col-lg-4 mx-auto">
                     <div class="auth-form-light text-left p-5">
-                        <div class="brand-logo">
-                            <img src="{{ asset('purple-free/src/assets/images/logo.svg') }}">
+                        <div class="brand-logo" style="text-align: center; margin-bottom: 0.5rem;">
+                            <img src="{{ asset('img/logo-mrp-new.png') }}">
                         </div>
-                        <h4 class="font-weight-bold text-center">Welcome to MRP!</h4>
+                        <h4 class="font-weight-bold text-center">Welcome to MRP System!</h4>
                         <h6 class="font-weight-light text-center">Sign in to your account.</h6>
                         <form class="pt-3" action="{{ route('login') }}" method="POST">
                             @csrf
