@@ -7,6 +7,7 @@ use App\Http\Controllers\OpenPoController;
 use App\Http\Controllers\OpenPrController;
 use App\Http\Controllers\OrderUnitController;
 use App\Http\Controllers\PlanningController;
+use App\Http\Controllers\PriceController;
 use App\Http\Controllers\StokController;
 use App\Http\Controllers\VisualizationController;
 use Illuminate\Support\Facades\Auth;
@@ -90,12 +91,20 @@ Route::prefix('/ppic')->group(function () {
         });
         Route::prefix('/production-planning')->group(function(){
             Route::get('/', [MppController::class, 'index_choose_prod_plan'])->name('prod-plan.index');
-            Route::get('load-data', [PlanningController::class, 'get_data'])->name('planning-production.data');
-            Route::post('import', [PlanningController::class, 'import'])->name('planning-production.import');
+            // Route::get('load-data', [PlanningController::class, 'get_data'])->name('planning-production.data');
+            // Route::post('import', [PlanningController::class, 'import'])->name('planning-production.import');
         });
         Route::prefix('/order-unit')->group(function(){
             Route::get('/', [MppController::class, 'index_choose_max_unit'])->name('max.index');
-            Route::get('/load-data', [OrderUnitController::class, 'get_data'])->name('order-unit.data');
+            // Route::get('/load-data', [OrderUnitController::class, 'get_data'])->name('order-unit.data');
         });
+    });
+    Route::prefix('/price')->group(function(){
+        Route::get('/', [PriceController::class, 'index'])->name('price.index');
+        Route::get('format-import', [PriceController::class, 'get_format'])->name('price.format');
+        Route::post('import', [PriceController::class, 'import'])->name('price.import');
+        Route::get('/input-currency', [PriceController::class, 'input_currency'])->name('price.input-currency');
+        Route::post('update-currency', [PriceController::class, 'update'])->name('price.update-currency');
+        // Route::get('/input-currency', function () {return view('price.input_currency',['title' => 'Input Currency']);})->name('price.input-currency');
     });
 });

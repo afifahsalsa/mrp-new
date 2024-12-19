@@ -69,6 +69,12 @@
                 <i class="mdi mdi-package menu-icon"></i>
             </a>
         </li>
+        <li class="nav-item {{ $title === 'Index Price' || $title === 'Input Currency' ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('price.index') }}" aria-controls="charts">
+                <span class="menu-title">Price</span>
+                <i class="mdi mdi-cash-multiple menu-icon"></i>
+            </a>
+        </li>
         {{-- <li class="nav-item">
             <a class="nav-link" data-bs-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
                 <span class="menu-title">Tables</span>

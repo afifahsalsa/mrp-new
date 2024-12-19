@@ -165,7 +165,7 @@
                 },
                 plugins: [ChartDataLabels]
             });
-            percentageChart.canvas.parentNode.style.height = '100px';
+            percentageChart.canvas.parentNode.style.height = '130px';
         });
     </script>
 @endsection

@@ -16,7 +16,20 @@
             <li class="nav-item nav-profile dropdown">
                 <a class="nav-link dropdown-toggle" id="profileDropdown" href="#" data-bs-toggle="dropdown"
                     aria-expanded="false">
-                    <div class="nav-profile-text">
+                    @if (Auth::check() && Auth::user()->name)
+                            <div class="nav-profile-img">
+                                <img src="{{ asset('purple-free/src/assets/images/faces/face1.jpg') }}" alt="image">
+                                <span class="availability-status online"></span>
+                            </div>
+                            <div class="nav-profile-text">
+                                <p class="mb-1 text-black">{{ Auth::user()->name }}</p>
+                            </div>
+                        @else
+                            <script>
+                                window.location = "{{ route('login') }}";
+                            </script>
+                        @endif
+                    {{-- <div class="nav-profile-text">
                         @if (Auth::check() && Auth::user()->user_code)
                             <div class="bg-primary rounded-circle font-weight-bold text-white"
                                 style="margin-right:-1rem; font-size:1.7rem; text-align:center; width: 50px; height: 50px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);">
@@ -27,7 +40,7 @@
                                 window.location = "{{ route('login') }}";
                             </script>
                         @endif
-                    </div>
+                    </div> --}}
                 </a>
                 <div class="dropdown-menu navbar-dropdown">
                     <form action="{{ route('logout') }}" method="POST">
