@@ -2,11 +2,10 @@
 
 use App\Http\Controllers\BufferController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\IncomingManualController;
 use App\Http\Controllers\MppController;
 use App\Http\Controllers\OpenPoController;
 use App\Http\Controllers\OpenPrController;
-use App\Http\Controllers\OrderUnitController;
-use App\Http\Controllers\PlanningController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\StokController;
 use App\Http\Controllers\VisualizationController;
@@ -82,6 +81,13 @@ Route::prefix('/ppic')->group(function () {
         Route::delete('delete', [OpenPrController::class, 'destroy'])->name('open-pr.delete');
         Route::get('get-unique-status/{year}/{month}', [OpenPrController::class, 'get_uniqe_status'])->name('open-pr.unique-status');
     });
+    Route::prefix('/incoming-manual')->group(function(){
+        Route::get('/', [IncomingManualController::class, 'index'])->name('incomong-manual.index');
+        Route::get('format-import', [IncomingManualController::class, 'get_format'])->name('incoming-manual.format');
+        Route::post('import', [IncomingManualController::class, 'import'])->name('incoming-manual.import');
+        Route::get('load-data/{year}/{month}', [IncomingManualController::class, 'get_data'])->name('incoming-manual.data');
+        // Route::get('get-unique-')
+    });
     Route::prefix('/mpp')->group(function(){
         Route::prefix('/order-original')->group(function(){
             Route::get('/', [MppController::class, 'index_choose_order_customer'])->name('order-customer.index');
@@ -105,6 +111,7 @@ Route::prefix('/ppic')->group(function () {
         Route::post('import', [PriceController::class, 'import'])->name('price.import');
         Route::get('/input-currency', [PriceController::class, 'input_currency'])->name('price.input-currency');
         Route::post('update-currency', [PriceController::class, 'update'])->name('price.update-currency');
-        // Route::get('/input-currency', function () {return view('price.input_currency',['title' => 'Input Currency']);})->name('price.input-currency');
+        Route::get('load-data/{year}/{month}', [PriceController::class, 'get_data'])->name('price.data');
+        Route::get('get-unique-currency/{year}/{month}', [PriceController::class, 'get_unique_currency'])->name('price.unique-currency');
     });
 });

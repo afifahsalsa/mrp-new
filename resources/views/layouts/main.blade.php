@@ -71,9 +71,11 @@
     @stack('scriptDashboard')
     @stack('scriptPo')
     @stack('scriptPr')
+    @stack('scriptIM');
     @stack('scriptPP')
     @stack('scriptOrderOriginal')
     @stack('scriptMpp');
+    @stack('scriptPrice');
     <!-- End custom js for this page -->
     <script>
         @if (session('swal'))
@@ -81,7 +83,7 @@
                 icon: '{{ session('swal.type') }}',
                 title: '{{ session('swal.title') }}',
                 text: '{{ session('swal.text') }}',
-                html: '{{ session('swal.html') }}'
+                html: '{!! session('swal.html') !!}'
             });
         @endif
 

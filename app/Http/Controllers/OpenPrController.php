@@ -126,13 +126,22 @@ class OpenPrController extends Controller
         if (!empty($duplicateItems) && !empty($duplicatePR)) {
             $uniqueDuplicateItems = array_unique($duplicateItems);
             $uniqueDuplicatePR = array_unique($duplicatePR);
-            $duplicateItemList = implode(', ', $uniqueDuplicateItems);
-            $duplicatePRList = implode(', ', $uniqueDuplicatePR);
+            $tableHtml = '<div class="table-responsive">';
+            $tableHtml .= '<p><strong>Terdapat duplikasi pada item number dan purchase requisition berikut:</strong></p>';
+            $tableHtml .= '<table class="table table-bordered table-striped">';
+            $tableHtml .= '<thead><tr><th>Item Number</th><th>Purchase Requisition</th></tr></thead>';
+            $tableHtml .= '<tbody>';
+            foreach ($uniqueDuplicateItems as $index => $item) {
+                $pr = $uniqueDuplicatePR[$index] ?? '';
+                $tableHtml .= "<tr><td>{$item}</td><td>{$pr}</td></tr>";
+            }
+            $tableHtml .= '</tbody></table></div>';
+
             return back()->with([
                 'swal' => [
                     'type' => 'error',
                     'title' => 'Import Gagal!',
-                    'text' => "Terdapat duplikasi data pada Item Number berikut: {$duplicateItemList} dengan Purchase Requisition  berikut: {$duplicatePRList}"
+                    'html' => $tableHtml
                 ]
             ]);
         }

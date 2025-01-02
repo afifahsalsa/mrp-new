@@ -7,6 +7,9 @@
         <a href="{{ route('open-pr.index') }}"
             style="text-decoration: none; color: {{ request()->routeIs('open-pr.index') ? 'purple' : 'blue' }}">
             Purchase Requisition | </a>
+        <a href="{{ route('incomong-manual.index') }}"
+            style="text-decoration: none; color: {{ request()->routeIs('incomong-manual.index') ? 'purple' : 'blue' }}">
+            Incoming Manual | </a>
         <a href="#"
             style="text-decoration: none; color: {{ request()->routeIs('buffer.stok.visualisasi') ? 'purple' : 'blue' }}">
             Visualization</a>

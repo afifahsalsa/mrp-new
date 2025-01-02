@@ -27,8 +27,8 @@
                 </div>
 
                 {{-- Modal Import --}}
-                <div class="modal fade" id="modalImportPrice" tabindex="-1" aria-labelledby="modalLabelPrice" aria-hidden="true"
-                    onsubmit="showLoading()">
+                <div class="modal fade" id="modalImportPrice" tabindex="-1" aria-labelledby="modalLabelPrice"
+                    aria-hidden="true" onsubmit="showLoading()">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -36,7 +36,8 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Close"></button>
                             </div>
-                            <form action="{{ route('price.import') }}" enctype="multipart/form-data" method="POST" id="importPrice">
+                            <form action="{{ route('price.import') }}" enctype="multipart/form-data" method="POST"
+                                id="importPrice">
                                 @csrf
                                 <div class="modal-body">
                                     <label for="date" class="form-label"><strong>Date</strong></label>
@@ -44,6 +45,7 @@
                                         value="<?php echo date('Y-m-d'); ?>" required>
                                     <label for="file" class="form-label mt-2"><strong>Choose File</strong></label>
                                     <input class="form-control" type="file" id="file" name="file" required>
+                                    {{-- <p style="font-size: 12px">Pastikan Item Number tidak ada yang double, price dan currency tidak ada yang blank!</p> --}}
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-dark" data-bs-dismiss="modal"
@@ -62,12 +64,12 @@
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="exampleModalLabel">Update Data Purchase Order</h1>
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Update Data Price</h1>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Close"></button>
                             </div>
-                            <form action="{{ route('open-pr.import') }}" enctype="multipart/form-data" method="POST"
-                                id="importPR">
+                            <form action="{{ route('price.import') }}" enctype="multipart/form-data" method="POST"
+                                id="importPrice">
                                 @csrf
                                 <div class="modal-body">
                                     <label for="date" class="form-label"><strong>Date</strong></label>
@@ -104,14 +106,14 @@
                                         {{ \Carbon\Carbon::create($mp->year, $mp->month)->format('F Y') }}
                                     </td>
                                     <td>
-                                        <a
+                                        {{-- <a
                                             href="{{ route('open-pr.index-edit', ['year' => $mp->year, 'month' => $mp->month]) }}">
                                             <button class="btn btn-inverse-dark px-4">
                                                 <i class="mdi mdi-table-edit"></i> Edit
                                             </button>
                                             <input type="hidden" id="year" name="year">
                                             <input type="hidden" id="month" name="month">
-                                        </a>
+                                        </a> --}}
                                         <button class="btn btn-inverse-success px-4" data-bs-toggle="modal"
                                             data-bs-target="#modalUpdatePrice">
                                             <i class="mdi mdi-cloud-sync"></i> Update
@@ -127,7 +129,7 @@
                                                 style="width: 100rem;">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h3 class="modal-title" id="viewModalLabel">Purchase Requisition
+                                                        <h3 class="modal-title" id="viewModalLabel">Price
                                                             in : <span id="modalMonthYear" class="text-danger"></span>
                                                         </h3>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
@@ -135,25 +137,27 @@
                                                     </div>
                                                     <div class="modal-body">
                                                         <div class="table-responsive">
-                                                            <table class="table display" id="prTable"
+                                                            <table class="table display" id="priceTable"
                                                                 style="width: 100%">
                                                                 <div class="d-flex mb-4">
                                                                     <h4 class="mt-3">Filter: </h4>
-                                                                    <select id="filter-status" class="form-select mt-2"
+                                                                    <select id="filter-currency" class="form-select mt-2"
                                                                         style="width: 20%; margin-left: 20px;">
-                                                                        <option value="">PR Status</option>
+                                                                        <option value="">Currency</option>
                                                                     </select>
                                                                 </div>
                                                                 <thead>
                                                                     <tr>
-                                                                        <th>Purchase Requisiton</th>
                                                                         <th>Item ID</th>
+                                                                        <th>Category Item</th>
+                                                                        <th>Part Name</th>
                                                                         <th>Part Number</th>
-                                                                        <th>Old Name</th>
-                                                                        <th>PR Date</th>
-                                                                        <th>Request Date</th>
-                                                                        <th>Quantity</th>
-                                                                        <th>PR Status</th>
+                                                                        <th>Search Name</th>
+                                                                        <th>Satuan</th>
+                                                                        <th>Price</th>
+                                                                        <th>Currency</th>
+                                                                        <th>Value Currency</th>
+                                                                        <th>Price IDR</th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
@@ -183,4 +187,101 @@
             </div>
         </div>
     </div>
+
+    @push('scriptPrice')
+        <script>
+            $(document).ready(function() {
+                $('#viewModal').on('show.bs.modal', function(event) {
+                    let button = $(event.relatedTarget);
+                    let year = button.data('year');
+                    let month = button.data('month');
+
+                    const table = $('#priceTable').DataTable({
+                        "lengthMenu": [10, 25, 50, 100],
+                        processing: true,
+                        serverSide: true,
+                        scrollX: true,
+                        ajax: {
+                            url: `/ppic/price/load-data/${year}/${month}`,
+                            type: 'GET',
+                            data: function(d) {
+                                var currencyValue = $('#filter-currency').val();
+                                if (currencyValue) {
+                                    d.currency = currencyValue;
+                                }
+                            }
+                        },
+                        columns: [{
+                                data: 'item_id'
+                            },
+                            {
+                                data: 'category_item'
+                            },
+                            {
+                                data: 'part_name'
+                            },
+                            {
+                                data: 'part_number'
+                            },
+                            {
+                                data: 'search_name'
+                            },
+                            {
+                                data: 'satuan'
+                            },
+                            {
+                                data: 'price'
+                            },
+                            {
+                                data: 'currency'
+                            },
+                            {
+                                data: 'val_currency'
+                            },
+                            {
+                                data: 'price_idr'
+                            }
+                        ],
+                        initComplete: function() {
+                            $.get(`/ppic/price/get-unique-currency/${year}/${month}`, function(
+                                data) {
+                                var select = $('#filter-currency');
+                                select.empty().append(
+                                    '<option value="">Filter Currency</option>');
+                                $.each(data, function(index, value) {
+                                    select.append(
+                                        `<option value="${value}">${value}</option>`
+                                    );
+                                });
+                            });
+                        },
+                        responsive: true,
+                        autoWidth: false
+                    });
+                    $('#filter-currency').on('change', function() {
+                        table.ajax.reload();
+                    });
+                });
+                $('#viewModal').on('hidden.bs.modal', function() {
+                    if ($.fn.DataTable.isDataTable('#priceTable')) {
+                        $('#priceTable').DataTable().destroy();
+                    }
+                });
+            });
+            document.addEventListener('DOMContentLoaded', function() {
+                const viewModal = document.getElementById('viewModal');
+                const modalMonthYear = document.getElementById('modalMonthYear');
+
+                viewModal.addEventListener('show.bs.modal', function(event) {
+                    const button = event.relatedTarget;
+                    const year = button.getAttribute('data-year');
+                    const month = button.getAttribute('data-month');
+                    const monthName = new Date(year, month - 1).toLocaleString('default', {
+                        month: 'long'
+                    });
+                    modalMonthYear.textContent = `${monthName}, ${year}`;
+                });
+            });
+        </script>
+    @endpush
 @endsection

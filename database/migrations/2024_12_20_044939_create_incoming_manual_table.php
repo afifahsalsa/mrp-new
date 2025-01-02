@@ -11,18 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('price', function (Blueprint $table) {
+        Schema::create('incoming_manual', function (Blueprint $table) {
             $table->id();
-            $table->string('item_id');
-            $table->string('category_item');
-            $table->string('part_name');
+            $table->string('supplier');
+            $table->date('tgl_kedatangan');
+            $table->string('item_number');
             $table->string('part_number');
-            $table->string('search_name');
-            $table->string('satuan');
-            $table->integer('price');
-            $table->string('currency');
-            $table->integer('val_currency');
-            $table->integer('price_idr');
+            $table->string('purchase_order');
+            $table->integer('qty');
             $table->date('date');
             $table->timestamps();
         });
@@ -33,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('price');
+        Schema::dropIfExists('incoming_manual');
     }
 };

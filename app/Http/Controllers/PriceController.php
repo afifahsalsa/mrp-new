@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat\Wizard\Currency;
+use Yajra\DataTables\Facades\DataTables;
 
 class PriceController extends Controller
 {
@@ -42,6 +43,31 @@ class PriceController extends Controller
     {
         $filePath = public_path('doc/Format Impor Price.xlsx');
         return response()->download($filePath);
+    }
+
+    public function get_unique_currency($year, $month)
+    {
+        $uniqueCurrency = Price::whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->distinct('currency')
+            ->pluck('currency')
+            ->filter(function ($value) {
+                return $value !== null;
+            })
+            ->values()
+            ->toArray();
+
+        return response()->json($uniqueCurrency);
+    }
+
+    public function get_data(Request $request, $year, $month)
+    {
+        $priceData = Price::whereYear('date', $year)
+            ->whereMonth('date', $month);
+        if ($request->has('currency') && $request->currency !== '') {
+            $priceData = $priceData->where('currency', $request->currency);
+        }
+        return DataTables::of($priceData)->make(true);
     }
 
     public function import(Request $request)
@@ -95,27 +121,45 @@ class PriceController extends Controller
                 ]
             ]);
         }
-
-        foreach ($tempData as $data) {
-            if ($data['price'] === null) {
-                return back()->with([
-                    'swal' => [
-                        'type' => 'error',
-                        'title' => 'Import Gagal!',
-                        'text' => "<strong>Price</strong> harus diisi"
-                    ]
-                ]);
-            }
-            if ($data['currency'] === null) {
-                return back()->with([
-                    'swal' => [
-                        'type' => 'error',
-                        'title' => 'Import Gagal!',
-                        'text' => "<strong>Currency</strong> harus diisi"
-                    ]
-                ]);
-            }
+        if($i[6] === null){
+            return back()->with([
+                'swal' => [
+                    'type' => 'error',
+                    'title' => 'Import Gagal!',
+                    'html' => "<strong>Price</strong> tidak boleh ada yang kosong!"
+                ]
+            ]);
         }
+        if($i[7] === null){
+            return back()->with([
+                'swal' => [
+                    'type' => 'error',
+                    'title' => 'Import Gagal!',
+                    'html' => "<strong>Currency</strong> tidak boleh ada yang kosong!"
+                ]
+            ]);
+        }
+
+        // foreach ($tempData as $data) {
+        //     if ($data['price'] === null) {
+        //         return back()->with([
+        //             'swal' => [
+        //                 'type' => 'error',
+        //                 'title' => 'Import Gagal!',
+        //                 'text' => "<strong>Price</strong> harus diisi"
+        //             ]
+        //         ]);
+        //     }
+        //     if ($data['currency'] === null) {
+        //         return back()->with([
+        //             'swal' => [
+        //                 'type' => 'error',
+        //                 'title' => 'Import Gagal!',
+        //                 'text' => "<strong>Currency</strong> harus diisi"
+        //             ]
+        //         ]);
+        //     }
+        // }
 
         // $currencyData = collect($tempData)
         //     ->filter(function ($item) {
@@ -142,13 +186,6 @@ class PriceController extends Controller
             }
         }
         return redirect()->route('price.input-currency');
-        // return back()->with([
-        //     'swal' => [
-        //         'type' => 'success',
-        //         'title' => 'Import Berhasil',
-        //         'text' => "Berhasil mengimpor {$rowCountPrice} baris data.",
-        //     ]
-        // ]);
     }
 
     /**

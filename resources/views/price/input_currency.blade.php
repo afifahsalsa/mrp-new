@@ -12,7 +12,7 @@
                     style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);">
                     <div class="card-body">
                         <form action="{{ route('price.update-currency') }}" enctype="multipart/form-data" method="POST"
-                            id="importPrice" class="forms-sample">
+                            id="importPrice" class="forms-sample" onsubmit="showLoading()">
                             @csrf
                             @foreach ($currencyData as $currency)
                                 <div class="form-group">
