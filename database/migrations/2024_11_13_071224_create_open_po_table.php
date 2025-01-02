@@ -13,27 +13,26 @@ return new class extends Migration
     {
         Schema::create('open_po', function (Blueprint $table) {
             $table->id();
-            $table->string('purchase_order');
+            $table->string('vendor_account');
             $table->string('item_number');
-            $table->string('product_name');
+            $table->string('name');
+            $table->string('purchase_order');
+            $table->integer('line_number');
             $table->string('purchase_requisition');
-            $table->float('tpqty');
-            $table->string('tpunit');
-            $table->string('tpsite');
-            $table->string('tpvendor');
+            $table->string('product_name');
+            $table->integer('deliver_reminder');
             $table->dateTime('delivery_date');
-            $table->float('delivery_reminder');
-            $table->string('old_number_format');
-            $table->dateTime('created_date_and_time');
-            $table->string('tpstatus');
-            $table->string('line_status');
-            $table->string('supplier_name');
-            $table->string('standar_datang');
+            $table->string('part_name');
+            $table->string('part_number');
+            $table->string('procurement_category');
+            $table->string('site');
+            $table->string('warehouse');
+            $table->string('location');
+            $table->integer('qty');
             $table->string('bulan_datang');
-            $table->string('lt');
+            $table->integer('lt');
             $table->string('ket_late');
-            $table->string('ket_lt');
-            $table->date('date');
+            $table->dateTime('date');
             $table->timestamps();
         });
     }

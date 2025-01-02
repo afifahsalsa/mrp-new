@@ -69,7 +69,7 @@ class IncomingManualController extends Controller
                         ]);
                     }
 
-                    $duplicateInArray = collect($tempData)->contains(function ($value) use ($i, $request){
+                    $duplicateInArray = collect($tempData)->contains(function ($value) use ($i){
                         return $value['purchase_order'] == $i[4] && $value['item_number'] == $i[2];
                     });
 
@@ -120,6 +120,16 @@ class IncomingManualController extends Controller
                     'type' => 'error',
                     'title' => 'Import Gagal!',
                     'text' => "Kolom quantity tidak boleh blank!"
+                ]
+            ]);
+        }
+
+        if(empty($i[2]) && empty($i[4])){
+            return back()->with([
+                'swal' => [
+                    'type' => 'error',
+                    'title' => 'Import Gagal!',
+                    'text' => "Kolom item number dan purchase order tidak boleh blank."
                 ]
             ]);
         }

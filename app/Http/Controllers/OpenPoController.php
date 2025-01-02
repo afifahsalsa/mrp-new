@@ -100,10 +100,11 @@ class OpenPoController extends Controller
                     $dataStok = Stok::where('item_number', $i[1])
                         ->orderBy('date', 'desc')
                         ->first();
-                    $convertDelivery = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($i[8]);
-                    $convertCreated = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($i[11]);
 
-                    if ($dataStok && $dataStok->lt == '0') {
+                    $convertDelivery = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($i[8]);
+                    // $convertCreated = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($i[11]);
+
+                    if ($dataStok && $dataStok->lt === '0') {
                         $lt = '0';
                     } elseif ($dataStok && !is_numeric($dataStok->lt)) {
                         $lt = substr($dataStok->lt, 0, 1);
@@ -113,8 +114,8 @@ class OpenPoController extends Controller
                         $lt = '0';
                     }
 
-                    $standarDatang = $convertCreated->modify('+' . ($lt * 30) . ' days');
-                    $standarDatangFormatted = $standarDatang->format('d-M-Y');
+                    // $standarDatang = $convertCreated->modify('+' . ($lt * 30) . ' days');
+                    // $standarDatangFormatted = $standarDatang->format('d-M-Y');
 
                     if ($convertDelivery <= now()) {
                         $monthDelivery = date(now()->format('m'));
@@ -124,10 +125,41 @@ class OpenPoController extends Controller
                         $late = 'ON PROCESS';
                     }
 
-                    $ket_lt = ($convertDelivery <= $standarDatang) ? 'LEAD TIME' : 'NON LEAD TIME';
+                    // $ket_lt = ($convertDelivery <= $standarDatang) ? 'LEAD TIME' : 'NON LEAD TIME';
 
-                    if (empty($i[3]) || $i[3] == 'NaN') {
+                    if (empty($i[5]) || $i[5] == 'NaN') {
                         $emptyPRItems[] = $i[1];
+                    }
+
+                    if($i[7] === null){
+                        return back()->with([
+                            'swal' => [
+                                'type' => 'error',
+                                'title' => 'Import Gagal',
+                                'text' => "Deliver reminder tidak boleh blank!"
+                            ]
+                        ]);
+                    }
+
+                    if($i[15] === null){
+                        return back()->with([
+                            'swal' => [
+                                'type' => 'error',
+                                'title' => 'Import Gagal',
+                                'text' => "Quantity tidak boleh blank!"
+                            ]
+                        ]);
+                    }
+
+                    // dd(date('2022-01-01'));
+                    if ($convertDelivery < new DateTime('2022-01-01')){
+                        return back()->with([
+                            'swal' => [
+                                'type' => 'error',
+                                'title' => 'Import Gagal!',
+                                'text' => "Delivery date tidak boleh kurang dari JANUARI 2022"
+                            ]
+                        ]);
                     }
 
                     $duplicateInArray = collect($tempData)->contains(function ($value) use ($i, $request){
@@ -139,26 +171,28 @@ class OpenPoController extends Controller
                         $duplicateItems[] = $i[1];
                     } else {
                         $tempData[] = [
-                            'purchase_order' => $i[0],
+                            'vendor_account' => $i[0],
                             'item_number' => $i[1],
-                            'product_name' => $i[2],
-                            'purchase_requisition' => $i[3] ?? 'NaN',
-                            'tpqty' => $i[4],
-                            'tpunit' => $i[5],
-                            'tpsite' => $i[6],
-                            'tpvendor' => $i[7],
+                            'name' => $i[2],
+                            'purchase_order' => $i[3],
+                            'line_number' => $i[4],
+                            'purchase_requisition' => $i[5] ?? 'NaN',
+                            'product_name' => $i[6],
+                            'deliver_reminder' => $i[7],
                             'delivery_date' => $convertDelivery,
-                            'delivery_reminder' => $i[9],
-                            'old_number_format' => $i[10],
-                            'created_date_and_time' => $convertCreated,
-                            'tpstatus' => $i[12],
-                            'line_status' => $i[13],
-                            'supplier_name' => $i[14],
-                            'standar_datang' => $standarDatangFormatted,
+                            'part_name' => $i[9],
+                            'part_number' => $i[10],
+                            // 'created_date_and_time' => $convertCreated,
+                            'procurement_category' => $i[11],
+                            'site' => $i[12],
+                            'warehouse' => $i[13],
+                            // 'standar_datang' => $standarDatangFormatted,
+                            'location' => $i[14],
+                            'qty' => $i[15],
                             'bulan_datang' => $monthDelivery,
                             'lt' => $lt,
                             'ket_late' => $late,
-                            'ket_lt' => $ket_lt,
+                            // 'ket_lt' => $ket_lt,
                             'date' => $request->date
                         ];
                     }

@@ -203,17 +203,22 @@
                                                                 </div>
                                                                 <thead>
                                                                     <tr>
-                                                                        <th>Purchase Order</th>
+                                                                        <th>Vendor Account</th>
                                                                         <th>Item Number</th>
-                                                                        <th>Product Name</th>
+                                                                        <th>Name</th>
+                                                                        <th>Purchase Order</th>
+                                                                        <th>Line Number</th>
                                                                         <th>Purchase Requisition</th>
-                                                                        <th>TP Qty</th>
-                                                                        <th>TP Unit</th>
-                                                                        <th>TP Site</th>
-                                                                        <th>TP Vendor</th>
+                                                                        <th>Product Name</th>
+                                                                        <th>Deliver Reminder</th>
                                                                         <th>Delivery Date</th>
-                                                                        <th>Delivery Reminder</th>
-                                                                        <th>Old Number Format</th>
+                                                                        <th>Part Name</th>
+                                                                        <th>Part Number</th>
+                                                                        <th>Procurement Category</th>
+                                                                        <th>Site</th>
+                                                                        <th>Warehouse</th>
+                                                                        <th>Location</th>
+                                                                        <th>Qty</th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
@@ -261,37 +266,52 @@
                             type: 'GET',
                         },
                         columns: [{
-                                data: 'purchase_order'
+                                data: 'vendor_account'
                             },
                             {
                                 data: 'item_number'
                             },
                             {
-                                data: 'product_name'
+                                data: 'name'
+                            },
+                            {
+                                data: 'purchase_order'
+                            },
+                            {
+                                data: 'line_number'
                             },
                             {
                                 data: 'purchase_requisition'
                             },
                             {
-                                data: 'tpqty'
+                                data: 'product_name'
                             },
                             {
-                                data: 'tpunit'
-                            },
-                            {
-                                data: 'tpsite'
-                            },
-                            {
-                                data: 'tpvendor'
+                                data: 'deliver_reminder'
                             },
                             {
                                 data: 'delivery_date'
                             },
                             {
-                                data: 'delivery_reminder'
+                                data: 'part_name'
                             },
                             {
-                                data: 'old_number_format'
+                                data: 'part_number'
+                            },
+                            {
+                                data: 'procurement_category'
+                            },
+                            {
+                                data: 'site'
+                            },
+                            {
+                                data: 'warehouse'
+                            },
+                            {
+                                data: 'location'
+                            },
+                            {
+                                data: 'qty'
                             }
                         ],
                         responsive: true,
@@ -328,7 +348,7 @@
                     searchDropdown.value = selectedValue === 'All' ? 'Select Purchase Order' : selectedValue;
                     if ($.fn.DataTable.isDataTable('#poTable')) {
                         var table = $('#poTable').DataTable();
-                        table.column(0).search(selectedValue === 'All' ? '' : selectedValue).draw();
+                        table.column(3).search(selectedValue === 'All' ? '' : selectedValue).draw();
                     }
                     var dropdownMenu = listItem.closest('.dropdown-menu');
                     var dropdown = bootstrap.Dropdown.getInstance(searchDropdown);

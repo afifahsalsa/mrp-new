@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
+use function PHPUnit\Framework\isNull;
+
 class OpenPrController extends Controller
 {
     /**
@@ -93,12 +95,22 @@ class OpenPrController extends Controller
                         return $value['pr_id'] == $i[0] && $value['item_id'] == $i[1] && $value['date'] == $request->date;
                     });
 
-                    if ($i[7] != "IN REVIEW" && $i[7] !== "APPROVED") {
+                    if ($i[7] !== "IN REVIEW" && $i[7] !== "APPROVED") {
                         return back()->with([
                             'swal' => [
                                 'type' => 'error',
                                 'title' => 'Import Gagal',
                                 'text' => "Kolom status harus berisi IN REVIEW atau APPROVED!"
+                            ]
+                        ]);
+                    }
+
+                    if (empty($i[6])) {
+                        return back()->with([
+                            'swal' => [
+                                'type' => 'error',
+                                'title' => 'Import Gagal!',
+                                'text' => "Kolom Quantity tidak boleh blank."
                             ]
                         ]);
                     }
