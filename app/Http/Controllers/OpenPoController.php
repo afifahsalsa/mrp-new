@@ -50,7 +50,7 @@ class OpenPoController extends Controller
     }
 
     public function get_format(){
-        $filePath = public_path('doc/Format Impor Purchase Order.xlsx');
+        $filePath = public_path('doc/Purchase Order.xlsx');
         return response()->download($filePath);
     }
 

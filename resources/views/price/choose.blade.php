@@ -145,9 +145,25 @@
                                                                         style="width: 20%; margin-left: 20px;">
                                                                         <option value="">Currency</option>
                                                                     </select>
+                                                                    <form
+                                                                            action="{{ route('price.delete') }}"
+                                                                            method="DELETE" id="delPrice">
+                                                                            @csrf
+                                                                            @method('delete')
+                                                                            <button
+                                                                                class="btn btn-danger ms-2 px-3 float-start"
+                                                                                type="button"
+                                                                                style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform:scale(1);"
+                                                                                onmouseover="this.style.transform='scale(1.05)';"
+                                                                                onmouseout="this.style.transform='scale(1)';"
+                                                                                onclick="deleteConfirm('delPrice')"><i
+                                                                                    class="mdi mdi-delete"></i></button>
+                                                                        </form>
                                                                 </div>
                                                                 <thead>
                                                                     <tr>
+                                                                        <th><input type="checkbox" name="select-checkbox"
+                                                                            id="selectAll"></th>
                                                                         <th>Item ID</th>
                                                                         <th>Category Item</th>
                                                                         <th>Part Name</th>
@@ -202,7 +218,7 @@
                         serverSide: true,
                         scrollX: true,
                         ajax: {
-                            url: `/ppic/price/load-data/${year}/${month}`,
+                            url: `/price/load-data/${year}/${month}`,
                             type: 'GET',
                             data: function(d) {
                                 var currencyValue = $('#filter-currency').val();
@@ -212,6 +228,15 @@
                             }
                         },
                         columns: [{
+                                data: null,
+                                orderable: false,
+                                className: 'select-checkbox',
+                                defaultContent: '',
+                                render: function(data, type, row) {
+                                    return `<input type="checkbox" class="select-checkbox">`;
+                                }
+                            },
+                            {
                                 data: 'item_id'
                             },
                             {
@@ -243,7 +268,7 @@
                             }
                         ],
                         initComplete: function() {
-                            $.get(`/ppic/price/get-unique-currency/${year}/${month}`, function(
+                            $.get(`/price/get-unique-currency/${year}/${month}`, function(
                                 data) {
                                 var select = $('#filter-currency');
                                 select.empty().append(
@@ -281,6 +306,79 @@
                     });
                     modalMonthYear.textContent = `${monthName}, ${year}`;
                 });
+            });
+
+            function deleteConfirm(formId) {
+                const selectedRows = [];
+                const table = $('#priceTable').DataTable();
+
+                table.$('input[type="checkbox"]:checked').each(function() {
+                    const row = table.row($(this).closest('tr'));
+                    const selectedID = row.data().id;
+                    selectedRows.push(selectedID);
+                });
+
+                if (selectedRows.length === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Oops...',
+                        text: 'Silahkan pilih data yang akan dihapus!',
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: `${selectedRows.length} data yang dipilih akan dihapus!`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('price.delete') }}",
+                            type: 'DELETE',
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                ids: selectedRows
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Berhasil!',
+                                        text: response.message,
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    }).then(() => {
+                                        $('#priceTable').DataTable().ajax.reload();
+                                        $('#selectAllRows').prop('checked', false);
+                                    });
+                                }
+                            },
+                            error: function(xhr) {
+                                if (xhr.status === 400) {
+                                    const response = JSON.parse(xhr.responseText);
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Oops...',
+                                        text: 'Terjadi kesalahan saat menghapus data!'
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+
+            $('#selectAll').on('change', function() {
+                const isChecked = $(this).prop('checked');
+                const table = $('#priceTable').DataTable();
+                table.$('input[type="checkbox"]').prop('checked', isChecked);
             });
         </script>
     @endpush

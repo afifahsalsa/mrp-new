@@ -111,7 +111,7 @@
                     searching: true,
                     scrollX: true,
                     ajax: {
-                        url: `/ppic/stok/load-data/${year}/${month}`,
+                        url: `/stok/load-data/${year}/${month}`,
                         type: 'GET'
                     },
                     columns: [{
@@ -206,7 +206,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: `/ppic/stok/update/${id}`,
+                            url: `/stok/update/${id}`,
                             type: 'PUT',
                             data: {
                                 _token: "{{ csrf_token() }}",

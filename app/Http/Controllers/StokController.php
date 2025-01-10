@@ -54,7 +54,7 @@ class StokController extends Controller
 
     public function get_format()
     {
-        $filePath = public_path('doc/Format Impor Stock.xlsx');
+        $filePath = public_path('doc/Stock.xlsx');
         return response()->download($filePath);
     }
 
@@ -107,17 +107,18 @@ class StokController extends Controller
         $cekDate = Stok::whereYear('date', $year)->whereMonth('date', $month)->get();
 
         foreach ($stokVal as $sheet) {
+            $header = array_flip($sheet[0]);
             foreach ($sheet as $idx => $row) {
                 if ($idx === 0) continue;
 
-                $itemNumber = $row[0] ?? null;
-                $partNumber = $row[1] ?? null;
-                $productName = $row[2] ?? null;
-                $lt = $row[3] ?? null;
-                $spl = $row[4] ?? null;
-                $li = $row[5] ?? null;
-                $type = $row[6] ?? null;
-                $stok = $row[7] ?? null;
+                $itemNumber = $row[$header['ITEM NUMBER']] ?? null;
+                $partNumber = $row[$header['PART NUMBER']] ?? null;
+                $productName = $row[$header['PART NAME']] ?? null;
+                $lt = $row[$header['LT']] ?? null;
+                $spl = $row[$header['SPL']] ?? null;
+                $li = $row[$header['L/I']] ?? null;
+                $type = $row[$header['TYPE']] ?? null;
+                $stok = $row[$header['STOCK']] ?? null;
 
                 if (strlen($itemNumber) != 18) {
                     $itemNumber = substr($itemNumber, 0, 18);

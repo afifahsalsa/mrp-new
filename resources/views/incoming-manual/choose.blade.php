@@ -9,10 +9,7 @@
             Purchase Requisition | </a>
         <a href="{{ route('incomong-manual.index') }}"
             style="text-decoration: none; color: {{ request()->routeIs('incomong-manual.index') ? 'purple' : 'blue' }}">
-            Incoming Manual | </a>
-        <a href="#"
-            style="text-decoration: none; color: {{ request()->routeIs('buffer.stok.visualisasi') ? 'purple' : 'blue' }}">
-            Visualization</a>
+            Incoming Manual</a>
 
         <div class="col-lg-12 grid-margin stretch-card mt-3">
             <div class="card">
@@ -114,14 +111,6 @@
                                         {{ \Carbon\Carbon::create($mi->year, $mi->month)->format('F Y') }}
                                     </td>
                                     <td>
-                                        <a
-                                            href="{{ route('open-po.index-edit', ['year' => $mi->year, 'month' => $mi->month]) }}">
-                                            <button class="btn btn-inverse-dark px-4">
-                                                <i class="mdi mdi-table-edit"></i> Edit
-                                            </button>
-                                            <input type="hidden" id="year" name="year">
-                                            <input type="hidden" id="month" name="month">
-                                        </a>
                                         <button class="btn btn-inverse-success px-4" data-bs-toggle="modal"
                                             data-bs-target="#modalUpdateIM">
                                             <i class="mdi mdi-cloud-sync"></i> Update
@@ -149,7 +138,8 @@
                                                                 style="width: 100%">
                                                                 <div class="d-flex mb-4 position-relative">
                                                                     <h4 class="mt-2 me-1">Filter: </h4>
-                                                                    <div class="dropdown" style="position: relative; margin-left: 10px;">
+                                                                    <div class="dropdown"
+                                                                        style="position: relative; margin-left: 10px;">
                                                                         <input type="text"
                                                                             class="form-control dropdown-toggle"
                                                                             id="searchDropdown" data-bs-toggle="dropdown"
@@ -175,73 +165,41 @@
                                                                                 <li class="list-group-item list-group-item-action"
                                                                                     style="cursor: pointer; padding: 0.5rem 1rem; transition: background-color 0.2s;"
                                                                                     data-value="All">
-                                                                                    <span class="text-muted">All Item Number</span>
+                                                                                    <span class="text-muted">All Item
+                                                                                        Number</span>
                                                                                 </li>
-                                                                                {{-- @foreach ($uniquePOs as $po)
+                                                                                @foreach ($uniquePOs as $po)
                                                                                     <li class="list-group-item list-group-item-action"
                                                                                         style="cursor: pointer; padding: 0.5rem 1rem; transition: background-color 0.2s;"
                                                                                         data-value="{{ $po }}">
                                                                                         {{ $po }}
                                                                                     </li>
-                                                                                @endforeach --}}
+                                                                                @endforeach
                                                                             </ul>
                                                                         </div>
                                                                     </div>
 
-                                                                    <div class="dropdown" style="position: relative; margin-left: 20px;">
-                                                                        <input type="text"
-                                                                            class="form-control dropdown-toggle"
-                                                                            id="searchDropdown" data-bs-toggle="dropdown"
-                                                                            aria-expanded="false"
-                                                                            placeholder="Select Purchase Order" readonly
-                                                                            style=" background-color: white; cursor: pointer; border: 1px solid #ced4da; border-radius: 0.375rem;">
-                                                                        <div class="dropdown-menu custom-dropdown-menu"
-                                                                            aria-labelledby="searchDropdown"
-                                                                            style="width: 100%; max-height: 350px; overflow-y: auto;
-                                                                                    padding: 0; margin-top: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e0e0e0; border-radius: 0.375rem;">
-                                                                            <div class="search-container"
-                                                                                style="padding: 10px; background-color: #f8f9fa; border-bottom: 1px solid #e0e0e0;
-                                                                                        position: sticky; top: 0; z-index: 10;">
-                                                                                <input type="text" class="form-control"
-                                                                                    id="filterInput"
-                                                                                    placeholder="Search in list..."
-                                                                                    onkeyup="filterList()"
-                                                                                    style="border-radius: 0.25rem; border: 1px solid #ced4da; padding: 0.25rem 0.5rem;">
-                                                                            </div>
-                                                                            <ul class="list-group list-group-flush"
-                                                                                id="dropdownMenuItems"
-                                                                                style="max-height: 250px; overflow-y: auto;">
-                                                                                <li class="list-group-item list-group-item-action"
-                                                                                    style="cursor: pointer; padding: 0.5rem 1rem; transition: background-color 0.2s;"
-                                                                                    data-value="All">
-                                                                                    <span class="text-muted">All Purchase
-                                                                                        Orders</span>
-                                                                                </li>
-                                                                                {{-- @foreach ($uniquePOs as $po)
-                                                                                    <li class="list-group-item list-group-item-action"
-                                                                                        style="cursor: pointer; padding: 0.5rem 1rem; transition: background-color 0.2s;"
-                                                                                        data-value="{{ $po }}">
-                                                                                        {{ $po }}
-                                                                                    </li>
-                                                                                @endforeach --}}
-                                                                            </ul>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <a href="{{ route('open-po.export', ['year' => $mi->year, 'month' => $mi->month]) }}"
-                                                                        class="ms-auto" onload="showLoading()">
-                                                                        <button type="button"
-                                                                            class="btn btn-gradient-success"
-                                                                            style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
-                                                                            onmouseover="this.style.transform='scale(1.05)';"
-                                                                            onmouseout="this.style.transform='scale(1)';">
-                                                                            <i class="mdi mdi-cloud-download"></i>
-                                                                            Download Excel
-                                                                        </button>
-                                                                    </a>
+                                                                    @if (auth()->user()->role == 'staff' || auth()->user()->role == 'superuser')
+                                                                        <form
+                                                                            action="{{ route('incoming-manual.delete') }}"
+                                                                            method="DELETE" id="delIM">
+                                                                            @csrf
+                                                                            @method('delete')
+                                                                            <button
+                                                                                class="btn btn-danger ms-2 px-3 float-start"
+                                                                                type="button"
+                                                                                style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform:scale(1);"
+                                                                                onmouseover="this.style.transform='scale(1.05)';"
+                                                                                onmouseout="this.style.transform='scale(1)';"
+                                                                                onclick="deleteConfirm('delIM')"><i
+                                                                                    class="mdi mdi-delete"></i></button>
+                                                                        </form>
+                                                                    @endif
                                                                 </div>
                                                                 <thead>
                                                                     <tr>
+                                                                        <th><input type="checkbox" name="select-checkbox"
+                                                                                id="selectAll"></th>
                                                                         <th>Supplier</th>
                                                                         <th>Tanggal Kedatangan</th>
                                                                         <th>Item Number</th>
@@ -291,10 +249,19 @@
                         serverSide: true,
                         scrollX: true,
                         ajax: {
-                            url: `/ppic/incoming-manual/load-data/${year}/${month}`,
+                            url: `/mpp/incoming-manual/load-data/${year}/${month}`,
                             type: 'GET',
                         },
                         columns: [{
+                                data: null,
+                                orderable: false,
+                                className: 'select-checkbox',
+                                defaultContent: '',
+                                render: function(data, type, row) {
+                                    return `<input type="checkbox" class="select-checkbox">`;
+                                }
+                            },
+                            {
                                 data: 'supplier',
                                 className: 'text-start'
                             },
@@ -350,10 +317,10 @@
                 if (listItem) {
                     var selectedValue = listItem.getAttribute('data-value');
                     var searchDropdown = document.getElementById('searchDropdown');
-                    searchDropdown.value = selectedValue === 'All' ? 'Select Purchase Order' : selectedValue;
+                    searchDropdown.value = selectedValue === 'All' ? 'Select Item Number' : selectedValue;
                     if ($.fn.DataTable.isDataTable('#imTable')) {
                         var table = $('#imTable').DataTable();
-                        table.column(0).search(selectedValue === 'All' ? '' : selectedValue).draw();
+                        table.column(3).search(selectedValue === 'All' ? '' : selectedValue).draw();
                     }
                     var dropdownMenu = listItem.closest('.dropdown-menu');
                     var dropdown = bootstrap.Dropdown.getInstance(searchDropdown);
@@ -388,8 +355,80 @@
                         month: 'long'
                     });
                     modalMonthYear.textContent = `${monthName}, ${year}`;
-                    downloadLink.href = `/ppic/purchase-order/export/${year}/${month}`;
                 });
+            });
+
+            function deleteConfirm(formId) {
+                const selectedRows = [];
+                const table = $('#imTable').DataTable();
+
+                table.$('input[type="checkbox"]:checked').each(function() {
+                    const row = table.row($(this).closest('tr'));
+                    const selectedID = row.data().id;
+                    selectedRows.push(selectedID);
+                });
+
+                if (selectedRows.length === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Oops...',
+                        text: 'Silahkan pilih data yang akan dihapus!',
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: `${selectedRows.length} data yang dipilih akan dihapus!`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('incoming-manual.delete') }}",
+                            type: 'DELETE',
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                ids: selectedRows
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Berhasil!',
+                                        text: response.message,
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    }).then(() => {
+                                        $('#imTable').DataTable().ajax.reload();
+                                        $('#selectAllRows').prop('checked', false);
+                                    });
+                                }
+                            },
+                            error: function(xhr) {
+                                if (xhr.status === 400) {
+                                    const response = JSON.parse(xhr.responseText);
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Oops...',
+                                        text: 'Terjadi kesalahan saat menghapus data!'
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+
+            $('#selectAll').on('change', function() {
+                const isChecked = $(this).prop('checked');
+                const table = $('#imTable').DataTable();
+                table.$('input[type="checkbox"]').prop('checked', isChecked);
             });
         </script>
     @endpush

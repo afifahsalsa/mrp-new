@@ -110,16 +110,22 @@
                                         <th><input type="checkbox" class="select-checkbox" onclick="selectAll()"
                                                 id="selectAllRows">
                                         </th>
-                                        <th>Purchase Order</th>
+                                        <th>Vendor Account</th>
                                         <th>Item Number</th>
-                                        <th>Product Name</th>
-                                        <th>Purchase Requisition</th>
                                         <th>Name</th>
-                                        <th>Created Date and Time</th>
+                                        <th>Purchase Order</th>
+                                        <th>Line Number</th>
+                                        <th>Purchase Requisition</th>
+                                        <th>Product Name</th>
+                                        <th>Deliver Reminder</th>
                                         <th>Delivery Date</th>
-                                        <th>Quantity</th>
-                                        <th>Line Status</th>
-                                        <th>Old Number Format</th>
+                                        <th>Part Name</th>
+                                        <th>Part Number</th>
+                                        <th>Procurement Category</th>
+                                        <th>Site</th>
+                                        <th>Warehouse</th>
+                                        <th>Location</th>
+                                        <th>Qty</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -144,7 +150,7 @@
                     searching: true,
                     scrollX: true,
                     ajax: {
-                        url: `/ppic/purchase-order/load-data/${year}/${month}`,
+                        url: `/purchase-order/load-data/${year}/${month}`,
                         type: 'GET',
                     },
                     columns: [{
@@ -157,41 +163,41 @@
                             }
                         },
                         {
-                            data: 'purchase_order',
-                            name: 'purchase_order'
+                            data: 'vendor_account',
+                            name: 'vendor_account'
                         },
                         {
                             data: 'item_number',
                             name: 'item_number'
                         },
                         {
-                            data: 'product_name',
-                            name: 'product_name'
+                            data: 'name',
+                            name: 'name'
+                        },
+                        {
+                            data: 'purchase_order',
+                            name: 'purchase_order'
+                        },
+                        {
+                            data: 'line_number',
+                            name: 'line_number'
                         },
                         {
                             data: 'purchase_requisition',
                             name: 'purchase_requisition'
                         },
                         {
-                            data: 'supplier_name',
-                            name: 'supplier_name'
+                            data: 'product_name',
+                            name: 'product_name',
                         },
                         {
-                            data: 'created_date_and_time',
-                            name: 'created_date_and_time'
-                        },
-                        {
-                            data: 'delivery_date',
-                            name: 'delivery_date'
-                        },
-                        {
-                            data: 'delivery_reminder',
-                            name: 'delivery_reminder',
+                            data: 'deliver_reminder',
+                            name: 'deliver_reminder',
                             render: function(data, type, row) {
                                 data = data || '';
                                 return type === 'display' ?
                                     `<div class = "edit-container">
-                            <input type = "number" style = "width: 100%; display: inline;" class="form-control delivery-reminder-input float-start px-1" data-id="${row.id}"
+                            <input type = "number" style = "width: 100%; display: inline;" class="form-control deliver-reminder-input float-start px-1" data-id="${row.id}"
                             value="${data}">
                             <button class="btn btn-success save-btn" data-id="${row.id}" data-purchase_order="${row.purchase_order}" style="display: none;">
                             <i class="mdi mdi-content-save"></i></button>
@@ -199,12 +205,36 @@
                             }
                         },
                         {
-                            data: 'line_status',
-                            name: 'line_status'
+                            data: 'delivery_date',
+                            name: 'delivery_date',
                         },
                         {
-                            data: 'old_number_format',
-                            name: 'old_number_format'
+                            data: 'part_name',
+                            name: 'part_name',
+                        },
+                        {
+                            data: 'part_number',
+                            name: 'part_number',
+                        },
+                        {
+                            data: 'procurement_category',
+                            name: 'procurement_category',
+                        },
+                        {
+                            data: 'site',
+                            name: 'site',
+                        },
+                        {
+                            data: 'warehouse',
+                            name: 'warehouse',
+                        },
+                        {
+                            data: 'location',
+                            name: 'location',
+                        },
+                        {
+                            data: 'qty',
+                            name: 'qty',
                         },
                     ],
                     responsive: true,
@@ -257,7 +287,7 @@
                 }
             });
 
-            $('#poTable').on('click', '.delivery-reminder-input', function() {
+            $('#poTable').on('click', '.deliver-reminder-input', function() {
                 $(this).siblings('.save-btn').css({
                     'display': 'inline-block',
                     'opacity': '1',
@@ -277,7 +307,7 @@
 
             $('#poTable').on('click', '.save-btn', function() {
                 const id = $(this).data('id');
-                const newQty = $(this).siblings('.delivery-reminder-input').val();
+                const newQty = $(this).siblings('.deliver-reminder-input').val();
                 const purchaseOrder = $(this).data('purchase_order');
                 const button = $(this);
                 const table = $('#poTable').DataTable();
@@ -292,7 +322,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: `/ppic/purchase-order/update/${id}`,
+                            url: `/purchase-order/update/${id}`,
                             type: 'PUT',
                             data: {
                                 _token: "{{ csrf_token() }}",

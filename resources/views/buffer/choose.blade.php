@@ -115,14 +115,15 @@
                                         {{ \Carbon\Carbon::create($mb->year, $mb->month)->format('F Y') }}
                                     </td>
                                     <td>
-                                        <a
-                                            href="{{ route('buffer.index-edit', ['year' => $mb->year, 'month' => $mb->month]) }}">
-                                            <button class="btn btn-inverse-dark px-4">
-                                                <i class="mdi mdi-table-edit"></i> Edit
-                                            </button>
-                                            <input type="hidden" id="year" name="year">
-                                            <input type="hidden" id="month" name="month">
-                                        </a>
+                                        @if (auth()->user()->role == 'staff' || auth()->user()->role == 'superuser')
+                                        <a href="{{ route('buffer.index-edit', ['year' => $mb->year, 'month' => $mb->month]) }}"
+                                            class="btn btn-inverse-dark px-4"
+                                            style="color: black; text-decoration: none;"
+                                            onmouseover="this.style.color='white'; this.querySelector('i').style.color='white';"
+                                            onmouseout="this.style.color='black'; this.querySelector('i').style.color='black';">
+                                             <i class="mdi mdi-table-edit" style="color: black;"></i> Edit | Delete
+                                         </a>
+                                        @endif
                                         <button class="btn btn-inverse-success px-4" data-bs-toggle="modal"
                                             data-bs-target="#modalUpdateBuffer">
                                             <i class="mdi mdi-cloud-sync"></i> Update
@@ -207,7 +208,7 @@
                         serverSide: true,
                         scrollX: true,
                         ajax: {
-                            url: `/ppic/buffer/load-data/${year}/${month}`,
+                            url: `/buffer/load-data/${year}/${month}`,
                             type: 'GET',
                             data: function(d) {
                                 var ltValue = $('#filter-lt').val();
@@ -223,7 +224,7 @@
                                 data: 'part_number'
                             },
                             {
-                                data: 'product_name'
+                                data: 'part_name'
                             },
                             {
                                 data: 'lt'
@@ -239,7 +240,7 @@
                             }
                         ],
                         initComplete: function() {
-                            $.get(`/ppic/buffer/get-unique-lt/${year}/${month}`, function(
+                            $.get(`/buffer/get-unique-lt/${year}/${month}`, function(
                                 data) {
                                 var select = $('#filter-lt');
                                 select.empty().append(

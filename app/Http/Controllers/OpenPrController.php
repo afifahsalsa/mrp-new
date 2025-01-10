@@ -42,7 +42,7 @@ class OpenPrController extends Controller
 
     public function get_format()
     {
-        $filePath = public_path('doc/Format Impor Purchase Requisition.xlsx');
+        $filePath = public_path('doc/Purchase Requisition.xlsx');
         return response()->download($filePath);
     }
 
@@ -105,7 +105,7 @@ class OpenPrController extends Controller
                         ]);
                     }
 
-                    if (empty($i[6])) {
+                    if ($i[6] === null) {
                         return back()->with([
                             'swal' => [
                                 'type' => 'error',
@@ -185,10 +185,9 @@ class OpenPrController extends Controller
         ]);
     }
 
-    public function export($year, $month)
+    public function export()
     {
-        $monthName = DateTime::createFromFormat('!m', $month)->format('F');
-        // return Excel::download(new Purc)
+
     }
 
     /**

@@ -22,7 +22,8 @@
                                     onmouseout="this.style.transform='scale(1)';" data-bs-toggle="modal"
                                     data-bs-target="#modalImportStok">Add New</button></li>
                             <li>
-                                <form action="{{ route('stok.format-import') }}" enctype="multipart/form-data" method="GET">
+                                <form action="{{ route('stok.format-import') }}" enctype="multipart/form-data"
+                                    method="GET">
                                     @csrf
                                     <button type="submit" class="btn btn-gradient-info btn-rounded ms-2"
                                         style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
@@ -56,8 +57,10 @@
                                     <input class="form-control" type="file" id="file" name="file" required>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal" style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);">Close</button>
-                                    <button type="submit" class="btn btn-primary" id="submitButton" style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);">Submit</button>
+                                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal"
+                                        style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);">Close</button>
+                                    <button type="submit" class="btn btn-primary" id="submitButton"
+                                        style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);">Submit</button>
                                 </div>
                             </form>
                         </div>
@@ -112,14 +115,15 @@
                                         {{ \Carbon\Carbon::create($ms->year, $ms->month)->format('F Y') }}
                                     </td>
                                     <td>
-                                        <a
-                                            href="{{ route('stok.index-edit', ['year' => $ms->year, 'month' => $ms->month]) }}">
-                                            <button class="btn btn-inverse-dark px-4">
-                                                <i class="mdi mdi-table-edit"></i> Edit
-                                            </button>
-                                            <input type="hidden" id="year" name="year">
-                                            <input type="hidden" id="month" name="month">
-                                        </a>
+                                        @if (auth()->user()->role == 'staff' || auth()->user()->role == 'superuser')
+                                        <a href="{{ route('stok.index-edit', ['year' => $ms->year, 'month' => $ms->month]) }}"
+                                            class="btn btn-inverse-dark px-4"
+                                            style="color: black; text-decoration: none;"
+                                            onmouseover="this.style.color='white'; this.querySelector('i').style.color='white';"
+                                            onmouseout="this.style.color='black'; this.querySelector('i').style.color='black';">
+                                             <i class="mdi mdi-table-edit" style="color: black;"></i> Edit | Delete
+                                         </a>
+                                        @endif
                                         <button class="btn btn-inverse-success px-4" data-bs-toggle="modal"
                                             data-bs-target="#modalUpdateStok">
                                             <i class="mdi mdi-cloud-sync"></i> Update
@@ -221,7 +225,7 @@
                         serverSide: true,
                         scrollX: true,
                         ajax: {
-                            url: `/ppic/stok/load-data/${year}/${month}`,
+                            url: `/stok/load-data/${year}/${month}`,
                             type: 'GET',
                             data: function(d) {
                                 var ltValue = $('#filter-lt').val();
@@ -253,7 +257,7 @@
                             }
                         ],
                         initComplete: function() {
-                            $.get(`/ppic/stok/get-unique-lt/${year}/${month}`, function(
+                            $.get(`/stok/get-unique-lt/${year}/${month}`, function(
                                 data) {
                                 var select = $('#filter-lt');
                                 select.empty().append(
@@ -291,7 +295,7 @@
                         month: 'long'
                     });
                     modalMonthYear.textContent = `${monthName}, ${year}`;
-                    downloadLink.href = `/ppic/stok/export/${year}/${month}`;
+                    downloadLink.href = `/stok/export/${year}/${month}`;
                 });
             });
         </script>

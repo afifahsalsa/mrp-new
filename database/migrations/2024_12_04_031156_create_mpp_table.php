@@ -56,7 +56,7 @@ return new class extends Migration
             $table->integer('max_bulan_11');
             $table->integer('max_bulan_12');
             $table->string('bulan');
-            $table->integer('tahun');
+            $table->string('tahun');
             $table->timestamps();
         });
     }

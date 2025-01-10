@@ -76,6 +76,8 @@
     @stack('scriptOrderOriginal')
     @stack('scriptMpp');
     @stack('scriptPrice');
+    @stack('scriptINM');
+    @stack('scriptSales');
     <!-- End custom js for this page -->
     <script>
         @if (session('swal'))

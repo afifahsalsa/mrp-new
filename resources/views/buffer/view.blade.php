@@ -64,7 +64,7 @@
                 searching: true,
                 scrollX: true,
                 ajax: {
-                    url: `/ppic/buffer/load-data/${year}/${month}`,
+                    url: `/buffer/load-data/${year}/${month}`,
                     type: 'GET',
                     data: function(d) {
                         var ltValue = $('#filter-lt').val();
@@ -83,7 +83,7 @@
                     { data: 'date', name: 'date' }
                 ],
                 initComplete: function () {
-                    $.get(`/ppic/buffer/get-unique-lt/${year}/${month}`, function(data) {
+                    $.get(`/buffer/get-unique-lt/${year}/${month}`, function(data) {
                         var select = $('#filter-lt');
                         select.empty().append('<option value="">Filter LT</option>');
                         $.each(data, function(index, value) {

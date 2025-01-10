@@ -18,26 +18,26 @@ class IncomingManualController extends Controller
             ->orderByRaw('YEAR(date), MONTH(date) DESC')
             ->get();
 
-        // $uniquePOs = IncomingManual::distinct('purchase_order')
-        //     ->whereNotNull('purchase_order')
-        //     ->pluck('purchase_order');
+        $uniquePOs = IncomingManual::distinct('item_number')
+            ->whereNotNull('item_number')
+            ->pluck('item_number');
 
         return view('incoming-manual.choose', [
             'title' => 'Index Incoming Manual',
-            'monthIncoming' => $monthIncoming
+            'monthIncoming' => $monthIncoming,
+            'uniquePOs' => $uniquePOs
         ]);
     }
 
     public function get_format()
     {
-        $filePath = public_path('doc/Format Impor Incoming Manual.xlsx');
+        $filePath = public_path('doc/Incoming Manual.xlsx');
         return response()->download($filePath);
     }
 
     public function get_data(Request $request, $year, $month){
         $imData = IncomingManual::whereYear('date', $year)
                 ->whereMonth('date', $month);
-        // if ($request->has(''))
         return DataTables::of($imData)->make(true);
     }
 
@@ -56,37 +56,38 @@ class IncomingManualController extends Controller
         $cekDate = IncomingManual::where(DB::raw("FORMAT(date, 'yyyy MM')"), '=', date('Y m', strtotime($request->date)))->get();
 
         foreach ($incomingVal as $iv){
+            $header = array_flip($iv[0]);
             foreach ($iv as $idx => $i){
-                if ($idx > 0){
-                    $convertDateArrived = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($i[1]);
-                    if ($convertDateArrived->format('d') >= 20) {
-                        return back()->with([
-                            'swal' => [
-                                'type' => 'error',
-                                'title' => 'Import Gagal!',
-                                'text' => "Tanggal kedatangan harus kurang dari 20."
-                            ]
-                        ]);
-                    }
+                if ($idx === 0) continue;
 
-                    $duplicateInArray = collect($tempData)->contains(function ($value) use ($i){
-                        return $value['purchase_order'] == $i[4] && $value['item_number'] == $i[2];
-                    });
+                $convertDateArrived = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($i[$header['Tanggal Kedatangan']]);
+                if ($convertDateArrived->format('d') >= 20) {
+                    return back()->with([
+                        'swal' => [
+                            'type' => 'error',
+                            'title' => 'Import Gagal!',
+                            'text' => "Tanggal kedatangan harus kurang dari 20."
+                        ]
+                    ]);
+                }
 
-                    if($duplicateInArray){
-                        $duplicateItems[] = $i[2];
-                        $duplicatePO[] = $i[4];
-                    } else {
-                        $tempData[] = [
-                            'supplier' => $i[0],
-                            'tgl_kedatangan' => $convertDateArrived,
-                            'item_number' => $i[2],
-                            'part_number' => $i[3],
-                            'purchase_order' => $i[4],
-                            'qty' => $i[5],
-                            'date' => $request->date
-                        ];
-                    }
+                $duplicateInArray = collect($tempData)->contains(function ($value) use ($i, $header){
+                    return $value['purchase_order'] == $i[$header['PO']] && $value['item_number'] == $i[$header['Item Number']];
+                });
+
+                if($duplicateInArray){
+                    $duplicateItems[] = $i[$header['Item Number']];
+                    $duplicatePO[] = $i[$header['PO']];
+                } else {
+                    $tempData[] = [
+                        'supplier' => $i[$header['Supplier ']],
+                        'tgl_kedatangan' => $convertDateArrived,
+                        'item_number' => $i[$header['Item Number']],
+                        'part_number' => $i[$header['Part Number']],
+                        'purchase_order' => $i[$header['PO']],
+                        'qty' => $i[$header['Quantity']],
+                        'date' => $request->date
+                    ];
                 }
             }
         }
@@ -114,7 +115,7 @@ class IncomingManualController extends Controller
             ]);
         }
 
-        if(empty($i[5])){
+        if(empty($i[$header['Quantity']])){
             return back()->with([
                 'swal' => [
                     'type' => 'error',
@@ -124,7 +125,7 @@ class IncomingManualController extends Controller
             ]);
         }
 
-        if(empty($i[2]) && empty($i[4])){
+        if(empty($i[$header['Item Number']]) && empty($i[$header['PO']])){
             return back()->with([
                 'swal' => [
                     'type' => 'error',
@@ -201,8 +202,19 @@ class IncomingManualController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
-        //
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'required|string',
+        ]);
+        $ids = $request->ids;
+        DB::table('incoming_manual')
+            ->whereIn('id', $ids)
+            ->delete();
+        return response()->json([
+            'success' => true,
+            'title' => 'Data berhasil dihapus'
+        ]);
     }
 }

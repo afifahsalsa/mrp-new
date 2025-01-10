@@ -35,6 +35,7 @@
                         <i class="mdi mdi-cloud-download me-2 text-primary"></i> Download Hasil Excel </a>
                 </div> --}}
 
+                @if (auth()->user()->role == 'staff' || auth()->user()->role == 'superuser')
                 {{-- Button Delete --}}
                 <form action="{{ route('buffer.delete') }}" method="DELETE" id="delBuff">
                     @csrf
@@ -44,6 +45,7 @@
                         onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';"
                         onclick="deleteConfirm('delBuff')"><i class="mdi mdi-delete"></i></button>
                 </form>
+                @endif
             </div>
         </div>
 
@@ -120,7 +122,7 @@
                     searching: true,
                     scrollX: true,
                     ajax: {
-                        url: `/ppic/buffer/load-data/${year}/${month}`,
+                        url: `/buffer/load-data/${year}/${month}`,
                         type: 'GET',
                     },
                     columns: [{
@@ -141,8 +143,8 @@
                             name: 'part_number'
                         },
                         {
-                            data: 'product_name',
-                            name: 'product_name'
+                            data: 'part_name',
+                            name: 'part_name'
                         },
                         {
                             data: 'lt',
@@ -213,7 +215,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: `/ppic/buffer/update/${id}`,
+                            url: `/buffer/update/${id}`,
                             type: 'PUT',
                             data: {
                                 _token: "{{ csrf_token() }}",

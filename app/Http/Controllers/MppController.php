@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Imports\MppImport;
 use App\Models\Mpp;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -12,13 +13,15 @@ class MppController extends Controller
 {
     public function index_choose_order_customer()
     {
-        $monthCust = Mpp::selectRaw('YEAR(created_at) as year, MONTH(created_at) as month')
-            ->groupByRaw('YEAR(created_at), MONTH(created_at)')
-            ->orderByRaw('YEAR(created_at) DESC, MONTH(created_at) DESC')
+        $monthCust = Mpp::selectRaw("tahun, bulan")
+            ->groupByRaw('tahun, bulan')
+            ->orderByRaw('tahun DESC, bulan DESC')
             ->get();
+
         $uniquePartNumber = Mpp::distinct('partnumber')
             ->whereNotNull('partnumber')
             ->pluck('partnumber');
+
         return view('mpp.choose_order_customer', [
             'title' => 'Index Order Customer',
             'monthCust' => $monthCust,
@@ -28,35 +31,44 @@ class MppController extends Controller
 
     public function index_choose_prod_plan()
     {
-        $monthProdPlan = Mpp::selectRaw('YEAR(created_at) as year, MONTH(created_at) as month')
-            ->groupByRaw('YEAR(created_at), MONTH(created_at)')
-            ->orderByRaw('YEAR(created_at) DESC, MONTH(created_at) DESC')
+        $monthProdPlan = Mpp::selectRaw("tahun, bulan")
+            ->groupByRaw("tahun, bulan")
+            ->orderByRaw("tahun DESC, bulan DESC")
             ->get();
+        $uniquePartNumber = Mpp::distinct('partnumber')
+            ->whereNotNull('partnumber')
+            ->pluck('partnumber');
         return view('mpp.choose_prod_plan', [
             'title' => 'Index Production Planning',
-            'monthProdPlan' => $monthProdPlan
+            'monthProdPlan' => $monthProdPlan,
+            'uniquePartNumber' => $uniquePartNumber
         ]);
     }
 
     public function index_choose_max_unit()
     {
-        $monthMaxUnit = Mpp::selectRaw('YEAR(created_at) as year, MONTH(created_at) as month')
-            ->groupByRaw('YEAR(created_at), MONTH(created_at)')
-            ->orderByRaw('YEAR(created_at) DESC, MONTH(created_at) DESC')
+        $monthMaxUnit = Mpp::selectRaw("tahun, bulan")
+            ->groupByRaw("tahun, bulan")
+            ->orderByRaw("tahun DESC,bulan DESC")
             ->get();
+        $uniquePartNumber = Mpp::distinct('partnumber')
+            ->whereNotNull('partnumber')
+            ->pluck('partnumber');
         return view('mpp.choose_max_unit', [
             'title' => 'Index Production Planning',
-            'monthMaxUnit' => $monthMaxUnit
+            'monthMaxUnit' => $monthMaxUnit,
+            'uniquePartNumber' => $uniquePartNumber
         ]);
     }
 
     public function get_format()
     {
-        $filePath = public_path('doc/Format Impor Mpp.xlsx');
+        $filePath = public_path('doc/Mpp.xlsx');
         return response()->download($filePath);
     }
 
-    public function get_data($year, $month){
+    public function get_data($year, $month)
+    {
         $mppData = Mpp::where('tahun', $year)
             ->where('bulan', $month);
         return DataTables::of($mppData)->make(true);
@@ -76,20 +88,19 @@ class MppController extends Controller
         $rowCountMpp = 0;
         $rowCountUpdateMpp = 0;
         $cekDate = Mpp::where('tahun', substr($request->month, 0, 4))
-                    ->where('bulan', substr($request->month, 5, 2))
-                    ->get();
-
-        foreach ($mppValue as $mv){
-            foreach($mv as $idx => $i){
-                if($idx > 1){
-                    if(empty($i[2]) || $i[2] == '-' || $i[2] == null){
+            ->where('bulan', substr($request->month, 5, 2))
+            ->get();
+        foreach ($mppValue as $mv) {
+            foreach ($mv as $idx => $i) {
+                if ($idx > 1) {
+                    if (empty($i[2]) || $i[2] == '-' || $i[2] == null) {
                         continue;
                     }
-                    $duplicateInArray = collect($tempData)->contains(function ($value) use ($i, $request){
+                    $duplicateInArray = collect($tempData)->contains(function ($value) use ($i, $request) {
                         return $value['kodefgs'] == $i[2] && $value['partnumber'] == $i[3] && $value['tahun'] == substr($request->month, 0, 4) && $value['bulan'] == substr($request->month, 5, 2);
                     });
 
-                    if($duplicateInArray){
+                    if ($duplicateInArray) {
                         $duplicateFgs[] = $i[2];
                         $duplicatePart[] = $i[3];
                     } else {
@@ -100,10 +111,10 @@ class MppController extends Controller
                             'partnumber' => $i[3],
                             'kategori' => $i[4] ?? 'NULL',
                             'ori_cust_bulan_1' => intval($i[5]) ?? 0,
-                            'ori_cust_bulan_2' => intval($i[6])?? 0,
-                            'ori_cust_bulan_3' => intval($i[7])?? 0,
-                            'ori_cust_bulan_4' => intval($i[8])?? 0,
-                            'ori_cust_bulan_5' => intval($i[9])?? 0,
+                            'ori_cust_bulan_2' => intval($i[6]) ?? 0,
+                            'ori_cust_bulan_3' => intval($i[7]) ?? 0,
+                            'ori_cust_bulan_4' => intval($i[8]) ?? 0,
+                            'ori_cust_bulan_5' => intval($i[9]) ?? 0,
                             'ori_cust_bulan_6' => intval($i[10]) ?? 0,
                             'ori_cust_bulan_7' => intval($i[11]) ?? 0,
                             'ori_cust_bulan_8' => intval($i[12]) ?? 0,
@@ -143,7 +154,7 @@ class MppController extends Controller
             }
         }
 
-        if (!empty($duplicateFgs) && !empty($duplicatePart)){
+        if (!empty($duplicateFgs) && !empty($duplicatePart)) {
             $uniqueDuplicateFgs = array_unique($duplicateFgs);
             $uniqueDuplicatePart = array_unique($duplicatePart);
             $duplicateFgsList = implode(', ', $uniqueDuplicateFgs);
@@ -157,10 +168,10 @@ class MppController extends Controller
             ]);
         }
 
-        if($cekDate){
-            foreach ($tempData as $data){
+        if ($cekDate) {
+            foreach ($tempData as $data) {
                 $kodefgsInCekDate = collect($cekDate)->firstWhere('kodefgs', $data['kodefgs']);
-                if($kodefgsInCekDate){
+                if ($kodefgsInCekDate) {
                     Mpp::where('kodefgs', $data['kodefgs'])->update($data);
                     $rowCountUpdateMpp++;
                 } else {
@@ -169,13 +180,13 @@ class MppController extends Controller
                 }
             }
         } else {
-            foreach ($tempData as $data){
+            foreach ($tempData as $data) {
                 Mpp::create($data);
                 $rowCountMpp++;
             }
         }
 
-        if ($rowCountUpdateMpp > 0){
+        if ($rowCountUpdateMpp > 0) {
             return back()->with([
                 'swal' => [
                     'type' => 'success',
@@ -192,15 +203,15 @@ class MppController extends Controller
                 ]
             ]);
         }
-
     }
 
-    public function get_unique_part_number($year, $month){
+    public function get_unique_part_number($year, $month)
+    {
         $uniquePartNumber = Mpp::where('tahun', $year)
             ->where('bulan', $month)
             ->distinct('partnumber')
             ->pluck('partnumber')
-            ->filter(function ($value){
+            ->filter(function ($value) {
                 return $value !== null;
             })
             ->values()
@@ -251,8 +262,19 @@ class MppController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
-        //
+        $request->validate([
+            'kodefgs' => 'required|array',
+            'kodefgs.*' => 'required|string',
+        ]);
+        $ids = $request->kodefgs;
+        DB::table('mpp')
+            ->whereIn('kodefgs', $ids)
+            ->delete();
+        return response()->json([
+            'success' => true,
+            'title' => 'Data berhasil dihapus'
+        ]);
     }
 }

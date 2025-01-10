@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('pw');
             $table->string('user_code');
+            $table->enum('role', ['superuser', 'staff', 'admin'])->default('admin');
             $table->rememberToken();
             $table->timestamps();
         });

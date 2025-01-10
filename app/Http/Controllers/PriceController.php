@@ -41,7 +41,7 @@ class PriceController extends Controller
 
     public function get_format()
     {
-        $filePath = public_path('doc/Format Impor Price.xlsx');
+        $filePath = public_path('doc/Price.xlsx');
         return response()->download($filePath);
     }
 
@@ -251,8 +251,19 @@ class PriceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
-        //
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'required|string',
+        ]);
+        $ids = $request->ids;
+        DB::table('price')
+            ->whereIn('id', $ids)
+            ->delete();
+        return response()->json([
+            'success' => true,
+            'title' => 'Data berhasil dihapus'
+        ]);
     }
 }

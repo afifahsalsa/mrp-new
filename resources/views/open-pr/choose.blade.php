@@ -9,10 +9,7 @@
             Purchase Requisition | </a>
         <a href="{{ route('incomong-manual.index') }}"
             style="text-decoration: none; color: {{ request()->routeIs('incomong-manual.index') ? 'purple' : 'blue' }}">
-            Incoming Manual | </a>
-        <a href="#"
-            style="text-decoration: none; color: {{ request()->routeIs('buffer.stok.visualisasi') ? 'purple' : 'blue' }}">
-            Visualization</a>
+            Incoming Manual</a>
 
         <div class="col-lg-12 grid-margin stretch-card mt-3">
             <div class="card">
@@ -118,14 +115,15 @@
                                         {{ \Carbon\Carbon::create($mp->year, $mp->month)->format('F Y') }}
                                     </td>
                                     <td>
-                                        <a
-                                            href="{{ route('open-pr.index-edit', ['year' => $mp->year, 'month' => $mp->month]) }}">
-                                            <button class="btn btn-inverse-dark px-4">
-                                                <i class="mdi mdi-table-edit"></i> Edit
-                                            </button>
-                                            <input type="hidden" id="year" name="year">
-                                            <input type="hidden" id="month" name="month">
-                                        </a>
+                                        @if (auth()->user()->role == 'staff' || auth()->user()->role == 'superuser')
+                                        <a href="{{ route('open-pr.index-edit', ['year' => $mp->year, 'month' => $mp->month]) }}"
+                                            class="btn btn-inverse-dark px-4"
+                                            style="color: black; text-decoration: none;"
+                                            onmouseover="this.style.color='white'; this.querySelector('i').style.color='white';"
+                                            onmouseout="this.style.color='black'; this.querySelector('i').style.color='black';">
+                                             <i class="mdi mdi-table-edit" style="color: black;"></i> Edit | Delete
+                                         </a>
+                                        @endif
                                         <button class="btn btn-inverse-success px-4" data-bs-toggle="modal"
                                             data-bs-target="#modalUpdatePR">
                                             <i class="mdi mdi-cloud-sync"></i> Update
@@ -211,7 +209,7 @@
                         serverSide: true,
                         scrollX: true,
                         ajax: {
-                            url: `/ppic/purchase-requisition/load-data/${year}/${month}`,
+                            url: `/purchase-requisition/load-data/${year}/${month}`,
                             type: 'GET',
                             data: function(d) {
                                 var statusValue = $('#filter-status').val();
@@ -246,7 +244,7 @@
                             }
                         ],
                         initComplete: function() {
-                            $.get(`/ppic/purchase-requisition/get-unique-status/${year}/${month}`,
+                            $.get(`/purchase-requisition/get-unique-status/${year}/${month}`,
                                 function(
                                     data) {
                                     var select = $('#filter-status');

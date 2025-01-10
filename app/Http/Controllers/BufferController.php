@@ -41,7 +41,7 @@ class BufferController extends Controller
 
     public function get_format()
     {
-        $filePath = public_path('doc/Format Impor Buffer.xlsx');
+        $filePath = public_path('doc/Buffer.xlsx');
         return response()->download($filePath);
     }
 
@@ -64,11 +64,9 @@ class BufferController extends Controller
     {
         $bufferData = Buffer::whereYear('date', $year)
             ->whereMonth('date', $month);
-
         if ($request->has('lt') && $request->lt !== '') {
             $bufferData = $bufferData->where('lt', $request->lt);
         }
-
         return DataTables::of($bufferData)->make(true);
     }
 
@@ -86,36 +84,42 @@ class BufferController extends Controller
         $duplicateItems = [];
         $cekDate = Buffer::where(DB::raw("FORMAT(date, 'yyyy MM')"), '=', date('Y m', strtotime($request->date)))->get();
 
+        $headers = [];
         foreach ($bufferVal as $bv) {
             foreach ($bv as $idx => $i) {
-                if ($idx > 0) {
-                    $duplicateInArray = collect($tempData)->contains(function ($value) use ($i, $request) {
-                        return $value['item_number'] == $i[0] && $value['date'] == $request->date;
+                if ($idx == 0) {
+                    $headers = $i;
+                    // dd($headers, $i);
+                } else {
+                    $data = array_combine($headers, $i);
+                    $duplicateInArray = collect($tempData)->contains(function ($value) use ($data, $request) {
+                        // dd($value, $data);
+                        return $value['item_number'] == $data['ITEM NUMBER'] && $value['date'] == $request->date;
                     });
 
-                    if (strtolower(substr($i[3], 1, 1) === 'l')) {
-                        $lt = substr($i[3], 0, 1);
-                    } else if (strtolower(substr($i[3], 1, 1) === 'i')){
-                        $lt = substr($i[3], 0, 1) + 1;
-                    } else if ($i[3] === null) {
-                        $ltBlank[] = $i[3];
+                    if (strtolower(substr($data['LT'], 1, 1)) === 'l') {
+                        $lt = substr($data['LT'], 0, 1);
+                    } else if (strtolower(substr($data['LT'], 1, 1)) === 'i'){
+                        $lt = substr($data['LT'], 0, 1) + 1;
+                    } else if ($data['LT'] === null) {
+                        $ltBlank[] = $data['LT'];
                         $lt = '-';
                     } else {
-                        $lt = $i[3];
+                        $lt = $data['LT'];
                     }
 
                     if ($duplicateInArray) {
-                        $duplicateItems[] = $i[0];
+                        $duplicateItems[] = $data['ITEM NUMBER'];
                     } else {
                         $tempData[] = [
-                            'item_number' => $i[0],
-                            'part_number' => $i[1],
-                            'product_name' => $i[2],
+                            'item_number' => $data['ITEM NUMBER'],
+                            'part_number' => $data['PART NUMBER'],
+                            'part_name' => $data['PART NAME'],
                             'lt' => $lt,
-                            'supplier' => $i[4],
-                            'li' => $i[5],
-                            'type' => $i[6],
-                            'qty' => intval($i[7]),
+                            'supplier' => $data['SPL'],
+                            'li' => $data['L/I'],
+                            'type' => $data['TYPE'],
+                            'qty' => intval($data['BUFFER QUANTITY']),
                             'date' => $request->date
                         ];
                     }
@@ -134,7 +138,7 @@ class BufferController extends Controller
                 ]
             ]);
         }
-        if ($i[7] === null) {
+        if ($data['BUFFER QUANTITY'] === null) {
             return back()->with([
                 'swal' => [
                     'type' => 'error',
@@ -143,11 +147,11 @@ class BufferController extends Controller
                 ]
             ]);
         }
-        if ($cekDate) {
+        if ($cekDate->isNotEmpty()) {
             foreach ($tempData as $data) {
-                $itemInCekDate = collect($cekDate)->firstWhere('item_number', $data['item_number']);
+                $itemInCekDate = collect($cekDate)->firstWhere('item_number', $data['ITEM NUMBER']);
                 if ($itemInCekDate) {
-                    Buffer::where('item_number', $data['item_number'])->update($data);
+                    Buffer::where('item_number', $data['ITEM NUMBER'])->update($data);
                 } else {
                     Buffer::create($data);
                 }

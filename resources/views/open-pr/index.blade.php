@@ -75,7 +75,7 @@
                     searching: true,
                     scrollX: true,
                     ajax: {
-                        url: `/ppic/purchase-requisition/load-data/${year}/${month}`,
+                        url: `/purchase-requisition/load-data/${year}/${month}`,
                         type: 'GET',
                         data: function(d) {
                             var statusValue = $('#filter-status').val();
@@ -137,7 +137,7 @@
                         }
                     ],
                     initComplete: function() {
-                        $.get(`/ppic/purchase-requisition/get-unique-status/${year}/${month}`, function(data) {
+                        $.get(`/purchase-requisition/get-unique-status/${year}/${month}`, function(data) {
                             var select = $('#filter-status');
                             select.empty().append(
                             '<option value="">Filter PR Status</option>');
@@ -199,7 +199,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: `/ppic/purchase-requisition/update/${id}`,
+                            url: `/purchase-requisition/update/${id}`,
                             type: 'PUT',
                             data: {
                                 _token: "{{ csrf_token() }}",

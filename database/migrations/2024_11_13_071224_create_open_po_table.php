@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('purchase_requisition');
             $table->string('product_name');
             $table->integer('deliver_reminder');
-            $table->dateTime('delivery_date');
+            $table->date('delivery_date');
             $table->string('part_name');
             $table->string('part_number');
             $table->string('procurement_category');
@@ -32,7 +32,7 @@ return new class extends Migration
             $table->string('bulan_datang');
             $table->integer('lt');
             $table->string('ket_late');
-            $table->dateTime('date');
+            $table->date('date');
             $table->timestamps();
         });
     }
