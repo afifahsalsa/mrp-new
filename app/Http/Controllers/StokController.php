@@ -22,7 +22,7 @@ class StokController extends Controller
     {
         $monthStok = Stok::selectRaw('YEAR(date) as year, MONTH(date) as month')
             ->groupByRaw('YEAR(date), MONTH(date)')
-            ->orderByRaw('YEAR(date), MONTH(date) DESC')
+            ->orderByRaw('YEAR(date) DESC, MONTH(date) DESC')
             ->get();
         return view('stok.choose', [
             'title' => 'Index Stok',
@@ -108,6 +108,15 @@ class StokController extends Controller
 
         foreach ($stokVal as $sheet) {
             $header = array_flip($sheet[0]);
+            if(!isset($header['ITEM NUMBER']) || !isset($header['PART NUMBER']) || !isset($header['PART NAME']) || !isset($header['LT']) || !isset($header['SPL']) || !isset($header['L/I']) || !isset($header['TYPE']) || !isset($header['STOCK'])) {
+                return back()->with([
+                    'swal' => [
+                        'type' => 'error',
+                        'title' => 'Import Gagal!',
+                        'text' => 'Format file tidak sesuai. Silakan periksa kembali file Anda.'
+                    ]
+                ]);
+            }
             foreach ($sheet as $idx => $row) {
                 if ($idx === 0) continue;
 

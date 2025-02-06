@@ -58,6 +58,15 @@ class IncomingManualController extends Controller
         foreach ($incomingVal as $iv){
             $header = array_flip($iv[0]);
             foreach ($iv as $idx => $i){
+                if(!isset($header['Supplier ']) || !isset($header['Tanggal Kedatangan']) || !isset($header['Item Number']) || !isset($header['Part Number']) || !isset($header['PO']) || !isset($header['Quantity'])) {
+                    return back()->with([
+                        'swal' => [
+                            'type' => 'error',
+                            'title' => 'Import Gagal!',
+                            'text' => 'Format file tidak sesuai. Silakan periksa kembali file Anda.'
+                        ]
+                    ]);
+                }
                 if ($idx === 0) continue;
 
                 $convertDateArrived = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($i[$header['Tanggal Kedatangan']]);
@@ -80,7 +89,7 @@ class IncomingManualController extends Controller
                     $duplicatePO[] = $i[$header['PO']];
                 } else {
                     $tempData[] = [
-                        'supplier' => $i[$header['Supplier ']],
+                        'spl' => $i[$header['Supplier ']],
                         'tgl_kedatangan' => $convertDateArrived,
                         'item_number' => $i[$header['Item Number']],
                         'part_number' => $i[$header['Part Number']],

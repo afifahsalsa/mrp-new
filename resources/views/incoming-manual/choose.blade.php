@@ -9,7 +9,10 @@
             Purchase Requisition | </a>
         <a href="{{ route('incomong-manual.index') }}"
             style="text-decoration: none; color: {{ request()->routeIs('incomong-manual.index') ? 'purple' : 'blue' }}">
-            Incoming Manual</a>
+            Incoming Manual | </a>
+        <a href="{{ route('incoming-non-manual.index') }}"
+            style="text-decoration: none; color: {{ request()->routeIs('incoming-non-manual.index') ? 'purple' : 'blue' }}">
+            Incoming Non Manual</a>
 
         <div class="col-lg-12 grid-margin stretch-card mt-3">
             <div class="card">
@@ -50,7 +53,8 @@
                                     <input type="date" name="date" id="date" class="form-control"
                                         value="<?php echo date('Y-m-d'); ?>" required>
                                     <label for="file" class="form-label mt-2"><strong>Choose File</strong></label>
-                                    <input class="form-control" type="file" id="file" name="file" required>
+                                    <input class="form-control" type="file" id="file" name="file" accept=".xlsx"
+                                        required>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-dark" data-bs-dismiss="modal"
@@ -81,7 +85,8 @@
                                     <input type="date" name="date" id="date" class="form-control"
                                         value="<?php echo date('Y-m-d'); ?>" required>
                                     <label for="file" class="form-label mt-2"><strong>Choose File</strong></label>
-                                    <input class="form-control" type="file" id="file" name="file" required>
+                                    <input class="form-control" type="file" id="file" name="file"
+                                        accept=".xlsx" required>
                                     <p class="ms-1 text-danger">Upload file dengan format yang sesuai saat import!</p>
                                 </div>
                                 <div class="modal-footer">
@@ -262,7 +267,7 @@
                                 }
                             },
                             {
-                                data: 'supplier',
+                                data: 'spl',
                                 className: 'text-start'
                             },
                             {

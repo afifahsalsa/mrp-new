@@ -28,23 +28,37 @@
                 </a>
             </li>
             <li
-                class="nav-item {{ $title === 'Index Open PO' || $title === 'Edit Open PO' || $title === 'Index Open PR' || $title === 'Edit Open PR' || $title === 'Index Incoming Manual' ? 'active' : '' }}">
+                class="nav-item {{ $title === 'Index Open PO' || $title === 'Edit Open PO' || $title === 'Index Open PR' || $title === 'Edit Open PR' || $title === 'Index Incoming Manual' || $title === 'Index Incoming Non Manual' ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('open-po.index') }}" aria-controls="charts">
                     <span class="menu-title">Outstanding PO | PR | IM</span>
                     <i class="mdi mdi-cube-send menu-icon"></i>
                 </a>
             </li>
-            <li class="nav-item {{ $title === 'Index Incoming Non Manual' ? 'active' : '' }}">
+            {{-- <li class="nav-item {{ $title === 'Index Incoming Non Manual' ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('incoming-non-manual.index') }}" aria-controls="charts">
                     <span class="menu-title">Incoming Non Manual</span>
                     <i class="mdi mdi-cube-outline menu-icon"></i>
                 </a>
-            </li>
+            </li> --}}
             <li
                 class="nav-item {{ $title === 'Index Order Customer' || $title === 'Index Production Planning' ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('order-customer.index') }}" aria-controls="charts">
                     <span class="menu-title">MPP</span>
                     <i class="mdi mdi-package menu-icon"></i>
+                </a>
+            </li>
+            <li
+                class="nav-item {{ $title === 'Index BOM' ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('bom.index') }}" aria-controls="charts">
+                    <span class="menu-title">BOM</span>
+                    <i class="mdi mdi-math-compass menu-icon"></i>
+                </a>
+            </li>
+            <li
+                class="nav-item {{ $title === 'MOQ & MPQ' || $title === 'Index MRP' || $title === 'Kebutuhan Material' || $title === 'Kebutuhan Produksi' ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('mrp.moq-mpq') }}" aria-controls="charts">
+                    <span class="menu-title">MRP</span>
+                    <i class="mdi mdi-math-compass menu-icon"></i>
                 </a>
             </li>
         @endif

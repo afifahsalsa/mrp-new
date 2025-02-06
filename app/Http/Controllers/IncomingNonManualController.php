@@ -49,7 +49,7 @@ class IncomingNonManualController extends Controller
             'file' => 'required|file|mimes:xlsx, csv'
         ]);
         $dataArray = [];
-        $incomingNonVal = Excel::toArray(new IncomingNonManualImport($dataArray), $request->file('file'));
+        $incomingNonVal = Excel::toArray(new IncomingNonManual($dataArray), $request->file('file'));
         $rowCountINM = 0;
         $tempData = [];
         $updateINM = 0;
@@ -109,15 +109,17 @@ class IncomingNonManualController extends Controller
         }
 
         foreach ($tempData as $data) {
+            // dd($tempData);
             $cekDate = IncomingNonManual::where(DB::raw("FORMAT(created_at, 'yyyy MM')"), '=', date('Y m', strtotime($data['created_at'])))->get();
             if ($cekDate) {
                 $itemInCekDate = collect($cekDate)->first(function ($value) use ($data){
-                    return $value['item_number'] === $data['item_number'] && $value['purchase_order'] === $data['purchase_order'];
+                return $value['item_number'] === $data['item_number'] && $value['purchase_order'] === $data['purchase_order'] && $value['internal_product_receipt'] === $data['internal_product_receipt'];
                 });
                 if($itemInCekDate){
                     IncomingNonManual::where([
                         ['item_number', '=', $data['item_number']],
-                        ['purchase_order', '=', $data['purchase_order']]
+                        ['purchase_order', '=', $data['purchase_order']],
+                        ['internal_product_receipt', '=', $data['internal_product_receipt']]
                     ])->update($data);
                     $updateINM++;
                 } else {
@@ -127,13 +129,24 @@ class IncomingNonManualController extends Controller
             }
         }
 
-        return back()->with([
-            'swal' => [
-                'type' => 'success',
-                'title' => 'Import Berhasil!',
-                'text' => "Berhasil mengimpor {$rowCountINM} baris data."
-            ]
-        ]);
+        if($updateINM > 0){
+            return back()->with([
+                'swal' => [
+                    'type' => 'success',
+                    'title' => 'Import Berhasil!',
+                    'text' => "Berhasil mengimpor {$rowCountINM} baris data dan mengupdate {$updateINM} baris data."
+                ]
+            ]);
+        } else {
+            return back()->with([
+                'swal' => [
+                    'type' => 'success',
+                    'title' => 'Import Berhasil!',
+                    'text' => "Berhasil mengimpor {$rowCountINM} baris data."
+                ]
+            ]);
+        }
+
     }
 
     /**

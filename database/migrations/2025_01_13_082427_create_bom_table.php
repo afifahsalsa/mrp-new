@@ -11,17 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('buffer', function (Blueprint $table) {
+        Schema::create('bom', function (Blueprint $table) {
             $table->id();
-            $table->string('item_number');
+            $table->string('item_id_fgs');
+            $table->string('item_id_rmi');
             $table->string('part_number');
-            $table->string('part_name');
-            $table->integer('lt');
-            $table->string('spl');
-            $table->string('li');
-            $table->string('type');
-            $table->float('qty');
-            $table->date('date');
+            // $table->decimal('bomqty', 38, 8);
+            $table->float('bomqty');
+            $table->string('unit_id');
             $table->timestamps();
         });
     }
@@ -31,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('buffer');
+        Schema::dropIfExists('bom');
     }
 };

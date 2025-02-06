@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\BomController;
 use App\Http\Controllers\BufferController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IncomingManualController;
 use App\Http\Controllers\IncomingNonManualController;
 use App\Http\Controllers\MppController;
+use App\Http\Controllers\MrpController;
 use App\Http\Controllers\OpenPoController;
 use App\Http\Controllers\OpenPrController;
 use App\Http\Controllers\PriceController;
@@ -107,6 +109,31 @@ Route::middleware(['auth', 'role:admin,staff,superuser'])->group(function () {
         Route::post('create', [SalesController::class, 'store'])->name('sales.store');
         Route::put('edit/{id}', [SalesController::class, 'update'])->name('sales.update');
         Route::delete('delete/{id}', [SalesController::class, 'destroy'])->name('sales.destroy');
+    });
+    Route::prefix('bom')->group(function(){
+        route::get('/', [BomController::class, 'index'])->name('bom.index');
+        route::get('format-import', [BomController::class, 'get_format'])->name('bom.format');
+        route::post('import', [BomController::class, 'import'])->name('bom.import');
+        Route::get('load-data/{year}/{month}', [BomController::class, 'get_data'])->name('bom.data');
+    });
+    Route::prefix('mrp')->group(function(){
+        Route::get('/', [MrpController::class, 'index'])->name('mrp.index');
+        Route::get('load-data', [MrpController::class, 'get_data'])->name('mrp.data');
+        Route::prefix('keb-material')->group(function(){
+            Route::get('/', [MrpController::class, 'index_keb_material'])->name('mrp.keb-material');
+            Route::get('load-data-keb-material', [MrpController::class, 'get_data_keb_material'])->name('mrp.data-keb-material');
+        });
+        Route::prefix('keb-production')->group(function(){
+            Route::get('/', [MrpController::class, 'index_keb_production'])->name('mrp.keb-production');
+            Route::get('load-data-keb-production', [MrpController::class, 'get_data_keb_production'])->name('mrp.data-keb-production');
+        });
+        Route::prefix('/moq-mpq')->group(function () {
+            Route::get('/', [MrpController::class, 'index_moq_mpq'])->name('mrp.moq-mpq');
+            Route::get('format-import', [MrpController::class, 'get_format'])->name('mrp.format');
+            Route::post('import', [MrpController::class, 'import'])->name('mrp.import');
+            Route::get('load-data/{year}/{month}', [MrpController::class, 'get_data_moq'])->name('mrp.data-moq');
+            Route::put('update/{id}', [MrpController::class, 'update'])->name('mrp.update');
+        });
     });
     Route::prefix('/price')->group(function () {
         Route::get('/', [PriceController::class, 'index'])->name('price.index');

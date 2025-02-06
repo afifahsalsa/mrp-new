@@ -80,6 +80,7 @@ class BufferController extends Controller
         $bufferVal = Excel::toArray(new BufferImport([], $request->date), $request->file('file'));
         $tempData = [];
         $rowCountBuffer = 0;
+        $rowCountUpdateBuff = 0;
         $ltBlank = [];
         $duplicateItems = [];
         $cekDate = Buffer::where(DB::raw("FORMAT(date, 'yyyy MM')"), '=', date('Y m', strtotime($request->date)))->get();
@@ -87,13 +88,20 @@ class BufferController extends Controller
         $headers = [];
         foreach ($bufferVal as $bv) {
             foreach ($bv as $idx => $i) {
-                if ($idx == 0) {
+                if ($idx === 0) {
                     $headers = $i;
-                    // dd($headers, $i);
+                    if($headers[0] !== 'ITEM NUMBER' || $headers[1] !== 'PART NUMBER' || $headers[2] !== 'PART NAME' || $headers[3] !== 'LT' || $headers[4] !== 'SPL' || $headers[5] !== 'L/I' || $headers[6] !== 'TYPE' || $headers[7] !== 'BUFFER QUANTITY') {
+                        return back()->with([
+                            'swal' => [
+                                'type' => 'error',
+                                'title' => 'Import Gagal',
+                                'text' => 'Format file tidak sesuai',
+                            ]
+                        ]);
+                    }
                 } else {
                     $data = array_combine($headers, $i);
                     $duplicateInArray = collect($tempData)->contains(function ($value) use ($data, $request) {
-                        // dd($value, $data);
                         return $value['item_number'] == $data['ITEM NUMBER'] && $value['date'] == $request->date;
                     });
 
@@ -116,7 +124,7 @@ class BufferController extends Controller
                             'part_number' => $data['PART NUMBER'],
                             'part_name' => $data['PART NAME'],
                             'lt' => $lt,
-                            'supplier' => $data['SPL'],
+                            'spl' => $data['SPL'],
                             'li' => $data['L/I'],
                             'type' => $data['TYPE'],
                             'qty' => intval($data['BUFFER QUANTITY']),
@@ -149,13 +157,14 @@ class BufferController extends Controller
         }
         if ($cekDate->isNotEmpty()) {
             foreach ($tempData as $data) {
-                $itemInCekDate = collect($cekDate)->firstWhere('item_number', $data['ITEM NUMBER']);
+                $itemInCekDate = collect($cekDate)->firstWhere('item_number', $data['item_number']);
                 if ($itemInCekDate) {
-                    Buffer::where('item_number', $data['ITEM NUMBER'])->update($data);
+                    Buffer::where('item_number', $data['item_number'])->update($data);
+                    $rowCountUpdateBuff++;
                 } else {
                     Buffer::create($data);
+                    $rowCountBuffer++;
                 }
-                $rowCountBuffer++;
             }
         } else {
             foreach ($tempData as $data) {
@@ -170,6 +179,14 @@ class BufferController extends Controller
                     'type' => 'warning',
                     'title' => 'Import Berhasil dengan Catatan',
                     'text' => "Berhasil impor {$rowCountBuffer} baris data buffer dengan jumlah {$countLt} LT yang blanks.",
+                ]
+            ]);
+        } else if($rowCountUpdateBuff > 0) {
+            return back()->with([
+                'swal' => [
+                    'type' => 'success',
+                    'title' => 'Import Berhasil',
+                    'text' => "Berhasil mengimpor {$rowCountBuffer} baris data dan mengupdate {$rowCountUpdateBuff} baris data.",
                 ]
             ]);
         } else {

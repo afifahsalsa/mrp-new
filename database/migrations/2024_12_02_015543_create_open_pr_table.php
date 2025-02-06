@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('old_name');
             $table->date('pr_date');
             $table->date('request_date');
-            $table->integer('qty');
+            $table->float('qty');
             $table->string('pr_status');
             $table->date('date');
             $table->timestamps();

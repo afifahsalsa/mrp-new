@@ -93,6 +93,7 @@ class MppController extends Controller
         foreach ($mppValue as $mv) {
             foreach ($mv as $idx => $i) {
                 if ($idx > 1) {
+                    // jika fgs berisi null / - / kosong, maka lewati
                     if (empty($i[2]) || $i[2] == '-' || $i[2] == null) {
                         continue;
                     }

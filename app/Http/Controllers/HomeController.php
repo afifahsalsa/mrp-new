@@ -150,21 +150,21 @@ class HomeController extends Controller
 
     private function getPlanProdData()
     {
-        $query = DB::table('order_original')
+        $query = DB::table('mpp')
             ->select(
                 DB::raw("
-                SUM(bulan_1) AS bulan_1,
-                SUM(bulan_2) AS bulan_2,
-                SUM(bulan_3) AS bulan_3,
-                SUM(bulan_4) AS bulan_4,
-                SUM(bulan_5) AS bulan_5,
-                SUM(bulan_6) AS bulan_6,
-                SUM(bulan_7) AS bulan_7,
-                SUM(bulan_8) AS bulan_8,
-                SUM(bulan_9) AS bulan_9,
-                SUM(bulan_10) AS bulan_10,
-                SUM(bulan_11) AS bulan_11,
-                SUM(bulan_12) AS bulan_12
+                SUM(ori_cust_bulan_1) AS ori_cust_bulan_1,
+                SUM(ori_cust_bulan_2) AS ori_cust_bulan_2,
+                SUM(ori_cust_bulan_3) AS ori_cust_bulan_3,
+                SUM(ori_cust_bulan_4) AS ori_cust_bulan_4,
+                SUM(ori_cust_bulan_5) AS ori_cust_bulan_5,
+                SUM(ori_cust_bulan_6) AS ori_cust_bulan_6,
+                SUM(ori_cust_bulan_7) AS ori_cust_bulan_7,
+                SUM(ori_cust_bulan_8) AS ori_cust_bulan_8,
+                SUM(ori_cust_bulan_9) AS ori_cust_bulan_9,
+                SUM(ori_cust_bulan_10) AS ori_cust_bulan_10,
+                SUM(ori_cust_bulan_11) AS ori_cust_bulan_11,
+                SUM(ori_cust_bulan_12) AS ori_cust_bulan_12
             ")
             )
             ->first();

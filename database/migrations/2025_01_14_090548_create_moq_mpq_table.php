@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('buffer', function (Blueprint $table) {
+        Schema::create('moq_mpq', function (Blueprint $table) {
             $table->id();
             $table->string('item_number');
             $table->string('part_number');
@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('spl');
             $table->string('li');
             $table->string('type');
-            $table->float('qty');
-            $table->date('date');
+            $table->float('moq');
+            $table->float('mpq');
             $table->timestamps();
         });
     }
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('buffer');
+        Schema::dropIfExists('moq_mpq');
     }
 };

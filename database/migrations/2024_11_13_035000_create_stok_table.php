@@ -16,13 +16,13 @@ return new class extends Migration
             $table->string('item_number');
             $table->string('part_number');
             $table->string('product_name');
-            $table->string('lt')->nullable();
+            $table->integer('lt')->nullable();
             $table->string('spl');
             $table->string('li');
             $table->string('type');
-            $table->integer('stok');
-            $table->integer('qty_buffer');
-            $table->integer('percentage');
+            $table->float('stok');
+            $table->float('qty_buffer');
+            $table->float('percentage');
             $table->date('date');
             $table->timestamps();
         });

@@ -51,7 +51,7 @@
                                     <input type="month" name="month" id="month" class="form-control"
                                         value="<?php echo date('Y-m'); ?>" required>
                                     <label for="file" class="form-label mt-2"><strong>Choose File</strong></label>
-                                    <input class="form-control" type="file" id="file" name="file" required>
+                                    <input class="form-control" type="file" id="file" name="file" accept=".xlsx" required>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-dark" data-bs-dismiss="modal"
@@ -82,7 +82,7 @@
                                     <input type="month" name="month" id="month" class="form-control"
                                         value="<?php echo date('Y-m'); ?>" required>
                                     <label for="file" class="form-label mt-2"><strong>Choose File</strong></label>
-                                    <input class="form-control" type="file" id="file" name="file" required>
+                                    <input class="form-control" type="file" id="file" name="file" accept=".xlsx" required>
                                     <p class="ms-1 text-danger">Upload file dengan format yang sesuai saat import!</p>
                                 </div>
                                 <div class="modal-footer">

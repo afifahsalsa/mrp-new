@@ -11,15 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('incoming_manual', function (Blueprint $table) {
+        Schema::create('temp_keb_produksi', function (Blueprint $table) {
             $table->id();
-            $table->string('spl');
-            $table->date('tgl_kedatangan');
-            $table->string('item_number');
-            $table->string('part_number');
-            $table->string('purchase_order');
-            $table->integer('qty');
-            $table->date('date');
+            $table->string('kode_fgs');
+            $table->string('kode_rmi');
+            $table->float('keb_produksi');
+            $table->string('bulan');
             $table->timestamps();
         });
     }
@@ -29,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('incoming_manual');
+        Schema::dropIfExists('temp_keb_produksi');
     }
 };

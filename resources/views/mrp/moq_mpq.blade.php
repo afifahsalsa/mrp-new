@@ -1,29 +1,35 @@
 @extends('layouts.main')
 @section('content')
     <div class="content-wrapper">
-        <a href="{{ route('buffer.index') }}"
-            style="text-decoration: none; color: {{ request()->routeIs('buffer.index') ? 'purple' : 'blue' }}">Buffer |</a>
-        <a href="{{ route('stok.index') }}"
-            style="text-decoration: none; color: {{ request()->routeIs('stok.index') ? 'purple' : 'blue' }}"> Stock | </a>
-        <a href="{{ route('buffer.stok.visualisasi') }}"
-            style="text-decoration: none; color: {{ request()->routeIs('buffer.stok.visualisasi') ? 'purple' : 'blue' }}">
-            Visualization</a>
+        <a href="{{ route('mrp.moq-mpq') }}"
+            style="text-decoration: none; color: {{ request()->routeIs('mrp.moq-mpq') ? 'purple' : 'blue' }}">MOQ & MPQ |
+        </a>
+        <a href="{{ route('mrp.keb-material') }}"
+            style="text-decoration: none; color: {{ request()->routeIs('mrp.keb-material') ? 'purple' : 'blue' }}">Kebutuhan Material
+            |
+        </a>
+        <a href="{{ route('mrp.keb-production') }}"
+            style="text-decoration: none; color: {{ request()->routeIs('mrp.keb-production') ? 'purple' : 'blue' }}">Kebutuhan Produksi
+            |
+        </a>
+        <a href="{{ route('mrp.index') }}"
+            style="text-decoration: none; color: {{ request()->routeIs('mrp.index') ? 'purple' : 'blue' }}"> Rencana
+            Pembelian</a>
 
         <div class="col-lg-12 grid-margin stretch-card mt-3">
             <div class="card">
                 <div class="page-header ms-4 mt-3">
                     <h3>Choose Month to <span class="text-primary">View</span> or <span class="text-primary">Edit</span>
-                        Data Buffer</h3>
+                        MOQ and MPQ</h3>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li><button type="button" class="btn btn-gradient-danger btn-rounded"
                                     style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
                                     onmouseover="this.style.transform='scale(1.05)';"
                                     onmouseout="this.style.transform='scale(1)';" data-bs-toggle="modal"
-                                    data-bs-target="#modalImportBuffer">Add New</button></li>
+                                    data-bs-target="#modalImportMOQMPQ">Add New</button></li>
                             <li>
-                                <form action="{{ route('buffer.format-import') }}" enctype="multipart/form-data"
-                                    method="GET">
+                                <form action="{{ route('mrp.format') }}" enctype="multipart/form-data" method="GET">
                                     @csrf
                                     <button type="submit" class="btn btn-gradient-info btn-rounded ms-2"
                                         style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; transform: scale(1);"
@@ -37,23 +43,23 @@
                 </div>
 
                 {{-- Modal Import --}}
-                <div class="modal fade" id="modalImportBuffer" tabindex="-1" aria-labelledby="modalLabelBuffer"
+                <div class="modal fade" id="modalImportMOQMPQ" tabindex="-1" aria-labelledby="modalLabelMOQMPQ"
                     aria-hidden="true" onsubmit="showLoading()">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="modalLabelBuffer">Import File Buffer</h1>
+                                <h1 class="modal-title fs-5" id="modalLabelMOQMPQ">Import File MOQ & MPQ</h1>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Close"></button>
                             </div>
-                            <form action="{{ route('buffer.import') }}" enctype="multipart/form-data" method="POST"
-                                id="importBuffer">
+                            <form action="{{ route('mrp.import') }}" enctype="multipart/form-data" method="POST"
+                                id="importMOQMPQ">
                                 @csrf
                                 <div class="modal-body">
                                     <label for="date" class="form-label"><strong>Date</strong></label>
                                     <input type="date" name="date" id="date" class="form-control"
                                         value="<?php echo date('Y-m-d'); ?>" required>
-                                    <label for="date" class="form-label mt-2"><strong>Choose File</strong></label>
+                                    <label for="file" class="form-label mt-2"><strong>Choose File</strong></label>
                                     <input class="form-control" type="file" id="file" name="file" accept=".xlsx"
                                         required>
                                 </div>
@@ -69,23 +75,23 @@
                 </div>
 
                 <!-- Modal Update -->
-                <div class="modal fade" id="modalUpdateBuffer" tabindex="-1" aria-labelledby="exampleModalLabel"
+                <div class="modal fade" id="modalUpdateMOQ" tabindex="-1" aria-labelledby="exampleModalLabel"
                     aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="exampleModalLabel">Update Data Buffer</h1>
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Update Data MOQ & MPQ</h1>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Close"></button>
                             </div>
-                            <form action="{{ route('buffer.import') }}" enctype="multipart/form-data" method="POST"
-                                id="importBuffer">
+                            <form action="{{ route('mrp.import') }}" enctype="multipart/form-data" method="POST"
+                                id="importMOQMPQ">
                                 @csrf
                                 <div class="modal-body">
                                     <label for="date" class="form-label"><strong>Date</strong></label>
                                     <input type="date" name="date" id="date" class="form-control"
                                         value="<?php echo date('Y-m-d'); ?>" required>
-                                    <label for="date" class="form-label mt-2"><strong>Choose File</strong></label>
+                                    <label for="file" class="form-label mt-2"><strong>Choose File</strong></label>
                                     <input class="form-control" type="file" id="file" name="file"
                                         accept=".xlsx" required>
                                     <p class="ms-1 text-danger">Upload file dengan format yang sesuai saat import!</p>
@@ -110,15 +116,15 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($monthBuffer as $index => $mb)
+                            @forelse ($monthMoq as $index => $mm)
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
                                     <td>
-                                        {{ \Carbon\Carbon::create($mb->year, $mb->month)->format('F Y') }}
+                                        {{ \Carbon\Carbon::create($mm->year, $mm->month)->format('F Y') }}
                                     </td>
                                     <td>
                                         @if (auth()->user()->role == 'staff' || auth()->user()->role == 'superuser')
-                                            <a href="{{ route('buffer.index-edit', ['year' => $mb->year, 'month' => $mb->month]) }}"
+                                            <a href="{{ route('buffer.index-edit', ['year' => $mm->year, 'month' => $mm->month]) }}"
                                                 class="btn btn-inverse-dark px-4"
                                                 style="color: black; text-decoration: none;"
                                                 onmouseover="this.style.color='white'; this.querySelector('i').style.color='white';"
@@ -127,12 +133,12 @@
                                             </a>
                                         @endif
                                         <button class="btn btn-inverse-success px-4" data-bs-toggle="modal"
-                                            data-bs-target="#modalUpdateBuffer">
+                                            data-bs-target="#modalUpdateMOQ">
                                             <i class="mdi mdi-cloud-sync"></i> Update
                                         </button>
                                         <button class="btn btn-inverse-primary px-4" data-bs-toggle="modal"
-                                            data-bs-target="#viewModal" data-year="{{ $mb->year }}"
-                                            data-month="{{ $mb->month }}">
+                                            data-bs-target="#viewModal" data-year="{{ $mm->year }}"
+                                            data-month="{{ $mm->month }}">
                                             <i class="mdi mdi-magnify"></i> View
                                         </button>
                                         <div class="modal fade" id="viewModal" tabindex="-1"
@@ -141,7 +147,7 @@
                                                 style="width: 100rem;">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h3 class="modal-title" id="viewModalLabel">Buffer in :
+                                                        <h3 class="modal-title" id="viewModalLabel">MOQ & MPQ in :
                                                             <span id="modalMonthYear" class="text-danger"></span>
                                                         </h3>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
@@ -149,7 +155,7 @@
                                                     </div>
                                                     <div class="modal-body">
                                                         <div class="table-responsive">
-                                                            <table class="table display" id="bufferTable"
+                                                            <table class="table display" id="moqTable"
                                                                 style="width: 100%">
                                                                 <div class="d-flex mb-4">
                                                                     <h4 class="mt-3">Filter: </h4>
@@ -182,11 +188,13 @@
                                                                                 id="selectAll"></th>
                                                                         <th>Item Number</th>
                                                                         <th>Part Number</th>
-                                                                        <th>Product Name</th>
+                                                                        <th>Part Name</th>
                                                                         <th>LT</th>
                                                                         <th>Supplier</th>
-                                                                        <th style="float: left;">Quantity</th>
-                                                                        <th>Date</th>
+                                                                        <th>Lokal / Import</th>
+                                                                        <th>Type</th>
+                                                                        <th>MOQ</th>
+                                                                        <th>MPQ</th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
@@ -213,10 +221,10 @@
                         </tbody>
                     </table>
                 </div>
-            </div>  
+            </div>
         </div>
     </div>
-    @push('scriptBuffer')
+    @push('scriptMoq')
         <script>
             $(document).ready(function() {
                 $('#viewModal').on('show.bs.modal', function(event) {
@@ -225,13 +233,13 @@
                     let year = button.data('year');
                     let month = button.data('month');
 
-                    const table = $('#bufferTable').DataTable({
+                    const table = $('#moqTable').DataTable({
                         "lengthMenu": [10, 25, 50, 100],
                         processing: true,
                         serverSide: true,
                         scrollX: true,
                         ajax: {
-                            url: `/buffer/load-data/${year}/${month}`,
+                            url: `/mrp/moq-mpq/load-data/${year}/${month}`,
                             type: 'GET',
                             data: function(d) {
                                 var ltValue = $('#filter-lt').val();
@@ -270,8 +278,16 @@
                                 name: 'spl'
                             },
                             {
-                                data: 'qty',
-                                name: 'qty',
+                                data: 'li',
+                                name: 'li'
+                            },
+                            {
+                                data: 'type',
+                                name: 'type'
+                            },
+                            {
+                                data: 'moq',
+                                name: 'moq',
                                 render: function(data, type, row) {
                                     data = data || '';
                                     if (type === 'display') {
@@ -279,7 +295,7 @@
                                             return `
                                                 <div class="edit-container">
                                                     <input type="number" style="width: 50%; display: inline; padding-top: 12px; padding-bottom: 10px;"
-                                                        class="form-control qty-input float-start px-1"
+                                                        class="form-control moq-input float-start px-1"
                                                         data-id="${row.id}" value="${data}">
                                                     <button class="btn btn-success save-btn" data-id="${row.id}" data-item_number="${row.item_number}"
                                                         style="display: none;">
@@ -290,7 +306,7 @@
                                             return `
                                             <div class="edit-container">
                                                 <input type="number" style="width: 50%; display: inline; padding-top: 12px; padding-bottom: 10px;"
-                                                    class="form-control qty-input float-start px-1"
+                                                    class="form-control moq-input float-start px-1"
                                                     data-id="${row.id}" value="${data}" readonly>
                                             </div>`;
                                         }
@@ -298,10 +314,34 @@
                                     return data;
                                 }
                             },
-
                             {
-                                data: 'date',
-                                name: 'date'
+                                data: 'mpq',
+                                name: 'mpq',
+                                render: function(data, type, row) {
+                                    data = data || '';
+                                    if (type === 'display') {
+                                        if (userRole === 'superuser' || userRole === 'staff') {
+                                            return `
+                                                <div class="edit-container">
+                                                    <input type="number" style="width: 50%; display: inline; padding-top: 12px; padding-bottom: 10px;"
+                                                        class="form-control mpq-input float-start px-1"
+                                                        data-id="${row.id}" value="${data}">
+                                                    <button class="btn btn-success save-btn" data-id="${row.id}" data-item_number="${row.item_number}"
+                                                        style="display: none;">
+                                                        <i class="mdi mdi-content-save"></i>
+                                                    </button>
+                                                </div>`;
+                                        } else {
+                                            return `
+                                            <div class="edit-container">
+                                                <input type="number" style="width: 50%; display: inline; padding-top: 12px; padding-bottom: 10px;"
+                                                    class="form-control mpq-input float-start px-1"
+                                                    data-id="${row.id}" value="${data}" readonly>
+                                            </div>`;
+                                        }
+                                    }
+                                    return data;
+                                }
                             }
                         ],
                         columnDefs: [{
@@ -316,34 +356,18 @@
                             style: 'multi',
                             selector: 'td:first-child'
                         },
-                        initComplete: function() {
-                            $.get(`/buffer/get-unique-lt/${year}/${month}`, function(
-                                data) {
-                                var select = $('#filter-lt');
-                                select.empty().append(
-                                    '<option value="">Filter LT</option>');
-                                $.each(data, function(index, value) {
-                                    select.append(
-                                        `<option value="${value}">${value}</option>`
-                                    );
-                                });
-                            });
-                        },
                         responsive: true,
                         autoWidth: false
                     });
-                    $('#filter-lt').on('change', function() {
-                        table.ajax.reload();
-                    });
                 });
                 $('#viewModal').on('hidden.bs.modal', function() {
-                    if ($.fn.DataTable.isDataTable('#bufferTable')) {
-                        $('#bufferTable').DataTable().destroy();
+                    if ($.fn.DataTable.isDataTable('#moqTable')) {
+                        $('#moqTable').DataTable().destroy();
                     }
                 });
             });
 
-            $('#bufferTable').on('click', '.qty-input', function() {
+            $('#moqTable').on('click', '.moq-input', function() {
                 $(this).siblings('.save-btn').css({
                     'display': 'inline-block',
                     'opacity': '1',
@@ -355,16 +379,29 @@
                 });
             });
 
-            $('#bufferTable').on('click', '.save-btn', function() {
+            $('#moqTable').on('click', '.mpq-input', function() {
+                $(this).siblings('.save-btn').css({
+                    'display': 'inline-block',
+                    'opacity': '1',
+                    'transition': 'opacity 0.3s ease',
+                    'width': 'auto',
+                    'padding': '10px 13px',
+                    'margin-end': '60px',
+                    'box-shadow': '0px 4px 8px rgba(0, 0, 0, 0.2)',
+                });
+            });
+
+            $('#moqTable').on('click', '.save-btn', function() {
                 const id = $(this).data('id');
-                const newQty = $(this).siblings('.qty-input').val();
+                const row = $(this).closest('tr');
+                const newMOQ = row.find('.moq-input').val();
+                const newMPQ = row.find('.mpq-input').val();
                 const itemNumber = $(this).data('item_number');
-                const button = $(this);
-                const table = $('#bufferTable').DataTable();
+                const table = $('#moqTable').DataTable();
 
                 Swal.fire({
                     title: `Konfirmasi Pembaruan`,
-                    text: `Apakah Anda yakin ingin memperbarui Quantity untuk Item Number ${itemNumber}?`,
+                    text: `Apakah Anda yakin ingin memperbarui MOQ dan MPQ untuk Item Number ${itemNumber}?`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Ya, Perbarui!',
@@ -372,11 +409,12 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: `/buffer/update/${id}`,
+                            url: `/mrp/moq-mpq/update/${id}`,
                             type: 'PUT',
                             data: {
                                 _token: "{{ csrf_token() }}",
-                                qty: newQty,
+                                moq: newMOQ,
+                                mpq: newMPQ,
                                 id: id
                             },
                             success: function(response) {
@@ -411,12 +449,11 @@
                         table.ajax.reload(null, false);
                     }
                 });
-                button.hide();
             });
 
             function deleteConfirm(formId) {
                 const selectedRows = [];
-                const table = $('#bufferTable').DataTable();
+                const table = $('#moqTable').DataTable();
 
                 table.$('input[type="checkbox"]:checked').each(function() {
                     const row = table.row($(this).closest('tr'));
@@ -460,7 +497,7 @@
                                         timer: 1500,
                                         showConfirmButton: false
                                     }).then(() => {
-                                        $('#bufferTable').DataTable().ajax.reload();
+                                        $('#moqTable').DataTable().ajax.reload();
                                         $('#selectAllRows').prop('checked', false);
                                     });
                                 }
@@ -498,7 +535,7 @@
 
             $('#selectAll').on('change', function() {
                 const isChecked = $(this).prop('checked');
-                const table = $('#bufferTable').DataTable();
+                const table = $('#moqTable').DataTable();
                 table.$('input[type="checkbox"]').prop('checked', isChecked);
             });
 

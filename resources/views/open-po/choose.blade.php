@@ -9,7 +9,10 @@
             Purchase Requisition | </a>
         <a href="{{ route('incomong-manual.index') }}"
             style="text-decoration: none; color: {{ request()->routeIs('incomong-manual.index') ? 'purple' : 'blue' }}">
-            Incoming Manual</a>
+            Incoming Manual | </a>
+        <a href="{{ route('incoming-non-manual.index') }}"
+            style="text-decoration: none; color: {{ request()->routeIs('incoming-non-manual.index') ? 'purple' : 'blue' }}">
+            Incoming Non Manual</a>
 
         <div class="col-lg-12 grid-margin stretch-card mt-3">
             <div class="card">
@@ -50,7 +53,8 @@
                                     <input type="date" name="date" id="date" class="form-control"
                                         value="<?php echo date('Y-m-d'); ?>" required>
                                     <label for="date" class="form-label mt-2"><strong>Choose File</strong></label>
-                                    <input class="form-control" type="file" id="file" name="file" required>
+                                    <input class="form-control" type="file" id="file" name="file" accept=".xlsx"
+                                        required>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-dark" data-bs-dismiss="modal"
@@ -81,7 +85,8 @@
                                     <input type="date" name="date" id="date" class="form-control"
                                         value="<?php echo date('Y-m-d'); ?>" required>
                                     <label for="date" class="form-label mt-2"><strong>Choose File</strong></label>
-                                    <input class="form-control" type="file" id="file" name="file" required>
+                                    <input class="form-control" type="file" id="file" name="file"
+                                        accept=".xlsx" required>
                                     <p class="ms-1 text-danger">Upload file dengan format yang sesuai saat import!</p>
                                 </div>
                                 <div class="modal-footer">
@@ -112,13 +117,13 @@
                                     </td>
                                     <td>
                                         @if (auth()->user()->role == 'staff' || auth()->user()->role == 'superuser')
-                                        <a href="{{ route('open-po.index-edit', ['year' => $mo->year, 'month' => $mo->month]) }}"
-                                            class="btn btn-inverse-dark px-4"
-                                            style="color: black; text-decoration: none;"
-                                            onmouseover="this.style.color='white'; this.querySelector('i').style.color='white';"
-                                            onmouseout="this.style.color='black'; this.querySelector('i').style.color='black';">
-                                             <i class="mdi mdi-table-edit" style="color: black;"></i> Edit | Delete
-                                         </a>
+                                            <a href="{{ route('open-po.index-edit', ['year' => $mo->year, 'month' => $mo->month]) }}"
+                                                class="btn btn-inverse-dark px-4"
+                                                style="color: black; text-decoration: none;"
+                                                onmouseover="this.style.color='white'; this.querySelector('i').style.color='white';"
+                                                onmouseout="this.style.color='black'; this.querySelector('i').style.color='black';">
+                                                <i class="mdi mdi-table-edit" style="color: black;"></i> Edit | Delete
+                                            </a>
                                         @endif
                                         <button class="btn btn-inverse-success px-4" data-bs-toggle="modal"
                                             data-bs-target="#modalUpdatePO">

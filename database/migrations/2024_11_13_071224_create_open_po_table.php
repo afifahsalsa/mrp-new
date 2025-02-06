@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string('site');
             $table->string('warehouse');
             $table->string('location');
-            $table->integer('qty');
+            $table->float('qty');
             $table->string('bulan_datang');
             $table->integer('lt');
             $table->string('ket_late');

@@ -22,7 +22,6 @@
                     onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';">
                     Import | Export <span id="dropdownArrow" class="arrow">&#9656;</span>
                 </button>
-
                 <div class="dropdown-menu navbar-dropdown" aria-labelledby="profileDropdown">
                     <a class="dropdown-item" href="{{ route('buffer.format-import') }}">
                         <i class="mdi mdi-cloud-download me-2 text-success"></i> Download Format </a>
@@ -151,8 +150,8 @@
                             name: 'lt'
                         },
                         {
-                            data: 'supplier',
-                            name: 'supplier'
+                            data: 'spl',
+                            name: 'spl'
                         },
                         {
                             data: 'qty',
